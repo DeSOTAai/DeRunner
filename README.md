@@ -42,7 +42,9 @@ git clone https://github.com/desota/derunner.git .
 %UserProfile%\miniconda3\condabin\conda create --prefix ./env python=3.11 -y
 %UserProfile%\miniconda3\condabin\conda activate ./env
 pip install -r requirements.txt
-echo DONE (:
+copy %UserProfile%\Desota\DeRunner\Assets\config_template.yaml %UserProfile%\Desota\DeRunner\config.yaml
+echo INSTALATION DONE 
+echo [ WARNING ]  -> Is Required to configure Desota API Key in %UserProfile%\Desota\DeRunner\config.yaml
 
 ```
 </details>
