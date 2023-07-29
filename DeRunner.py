@@ -33,164 +33,6 @@ def cprint(query, condition):
     if condition:
         print(query)
 
-# Monitor API Model Request 
-def monitor_model_request(debug=False):
-    global models, I
-    I+=1
-    
-    cprint(f"Running...{I}", debug) # Conditional Print
-
-    selected_task = False
-    
-    model_request_dict = {
-        "task_type": None,      # TASK VARS
-        "task_model": None,
-        "task_dep": None,
-        "task_args": None,
-        "task_id": None,
-        "filename": None,       # FILE VARS
-        "file_url": None,
-        "text_prompt": None     # TXT VAR
-    }
-    
-    for model in models:
-        '''
-        Send a POST request to API to get a task
-            Return: `task`
-        ''' 
-
-        data = {
-            "api_key":API_KEY,
-            "model":model
-        }
-        task = requests.post(API_URL, data=data)
-        # print(f"Task Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {task.status_code}")
-        if task.status_code != 200:
-            continue
-
-        '''
-        Send a POST request to select a task
-            Return: `select_task`
-        ''' 
-        data = {
-            "api_key":API_KEY,
-            "model":model,
-            "select_task":I
-        }
-        select_task = requests.post(API_URL, data=data)
-        # print(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {select_task.status_code}")
-        if select_task.status_code != 200:
-            continue
-        else:
-            cprint(f"MODEL: {model}", debug)     # Conditional Print
-            
-            cont = str(select_task.content.decode('UTF-8'))
-            # print(cont)
-            try:
-                selected_task = json.loads(cont)
-            except:
-                cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   # Conditional Print
-                cont = cont.replace("FIXME!!!", "")
-                ''' 
-                cont = cont.replace("\n", "")
-                #cont = cont.replace(r'\\\\', "")
-                #cont = cont.replace("\\\\\\", "")
-                #cont = cont.replace('\\', '')
-                #cont = cont.replace("\n", "")
-                #cont = cont.replace("\\", "")
-                '''
-                
-                try:
-                    selected_task = json.loads(cont)
-                except:
-                    selected_task = "error"
-                    print(selected_task)
-
-            if "error" in selected_task:
-                #error = selected_task['error']
-                print(f"[ WARNING ] -> API Model Request fail for model `{model}`")
-                selected_task = False
-                continue
-            
-            cprint(selected_task, debug)     # Conditional Print
-            #cprint(selected_task['task'], debug)
-            model_request_dict['filename'] = 0
-            task_dic = ast.literal_eval(str(selected_task['task']))
-            if(task_dic != int(0)):
-                for file_type in task_dic:
-                    #print(file_type)
-                    if file_type in ["image", "audio", "video"]:
-                        model_request_dict['filename']=str(task_dic[file_type])
-                        model_request_dict['file_url'] = f"{API_UP}/{model_request_dict['filename']}"
-                        cprint(f"file name select 1: {model_request_dict['filename']}", debug)   # Conditional Print
-                    else:
-                        cprint(f'text select on 0', debug)   # Conditional Print
-                        task_text_prompt=str(task_dic[file_type])
-                        #model_request_dict['file_url'] = f"{API_UP}/{model_request_dict['filename']}"
-                    if "text" in task_dic:
-                        cprint(f'text select on 1', debug)   # Conditional Print
-                        task_text_prompt = task_dic['text']
-
-                    
-                model_request_dict["task_type"] = selected_task['type']
-                task_dep = str(selected_task['dep']).replace("\\\\n", "").replace("\\", "")
-                task_dep = ast.literal_eval(task_dep)
-                model_request_dict["task_dep"] = task_dep
-                cprint(f"task type is {model_request_dict['task_type']}", debug)     # Conditional Print
-                cprint(f"task deps are {task_dep}", debug)   # Conditional Print
-                #if json.loads(str(task_dep.decode('UTF-8'))):
-                if task_dep != "[-1]":
-                    cprint("Dependencies:", debug)   # Conditional Print
-                    #deps = json.loads(str(task_dep.decode('UTF-8')))
-                    for dep in task_dep:
-                        try:
-                            dep_dic = json.loads(str(task_dep[dep]))
-                        except:
-                            dep_dic = find_json(str(task_dep[dep]))
-                            dep_dic = json.loads(dep_dic)
-                        try:
-                            for file_type in dep_dic:
-                                model_request_dict['filename']=str(dep_dic[file_type])
-                                model_request_dict['file_url'] = f"{API_UP}/{model_request_dict['filename']}"
-                                cprint(model_request_dict['filename'], debug)    # Conditional Print
-                        except:
-                            if not model_request_dict['filename'] and debug:
-                                print("no filename found")
-
-                cprint("No Dependencies!", debug)    # Conditional Print
-                #exit()
-                model_request_dict['text_prompt'] = task_text_prompt
-
-            cprint(f"No task for {model}!", debug)   # Conditional Print
-            #exit()
-
-            cprint(task_text_prompt, debug)  # Conditional Print
-
-        model_request_dict["task_model"] = model    # Return Model to work on
-
-        if selected_task and "error" not in selected_task:
-            break
-    
-    if not selected_task:
-        cprint("Byeeee\n", debug)    # Conditional Print
-        return None
-
-    model_request_dict["task_args"] = task_dic
-    model_request_dict['task_id'] = selected_task['id']
-
-    #send_task_data = {
-    #    "api_key":API_KEY,
-    #    "model":model
-    #}
-    #sendTask = requests.post(API_URL, data=data)
-
-    if model_request_dict["task_type"] in ["image-to-image", "seg-image-to-image", "canny-image-to-image", "softedge-image-to-image", "lines-image-to-image", "normals-image-to-image", "pose-image-to-image"]:
-        if (not model_request_dict['filename'].endswith('.jpg')) and (not model_request_dict['filename'].endswith('.png')) and (not model_request_dict['filename'].endswith('.png')) and (not model_request_dict['filename'].endswith('.gif')) and (not model_request_dict['filename'].endswith('.bmp')):
-            model_request_dict['text_prompt'] = model_request_dict['filename']
-            model_request_dict["task_type"] = model_request_dict["task_type"].replace("image-to-", "text-to-")
-    
-    return model_request_dict
-
 # Monitor API Model Request
 def run_models(model_request_dict):
     selected_task = model_request_dict['selected_task']
@@ -634,6 +476,163 @@ def run_models(model_request_dict):
     
     time.sleep(1)
 
+# Monitor API Model Request 
+def monitor_model_request(debug=False):
+    global models, I
+    I+=1
+    
+    cprint(f"Running...{I}", debug) # Conditional Print
+
+    selected_task = False
+    
+    model_request_dict = {
+        "task_type": None,      # TASK VARS
+        "task_model": None,
+        "task_dep": None,
+        "task_args": None,
+        "task_id": None,
+        "filename": None,       # FILE VARS
+        "file_url": None,
+        "text_prompt": None     # TXT VAR
+    }
+    
+    for model in models:
+        '''
+        Send a POST request to API to get a task
+            Return: `task`
+        ''' 
+
+        data = {
+            "api_key":API_KEY,
+            "model":model
+        }
+        task = requests.post(API_URL, data=data)
+        # print(f"Task Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {task.status_code}")
+        if task.status_code != 200:
+            continue
+
+        '''
+        Send a POST request to select a task
+            Return: `select_task`
+        ''' 
+        data = {
+            "api_key":API_KEY,
+            "model":model,
+            "select_task":I
+        }
+        select_task = requests.post(API_URL, data=data)
+        # print(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {select_task.status_code}")
+        if select_task.status_code != 200:
+            continue
+        else:
+            cprint(f"MODEL: {model}", debug)     # Conditional Print
+            
+            cont = str(select_task.content.decode('UTF-8'))
+            # print(cont)
+            try:
+                selected_task = json.loads(cont)
+            except:
+                cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   # Conditional Print
+                cont = cont.replace("FIXME!!!", "")
+                ''' 
+                cont = cont.replace("\n", "")
+                #cont = cont.replace(r'\\\\', "")
+                #cont = cont.replace("\\\\\\", "")
+                #cont = cont.replace('\\', '')
+                #cont = cont.replace("\n", "")
+                #cont = cont.replace("\\", "")
+                '''
+                
+                try:
+                    selected_task = json.loads(cont)
+                except:
+                    selected_task = "error"
+                    print(selected_task)
+
+            if "error" in selected_task:
+                #error = selected_task['error']
+                print(f"[ WARNING ] -> API Model Request fail for model `{model}`")
+                selected_task = False
+                continue
+            
+            cprint(selected_task, debug)     # Conditional Print
+            #cprint(selected_task['task'], debug)
+            model_request_dict['filename'] = 0
+            task_dic = ast.literal_eval(str(selected_task['task']))
+            if(task_dic != int(0)):
+                for file_type in task_dic:
+                    #print(file_type)
+                    if file_type in ["image", "audio", "video"]:
+                        model_request_dict['filename']=str(task_dic[file_type])
+                        model_request_dict['file_url'] = f"{API_UP}/{model_request_dict['filename']}"
+                        cprint(f"file name select 1: {model_request_dict['filename']}", debug)   # Conditional Print
+                    else:
+                        cprint(f'text select on 0', debug)   # Conditional Print
+                        task_text_prompt=str(task_dic[file_type])
+                        #model_request_dict['file_url'] = f"{API_UP}/{model_request_dict['filename']}"
+                    if "text" in task_dic:
+                        cprint(f'text select on 1', debug)   # Conditional Print
+                        task_text_prompt = task_dic['text']
+
+                    
+                model_request_dict["task_type"] = selected_task['type']
+                task_dep = str(selected_task['dep']).replace("\\\\n", "").replace("\\", "")
+                task_dep = ast.literal_eval(task_dep)
+                model_request_dict["task_dep"] = task_dep
+                cprint(f"task type is {model_request_dict['task_type']}", debug)     # Conditional Print
+                cprint(f"task deps are {task_dep}", debug)   # Conditional Print
+                #if json.loads(str(task_dep.decode('UTF-8'))):
+                if task_dep != "[-1]":
+                    cprint("Dependencies:", debug)   # Conditional Print
+                    #deps = json.loads(str(task_dep.decode('UTF-8')))
+                    for dep in task_dep:
+                        try:
+                            dep_dic = json.loads(str(task_dep[dep]))
+                        except:
+                            dep_dic = find_json(str(task_dep[dep]))
+                            dep_dic = json.loads(dep_dic)
+                        try:
+                            for file_type in dep_dic:
+                                model_request_dict['filename']=str(dep_dic[file_type])
+                                model_request_dict['file_url'] = f"{API_UP}/{model_request_dict['filename']}"
+                                cprint(model_request_dict['filename'], debug)    # Conditional Print
+                        except:
+                            if not model_request_dict['filename'] and debug:
+                                print("no filename found")
+
+                cprint("No Dependencies!", debug)    # Conditional Print
+                #exit()
+                model_request_dict['text_prompt'] = task_text_prompt
+
+            cprint(f"No task for {model}!", debug)   # Conditional Print
+            #exit()
+
+            cprint(task_text_prompt, debug)  # Conditional Print
+
+        model_request_dict["task_model"] = model    # Return Model to work on
+
+        if selected_task and "error" not in selected_task:
+            break
+    
+    if not selected_task:
+        cprint("Byeeee\n", debug)    # Conditional Print
+        return None
+
+    model_request_dict["task_args"] = task_dic
+    model_request_dict['task_id'] = selected_task['id']
+
+    #send_task_data = {
+    #    "api_key":API_KEY,
+    #    "model":model
+    #}
+    #sendTask = requests.post(API_URL, data=data)
+
+    if model_request_dict["task_type"] in ["image-to-image", "seg-image-to-image", "canny-image-to-image", "softedge-image-to-image", "lines-image-to-image", "normals-image-to-image", "pose-image-to-image"]:
+        if (not model_request_dict['filename'].endswith('.jpg')) and (not model_request_dict['filename'].endswith('.png')) and (not model_request_dict['filename'].endswith('.png')) and (not model_request_dict['filename'].endswith('.gif')) and (not model_request_dict['filename'].endswith('.bmp')):
+            model_request_dict['text_prompt'] = model_request_dict['filename']
+            model_request_dict["task_type"] = model_request_dict["task_type"].replace("image-to-", "text-to-")
+    
+    return model_request_dict
 
 # Main Loop
 def main():    
