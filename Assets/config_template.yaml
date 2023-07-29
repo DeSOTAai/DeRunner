@@ -11,10 +11,10 @@ models: [
     franciscomvargas/descraper/html
 ]
 
-## Task Method: Static OBJ
-task_to_method: {
-    question-answering-large-dataset: run_neuralqa_qa,  # franciscomvargas/neuralqa/qa
-    query-expansion: run_neuralqa_expansion,            # franciscomvargas/neuralqa/expansion
-    url-to-text: run_descraper_url,                     # franciscomvargas/descraper/url
-    html-to-text: run_descraper_html                    # franciscomvargas/descraper/html
+## Model Method: Static OBJ
+model_to_method: {
+    franciscomvargas/neuralqa/qa: run_neuralqa_qa,
+    franciscomvargas/neuralqa/expansion: run_neuralqa_expansion,
+    franciscomvargas/descraper/url: run_descraper_url,
+    franciscomvargas/descraper/html: run_descraper_html
 }

@@ -21,10 +21,25 @@ API_KEY = configs['api_key']
 API_URL = configs['api_url']
 API_UP =  configs['api_up']
 models = configs['models']
-MODEL_TO_METHOD = configs['task_to_method']
+MODEL_TO_METHOD = configs['model_to_method']
 I=0
 DEBUG = False
 # models=['audio-classification-efficientat', 'whisper-small-en', 'coqui-tts-male', 'lllyasviel/sd-controlnet-seg-text-to-image','lllyasviel/sd-controlnet-openpose-text-to-image','lllyasviel/sd-controlnet-normal-text-to-image','lllyasviel/sd-controlnet-mlsd-text-to-image','lllyasviel/sd-controlnet-hed-text-to-image','lllyasviel/sd-controlnet-depth-text-to-image','lllyasviel/sd-controlnet-canny-text-to-image','lllyasviel/sd-controlnet-openpose-control','lllyasviel/sd-controlnet-normal-control','lllyasviel/sd-controlnet-mlsd-control','lllyasviel/sd-controlnet-hed-control','lllyasviel/sd-controlnet-canny-control','lllyasviel/sd-controlnet-text','clip','basic-vid2vid','basic-txt2vid','watch-video','talking-heads','clip-2','clip-2']
+
+# Utils Funcs
+#   > Find JSON OBJ in STR
+def find_json(s):
+    s = s.replace("\'", "\"")
+    start = s.find("{")
+    end = s.rfind("}")
+    res = s[start:end+1]
+    res = res.replace("\n", "")
+    return res
+#   > Conditional print
+def cprint(query, condition):
+    if condition:
+        print(query)
+
 
 # Models Methods
 class ModelsRunner(object):
@@ -535,22 +550,6 @@ def run_models(model_request_dict):
     print(f"Will start this thing again hehe!")
     
     time.sleep(1)
-
-
-
-# Utils
-#   > Find JSON OBJ in strings
-def find_json(s):
-    s = s.replace("\'", "\"")
-    start = s.find("{")
-    end = s.rfind("}")
-    res = s[start:end+1]
-    res = res.replace("\n", "")
-    return res
-# Conditional print
-def cprint(query, condition):
-    if condition:
-        print(query)
 
 # Monitor API Model Request 
 def monitor_model_request(debug=False):

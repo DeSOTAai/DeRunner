@@ -44,7 +44,7 @@ git clone https://github.com/desota/derunner.git .
 pip install -r requirements.txt
 copy %UserProfile%\Desota\DeRunner\Assets\config_template.yaml %UserProfile%\Desota\DeRunner\config.yaml
 echo INSTALATION DONE 
-echo [ WARNING ]  -> Is Required to configure Desota API Key in %UserProfile%\Desota\DeRunner\config.yaml
+echo [ WARNING ]  - Is Required to configure Desota API Key in %UserProfile%\Desota\DeRunner\config.yaml
 
 ```
 </details>
