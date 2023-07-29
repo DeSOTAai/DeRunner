@@ -9,29 +9,89 @@ import io
 import os
 import re
 import shutil
+# import pyyaml module
+import yaml
+from yaml.loader import SafeLoader
 
-def find_json(s):
-    s = s.replace("\'", "\"")
-    start = s.find("{")
-    end = s.rfind("}")
-    res = s[start:end+1]
-    res = res.replace("\n", "")
-    return res
-    
-print("Runner Up!")
 
-API_KEY = "01e9b4cd0be07cbf719a1b88c161aabd83f35d1e5955716affea61744a197110"
-API_URL = "http://129.152.27.36/assistant/api.php"
-API_UP = "http://129.152.27.36/assistant/api_uploads"
-DEBUG = False
+# Open the file and load the file
+with open('config.yaml') as f:
+    configs = yaml.load(f, Loader=SafeLoader)
+API_KEY = configs['api_key']
+API_URL = configs['api_url']
+API_UP =  configs['api_up']
+models = configs['models']
+MODEL_TO_METHOD = configs['task_to_method']
 I=0
+DEBUG = False
+# models=['audio-classification-efficientat', 'whisper-small-en', 'coqui-tts-male', 'lllyasviel/sd-controlnet-seg-text-to-image','lllyasviel/sd-controlnet-openpose-text-to-image','lllyasviel/sd-controlnet-normal-text-to-image','lllyasviel/sd-controlnet-mlsd-text-to-image','lllyasviel/sd-controlnet-hed-text-to-image','lllyasviel/sd-controlnet-depth-text-to-image','lllyasviel/sd-controlnet-canny-text-to-image','lllyasviel/sd-controlnet-openpose-control','lllyasviel/sd-controlnet-normal-control','lllyasviel/sd-controlnet-mlsd-control','lllyasviel/sd-controlnet-hed-control','lllyasviel/sd-controlnet-canny-control','lllyasviel/sd-controlnet-text','clip','basic-vid2vid','basic-txt2vid','watch-video','talking-heads','clip-2','clip-2']
 
-models=['audio-classification-efficientat', 'whisper-small-en', 'coqui-tts-male', 'lllyasviel/sd-controlnet-seg-text-to-image','lllyasviel/sd-controlnet-openpose-text-to-image','lllyasviel/sd-controlnet-normal-text-to-image','lllyasviel/sd-controlnet-mlsd-text-to-image','lllyasviel/sd-controlnet-hed-text-to-image','lllyasviel/sd-controlnet-depth-text-to-image','lllyasviel/sd-controlnet-canny-text-to-image','lllyasviel/sd-controlnet-openpose-control','lllyasviel/sd-controlnet-normal-control','lllyasviel/sd-controlnet-mlsd-control','lllyasviel/sd-controlnet-hed-control','lllyasviel/sd-controlnet-canny-control','lllyasviel/sd-controlnet-text','clip','basic-vid2vid','basic-txt2vid','watch-video','talking-heads','clip-2','clip-2']
+# Models Methods
+class ModelsRunner(object):
+    # question-answering-large-dataset
+    def run_neuralqa_qa(self, model_request_dict):
+        print('Hello')
+    
+    # query-expansion
+    def run_neuralqa_expansion(self, model_request_dict):
+        print('Hello')
 
-# Conditional print
-def cprint(query, condition):
-    if condition:
-        print(query)
+    # url-to-text
+    def run_descraper_url(self, model_request_dict):
+        # Time when grabed
+        start_time = time.time()
+
+        # API Response URL
+        send_task_url = f"{api_url}?api_key={api_key}&model={model_request_dict['task_model']}&send_task=" + model_request_dict['task_id']
+        
+        # File Path
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        out_filepath = os.path.join(dir_path, f"url-to-text_{start_time}.txt")
+        
+        # Descraper Request Preparation
+        descraper_url = "http://127.0.0.1:8880/api/scraper"
+        payload = {
+            "url": model_request_dict["task_args"]['url'] if 'url' in model_request_dict["task_args"] else model_request_dict["task_args"]['text'],
+            "html_text": True,
+            "overwrite_files": False
+        }
+        headers = {
+            "Accept": "application/json, text/javascript, */*; q=0.01",
+            "Connection": "keep-alive",
+            "Content-Type": "application/json; charset=UTF-8"
+        }
+        # Descraper Request
+        print(f"[ INFO ] -> Descraper Request Payload:\n{json.dumps(payload, indent=2)}")
+        descraper_response = requests.request("POST", descraper_url, json=payload, headers=headers)
+        descraper_res = descraper_response.json()
+        print(f"[ INFO ] -> Descraper Response:\n{json.dumps(descraper_res, indent=2)}")
+
+        if descraper_response.status_code != 200:
+            print(f"[ ERROR ] -> Descraper Request Failed (Info):\npayload:{json.dumps(payload, indent=2)}\nResponse Code:{descraper_response.status_code}")
+            return False
+        
+        # DeSOTA API Response Preparation
+        with open(out_filepath, 'w', encoding="utf-8") as fw:
+            fw.write(descraper_res["html_text"] if "html_text" in descraper_res else json.dumps(descraper_res))
+        files = []
+        with open(out_filepath, 'rb') as fr:
+            files.append(('upload[]', fr))
+            # DeSOTA API Response Post
+            send_task = requests.post(url = send_task_url, files=files)
+            print(f"[ INFO ] -> DeSOTA API Upload:\n{json.dumps(send_task.json(), indent=2)}")
+        # Delete temporary file
+        os.remove(out_filepath)
+
+        if send_task.status_code != 200:
+            print(f"[ ERROR ] -> Descraper Post Failed (Info):\files: {files}\nResponse Code: {send_task.status_code}")
+            return False
+        
+        print("TASK OK!")
+        return True
+
+    # html-to-text
+    def run_descraper_html(self, model_request_dict):
+        print('Hello')
 
 # Monitor API Model Request
 def run_models(model_request_dict):
@@ -476,6 +536,22 @@ def run_models(model_request_dict):
     
     time.sleep(1)
 
+
+
+# Utils
+#   > Find JSON OBJ in strings
+def find_json(s):
+    s = s.replace("\'", "\"")
+    start = s.find("{")
+    end = s.rfind("}")
+    res = s[start:end+1]
+    res = res.replace("\n", "")
+    return res
+# Conditional print
+def cprint(query, condition):
+    if condition:
+        print(query)
+
 # Monitor API Model Request 
 def monitor_model_request(debug=False):
     global models, I
@@ -637,7 +713,10 @@ def monitor_model_request(debug=False):
 # Main Loop
 def main():    
     print("Runner Up!")
-    
+    '''Get Configurations'''
+    print(f"[ INFO ] -> \n")
+    print(f"Configurations:\n{json.dumps(configs, indent=2)}")
+    print(f"Available Models: {json.dumps(models, indent=2)}")
     while True:
         # clear()
         model_req = monitor_model_request(DEBUG)
@@ -645,7 +724,23 @@ def main():
             continue
         print(f"[ INFO ] -> Incoming Model Request:\n{json.dumps(model_req, indent=2)}")
 
-        run_models(model_req)
+        
+        models_runner = ModelsRunner()  # Models Methods Class
+        try:    # Inspired in https://stackoverflow.com/questions/7936572/python-call-a-function-from-string-name
+
+            # Find Model Method
+            req_method_str = MODEL_TO_METHOD[ model_req['task_type'] ]
+            model_method = getattr(models_runner, req_method_str)
+            # Run Model Method
+            model_method(model_req)
+
+        except AttributeError:
+            raise NotImplementedError("Class `{}` does not implement `{}`".format(models_runner.__class__.__name__, req_method_str))
+        except KeyError:
+            raise KeyError(f"Task Type `{model_req['task_type']}` not found in configs.yaml `task-to-method`: {list(MODEL_TO_METHOD.keys())}")
+
+if __name__ == "__main__":
+    main()
 
 if __name__ == "__main__":
     main()
