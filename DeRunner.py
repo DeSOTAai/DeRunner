@@ -713,9 +713,7 @@ def monitor_model_request(debug=False):
 def main():    
     print("Runner Up!")
     '''Get Configurations'''
-    print(f"[ INFO ] -> \n")
-    print(f"Configurations:\n{json.dumps(configs, indent=2)}")
-    print(f"Available Models: {json.dumps(models, indent=2)}")
+    print(f"[ INFO ] -> Configurations:\n{json.dumps(configs, indent=2)}")
     while True:
         # clear()
         model_req = monitor_model_request(DEBUG)
@@ -728,7 +726,7 @@ def main():
         try:    # Inspired in https://stackoverflow.com/questions/7936572/python-call-a-function-from-string-name
 
             # Find Model Method
-            req_method_str = MODEL_TO_METHOD[ model_req['task_type'] ]
+            req_method_str = MODEL_TO_METHOD[ model_req['task_model'] ]
             model_method = getattr(models_runner, req_method_str)
             # Run Model Method
             model_method(model_req)
@@ -737,9 +735,6 @@ def main():
             raise NotImplementedError("Class `{}` does not implement `{}`".format(models_runner.__class__.__name__, req_method_str))
         except KeyError:
             raise KeyError(f"Task Type `{model_req['task_type']}` not found in configs.yaml `task-to-method`: {list(MODEL_TO_METHOD.keys())}")
-
-if __name__ == "__main__":
-    main()
 
 if __name__ == "__main__":
     main()
