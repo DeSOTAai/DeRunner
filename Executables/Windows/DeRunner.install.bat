@@ -25,7 +25,7 @@ IF %PROCESSOR_ARCHITECTURE%==AMD64 powershell -command "Invoke-WebRequest -Uri h
 IF %PROCESSOR_ARCHITECTURE%==x86 powershell -command "Invoke-WebRequest -Uri https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86.exe -OutFile %UserProfile%\miniconda_installer.exe" && start /B /WAIT %UserProfile%\miniconda_installer.exe /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /S /D=%UserProfile%\miniconda3 && del %UserProfile%\miniconda_installer.exe
 :skipinstallminiconda
 @REM  Clone Repository
-call git clone https://github.com/desota/derunner.git .
+call git clone https://github.com/desotaai/derunner.git .
 @REM Create/Activate Conda Virtual Environment
 call %UserProfile%\miniconda3\condabin\conda create --prefix ./env python=3.11 -y
 call %UserProfile%\miniconda3\condabin\conda activate ./env

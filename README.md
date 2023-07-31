@@ -38,7 +38,7 @@ powershell -command "Invoke-WebRequest -Uri https://repo.anaconda.com/miniconda/
 Copy-Paste the following comands 
 ```cmd
 cd %UserProfile%\Desota\DeRunner
-git clone https://github.com/desota/derunner.git .
+git clone https://github.com/desotaai/derunner.git .
 %UserProfile%\miniconda3\condabin\conda create --prefix ./env python=3.11 -y
 %UserProfile%\miniconda3\condabin\conda activate ./env
 pip install -r requirements.txt
