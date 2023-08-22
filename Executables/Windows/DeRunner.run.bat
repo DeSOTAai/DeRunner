@@ -1,7 +1,7 @@
+@REM  VARS 
+for %%a in ("%~dp0..\..") do set "model_path_run=%%~fa"
 @REM Go to Project Folder
-call cd %UserProfile%\Desota\DeRunner
-@REM Activate Conda Virtual Environment
-call %UserProfile%\miniconda3\condabin\conda activate ./env
-@REM Run ZapCrawler
-call python DeRunner.py
+call cd %model_path_run%
+@REM Run DeRunner
+call %model_path_run%\env\python DeRunner.py
 PAUSE

@@ -1,17 +1,12 @@
 # SERVER API CONFIGS
-api_key: INPUT YOUR API KEY HERE!
+api_key: ==user_api_key==
 api_url: http://129.152.27.36/assistant/api.php
 api_up: http://129.152.27.36/assistant/api_uploads
 
 
 # MODELS INSTALLED
 # -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
-models: [
-    # franciscomvargas/neuralqa/qa,
-    # franciscomvargas/neuralqa/expansion,
-    franciscomvargas/descraper/url,
-    # franciscomvargas/descraper/html
-]
+models: ==user_models==
 
 ## Model Method
 model_to_method: {
@@ -25,14 +20,14 @@ model_to_method: {
 ## Handle DeSOTA Services
 # Environment
 environment: {
-    system: win,
+    system: ==user_system==,
     win_profile: \%UserProfile\%,
     lin_profile: \~,
     mac_profile: \~,
     win_bash: bat,
     lin_bash: sh,
-    mac_bash: command,
-},
+    mac_bash: command
+}
 desota_services: {
     # DeSOTA models runner
     derunner: {

@@ -13,7 +13,7 @@ set model_start=%model_path%\executables\Windows\derunner.start.bat
 
 
 
-@REM -- Edit bellow if you're felling lucky ;) --
+@REM -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
 
 @REM - Program Installers
 set python64=https://www.python.org/ftp/python/3.11.4/python-3.11.4-amd64.exe

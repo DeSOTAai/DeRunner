@@ -2,7 +2,7 @@
 set model_path=%UserProfile%\Desota\DeRunner
 @REM Service VARS
 @REM retrieved from https://nssm.cc/usage
-set model_name=Desota/DeRunner
+set model_name=DeRunner
 set service_name=derunner_service
 set exe_path=%model_path%\executables\Windows
 set model_exe=%exe_path%\derunner.service.bat
@@ -34,7 +34,7 @@ call %nssm_exe% install %service_name% %model_exe% %exe_path%
 call %nssm_exe% set %service_name% AppDirectory %exe_path%
 call %nssm_exe% set %service_name% AppParameters server
 @REM Details tab
-call %nssm_exe% set %service_name% DisplayName %model_name%
+call %nssm_exe% set %service_name% DisplayName Desota/%model_name%
 call %nssm_exe% set %service_name% Description %model_desc%
 call %nssm_exe% set %service_name% Start SERVICE_AUTO_START
 @REM Log on tab

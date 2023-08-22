@@ -609,9 +609,9 @@ def monitor_model_request(debug=False):
             cprint(f"MODEL: {model}", debug)     # Conditional Print
             
             cont = str(select_task.content.decode('UTF-8'))
-            print(cont)
+            # print(cont)
             try:
-                print(selected_task)
+                # print(selected_task)
                 selected_task = json.loads(cont)
             except:
                 cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   # Conditional Print
@@ -725,7 +725,8 @@ def main(args):
     
     print("Runner Up!")
     '''Get Configurations'''
-    print(f"[ INFO ] -> Configurations:\n{json.dumps(configs, indent=2)}")
+    config_2_print = { k:v for k,v in configs.items() if k in ["api_key", "models"] }
+    print(f"[ INFO ] -> Configurations:\n{json.dumps(config_2_print, indent=2)}")
     while True:
         # clear()
         model_req = monitor_model_request(DEBUG)
