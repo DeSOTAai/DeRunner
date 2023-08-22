@@ -12,6 +12,11 @@ import shutil
 # import pyyaml module
 import yaml
 from yaml.loader import SafeLoader
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('-hs', '--handshake',
+                    help='Service Status Request',
+                    action='store_true')
 
 
 # Open the file and load the file
@@ -57,7 +62,7 @@ class ModelsRunner(object):
         start_time = time.time()
 
         # API Response URL
-        send_task_url = f"{api_url}?api_key={api_key}&model={model_request_dict['task_model']}&send_task=" + model_request_dict['task_id']
+        send_task_url = f"{API_URL}?api_key={API_KEY}&model={model_request_dict['task_model']}&send_task=" + model_request_dict['task_id']
         
         # File Path
         dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -108,7 +113,8 @@ class ModelsRunner(object):
     def run_descraper_html(self, model_request_dict):
         print('Hello')
 
-# Monitor API Model Request
+# Monitor API Model Request 
+# TODO - MOVE TO Models Methods
 def run_models(model_request_dict):
     selected_task = model_request_dict['selected_task']
     send_task_url = f"{API_URL}?api_key={API_KEY}&model={model}&send_task="+selected_task['id']
@@ -603,8 +609,9 @@ def monitor_model_request(debug=False):
             cprint(f"MODEL: {model}", debug)     # Conditional Print
             
             cont = str(select_task.content.decode('UTF-8'))
-            # print(cont)
+            print(cont)
             try:
+                print(selected_task)
                 selected_task = json.loads(cont)
             except:
                 cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   # Conditional Print
@@ -626,7 +633,7 @@ def monitor_model_request(debug=False):
 
             if "error" in selected_task:
                 #error = selected_task['error']
-                print(f"[ WARNING ] -> API Model Request fail for model `{model}`")
+                # print(f"[ WARNING ] -> API Model Request fail for model `{model}`")
                 selected_task = False
                 continue
             
@@ -710,7 +717,12 @@ def monitor_model_request(debug=False):
     return model_request_dict
 
 # Main Loop
-def main():    
+def main(args):
+    # Handshake - Service checker
+    if args.handshake:
+        print('{"status":"ready"}')
+        return 0
+    
     print("Runner Up!")
     '''Get Configurations'''
     print(f"[ INFO ] -> Configurations:\n{json.dumps(configs, indent=2)}")
@@ -737,4 +749,5 @@ def main():
             raise KeyError(f"Task Type `{model_req['task_type']}` not found in configs.yaml `task-to-method`: {list(MODEL_TO_METHOD.keys())}")
 
 if __name__ == "__main__":
-    main()
+    args = parser.parse_args()
+    main(args)
