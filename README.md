@@ -47,7 +47,9 @@
                 </tr>
             </tbody>
         </table>
+
         `Install with overwrite permission and start server after instalation`
+        
         ```cmd
         powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner/raw/main/Executables/Windows/DeRunner.install.bat -OutFile ~\derunner_installer.bat" && call %UserProfile%\derunner_installer.bat /reinstall /startmodel && del %UserProfile%\derunner_installer.bat
 
@@ -106,7 +108,8 @@
         |---|---|
         |/Q|Uninstall without requiring user interaction|
         
-        `Uninstall `
+        `Uninstall Quietly`
+        
         ```cmd
         %UserProfile%\Desota\Desota_Models\NeuralQA\neuralqa\executables\Windows\neuralqa.uninstall.bat /Q
 
