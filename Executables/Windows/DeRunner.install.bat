@@ -71,7 +71,7 @@ git --version 3>NUL
 IF NOT errorlevel 1 (
     @REM  Clone Descraper Repository
     call git clone --branch %model_git_branch% %model_git% .
-    call copy %model_path%\Assets\config_template.yam %model_path%\config.yaml
+    call copy %model_path%\Assets\config_template.yaml %model_path%\config.yaml
     GOTO endgitclonemodel
 )
 @REM PORTABLE GIT MODEL CLONE
@@ -83,6 +83,7 @@ IF %PROCESSOR_ARCHITECTURE%==AMD64 powershell -command "Invoke-WebRequest -Uri %
 IF %PROCESSOR_ARCHITECTURE%==x86 powershell -command "Invoke-WebRequest -Uri %git32_portable% -OutFile ~\Desota\Portables\git_installer.exe" && start /B /WAIT %UserProfile%\Desota\Portables\git_installer.exe -o"%UserProfile%\Desota\Portables\PortableGit" && del %UserProfile%\Desota\Portables\git_installer.exe && goto clonerep
 :clonerep
 call %UserProfile%\Desota\Portables\PortableGit\bin\git.exe clone --branch %model_git_branch% %model_git% .
+call copy %model_path%\Assets\config_template.yaml %model_path%\config.yaml
 :endgitclonemodel
 
 
