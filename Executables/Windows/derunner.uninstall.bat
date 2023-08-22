@@ -4,7 +4,6 @@ set model_path=%UserProfile%\Desota\DeRunner
 set service_name=derunner_service
 set nssm_path=%UserProfile%\Desota\Portables\nssm
 
-%UserProfile%\Desota\Portables\nssm\win64\nssm.exe remove derunner_service confirm
 
 
 @REM -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
