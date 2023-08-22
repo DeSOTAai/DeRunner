@@ -71,6 +71,7 @@ git --version 3>NUL
 IF NOT errorlevel 1 (
     @REM  Clone Descraper Repository
     call git clone --branch %model_git_branch% %model_git% .
+    call copy %model_path%\Assets\config_template.yam %model_path%\config.yaml
     GOTO endgitclonemodel
 )
 @REM PORTABLE GIT MODEL CLONE

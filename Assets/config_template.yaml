@@ -3,18 +3,92 @@ api_key: INPUT YOUR API KEY HERE!
 api_url: http://129.152.27.36/assistant/api.php
 api_up: http://129.152.27.36/assistant/api_uploads
 
+
 # MODELS INSTALLED
+# -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
 models: [
-    franciscomvargas/neuralqa/qa,
-    franciscomvargas/neuralqa/expansion,
+    # franciscomvargas/neuralqa/qa,
+    # franciscomvargas/neuralqa/expansion,
     franciscomvargas/descraper/url,
-    franciscomvargas/descraper/html
+    # franciscomvargas/descraper/html
 ]
 
-## Model Method: Static OBJ
+## Model Method
 model_to_method: {
     franciscomvargas/neuralqa/qa: run_neuralqa_qa,
     franciscomvargas/neuralqa/expansion: run_neuralqa_expansion,
     franciscomvargas/descraper/url: run_descraper_url,
     franciscomvargas/descraper/html: run_descraper_html
+}
+
+
+## Handle DeSOTA Services
+# Environment
+environment: {
+    system: win,
+    win_profile: \%UserProfile\%,
+    lin_profile: \~,
+    mac_profile: \~,
+    win_bash: bat,
+    lin_bash: sh,
+    mac_bash: command,
+},
+desota_services: {
+    # DeSOTA models runner
+    derunner: {
+        service_path_win: Desota\DeRunner\executables\Windows,
+        service_path_lin: Desota\DeRunner\executables\Linux,
+        service_path_mac: Desota\DeRunner\executables\MacOS,
+        installer: https://github.com/desotaai/derunner/raw/main/Executables/Windows/DeRunner.install.bat,
+        uninstaller: derunner.uninstall,
+        starter: derunner.start,
+        stoper: derunner.stop,
+        run_constantly: true,
+        submodel: false
+    },
+    # Models
+    franciscomvargas/neuralqa/qa: {
+        service_path_win: Desota\Desota_Models\NeuraQA\neuralqa\executables\Windows,
+        service_path_lin: Desota\Desota_Models\NeuraQA\neuralqa\executables\Linux,
+        service_path_mac: Desota\Desota_Models\NeuraQA\neuralqa\executables\MacOS,
+        installer: https://raw.githubusercontent.com/franciscomvargas/neuralqa/master/neuralqa/executables/Windows/neuralqa.install.bat,
+        uninstaller: neuralqa.uninstall,
+        starter: neuralqa.start,
+        stoper: neuralqa.stop,
+        run_constantly: false,
+        submodel: false
+    },
+    franciscomvargas/neuralqa/expansion: {
+        service_path_win: Desota\Desota_Models\NeuraQA\neuralqa\executables\Windows,
+        service_path_lin: Desota\Desota_Models\NeuraQA\neuralqa\executables\Linux,
+        service_path_mac: Desota\Desota_Models\NeuraQA\neuralqa\executables\MacOS,
+        installer: https://raw.githubusercontent.com/franciscomvargas/neuralqa/master/neuralqa/executables/Windows/neuralqa.install.bat,
+        uninstaller: neuralqa.uninstall,
+        starter: neuralqa.start,
+        stoper: neuralqa.stop,
+        run_constantly: false,
+        submodel: true
+    },
+    franciscomvargas/descraper/url: {
+        service_path_win: Desota\Desota_Models\DeScraper\executables\Windows,
+        service_path_lin: Desota\Desota_Models\DeScraper\executables\Linux,
+        service_path_mac: Desota\Desota_Models\DeScraper\executables\MacOS,
+        installer: https://raw.githubusercontent.com/franciscomvargas/descraper/main/executables/Windows/descraper.install.bat,
+        uninstaller: descraper.uninstall,
+        starter: descraper.start,
+        stoper: descraper.stop,
+        run_constantly: false,
+        submodel: false
+    },
+    franciscomvargas/descraper/html: {
+        service_path_win: Desota\Desota_Models\DeScraper\executables\Windows,
+        service_path_lin: Desota\Desota_Models\DeScraper\executables\Linux,
+        service_path_mac: Desota\Desota_Models\DeScraper\executables\MacOS,
+        installer: https://raw.githubusercontent.com/franciscomvargas/descraper/main/executables/Windows/descraper.install.bat,
+        uninstaller: descraper.uninstall,
+        starter: descraper.start,
+        stoper: descraper.stop,
+        run_constantly: false,
+        submodel: true
+    },
 }

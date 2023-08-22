@@ -1,69 +1,117 @@
 # Instalation
+
+* If model allready instaled function as upgrade since the the installer crawl newest installer from github - Take a look into Installer Optional `Arguments`
+* Install python if not exist
+* Download miniconda, git and nssm as portables to Desota Folder
+* Clone GitHub Repository
+* Copy config_template into User main config.yaml
+* Create a virtual environment with miniconda
+* Start Server after instalation - Take a look into Installer Optional `Arguments`
+
 <details>
     <summary><h2>Windows</h2></summary>
 
-### Create Project Folder 
-**Model PATH:** `%UserProfile%\Desota_Models\DeRunner`
-
-* Open CMD:
+* Go to CMD as Administrator (command prompt):
     * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
-    * Search: `cmd` <br>
+    * Search: `cmd` 
+    * <kbd>Ctrl</kbd> + <kbd>⇧ Shift</kbd> + <kbd>↵ Enter</kbd>
 
 * Copy-Paste the following comands: 
-```cmd
-mkdir %UserProfile%\Desota\DeRunner
-cd %UserProfile%\Desota\DeRunner
+    ```cmd
+    powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner/raw/main/Executables/Windows/DeRunner.install.bat -OutFile ~\derunner_installer.bat" && call %UserProfile%\derunner_installer.bat && del %UserProfile%\derunner_installer.bat
 
-```
+    ```
+    * Installer Optional `Arguments`
 
-### Test if conda is instaled
+        <table>
+            <thead>
+                <tr>
+                    <th>arg</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td rowspan=3>/reinstall</td>
+                    <td>Overwrite project when re-installing</td>
+                </tr>
+                <tr>
+                    <td>Delete project service when re-installing</td>
+                </tr>
+                <tr>
+                    <td>Install without requiring user interaction</td>
+                </tr>
+                <tr>
+                    <td>/startmodel</td>
+                    <td>Start project service after instalation</td>
+                </tr>
+            </tbody>
+        </table>
+        `Install with overwrite permission and start server after instalation`
+        ```cmd
+        powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner/raw/main/Executables/Windows/DeRunner.install.bat -OutFile ~\derunner_installer.bat" && call %UserProfile%\derunner_installer.bat /reinstall /startmodel && del %UserProfile%\derunner_installer.bat
 
-Copy-Paste the following comands 
-```cmd
-%UserProfile%\miniconda3\condabin\conda --version
-```
-if response is:
->  '`YourUserPath`\miniconda3\condabin\conda' is not recognized as an internal or external command, operable program or batch file.
-
-then is required conda instalation !
-
-### Conda Instalation
-Copy-Paste the following comand
-```sh
-powershell -command "Invoke-WebRequest -Uri https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe -OutFile ~\miniconda.exe && start /B /WAIT %UserProfile%\miniconda.exe /InstallationType=JustMe /AddToPath=0 /RegisterPython=0 /S /D=%UserProfile%\miniconda3 && del %UserProfile%\miniconda.exe 
-
-```
-
-### Install DeRunner
-Copy-Paste the following comands 
-```cmd
-cd %UserProfile%\Desota\DeRunner
-git clone https://github.com/desotaai/derunner.git .
-%UserProfile%\miniconda3\condabin\conda create --prefix ./env python=3.11 -y
-%UserProfile%\miniconda3\condabin\conda activate ./env
-pip install -r requirements.txt
-copy %UserProfile%\Desota\DeRunner\Assets\config_template.yaml %UserProfile%\Desota\DeRunner\config.yaml
-echo INSTALATION DONE 
-echo [ WARNING ]  - Is Required to configure Desota API Key in %UserProfile%\Desota\DeRunner\config.yaml
-
-```
+        ```
+    
+    
 </details>
 
-# Run
+# Service Operations
+
+* Start/Stop Service
+
 <details>
     <summary><h2>Windows</h2></summary>
 
-* Open CMD:
-    * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
-    * Search: `cmd` <br>
+* Go to CMD (command prompt):
+  * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
+  * Search: `cmd` 
+  * <kbd>Ctrl</kbd> + <kbd>⇧ Shift</kbd> + <kbd>↵ Enter</kbd>
+
+### Start Service
+* Copy-Paste the following comands: 
+    ```cmd
+    %UserProfile%\Desota\DeRunner\executables\Windows\derruner.start.bat
+
+    ```
+### Stop Service
+* Copy-Paste the following comands: 
+    ```cmd
+    %UserProfile%\Desota\DeRunner\executables\Windows\derruner.stop.bat
+
+    ```
+</details>
+
+# Uninstalation
+
+* Delete Service
+* Delete DeRunner Folder
+
+<details>
+    <summary><h2>Windows</h2></summary>
+
+* Go to CMD (command prompt):
+  * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
+  * Search: `cmd` 
+  * <kbd>Ctrl</kbd> + <kbd>⇧ Shift</kbd> + <kbd>↵ Enter</kbd>
 
 * Copy-Paste the following comands: 
-```cmd
-cd %UserProfile%\Desota\DeRunner
-%UserProfile%\miniconda3\condabin\conda activate ./env
-python DeRunner.py
+    ```cmd
+    %UserProfile%\Desota\DeRunner\executables\Windows\derruner.uninstall.bat
 
-```
+    ```
+    * Uninstaller Optional `Arguments`
+
+        |arg|Description|
+        |---|---|
+        |/Q|Uninstall without requiring user interaction|
+        
+        `Uninstall `
+        ```cmd
+        %UserProfile%\Desota\Desota_Models\NeuralQA\neuralqa\executables\Windows\neuralqa.uninstall.bat /Q
+
+        ```
+      
 </details>
 
 # Credits / Lincense
