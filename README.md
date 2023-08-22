@@ -73,13 +73,13 @@
 ### Start Service
 * Copy-Paste the following comands: 
     ```cmd
-    %UserProfile%\Desota\DeRunner\executables\Windows\derruner.start.bat
+    %UserProfile%\Desota\DeRunner\executables\Windows\derunner.start.bat
 
     ```
 ### Stop Service
 * Copy-Paste the following comands: 
     ```cmd
-    %UserProfile%\Desota\DeRunner\executables\Windows\derruner.stop.bat
+    %UserProfile%\Desota\DeRunner\executables\Windows\derunner.stop.bat
 
     ```
 </details>
@@ -99,7 +99,7 @@
 
 * Copy-Paste the following comands: 
     ```cmd
-    %UserProfile%\Desota\DeRunner\executables\Windows\derruner.uninstall.bat
+    %UserProfile%\Desota\DeRunner\executables\Windows\derunner.uninstall.bat
 
     ```
     * Uninstaller Optional `Arguments`
