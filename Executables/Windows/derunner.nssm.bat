@@ -17,13 +17,41 @@ set model_env=
 
 :: -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
 
+:: - Program Installers
+set nssm_installer=https://nssm.cc/ci/nssm-2.24-101-g897c7ad.zip
+
+:: - .bat ANSI Colored CLI
+set header=
+set info=
+set sucess=
+set fail=
+set ansi_end=
+for /f "tokens=4-5 delims=. " %%i in ('ver') do set VERSION=%%i.%%j
+if "%version%" == "10.0" GOTO set_ansi_colors
+if "%version%" == "11.0" GOTO set_ansi_colors
+GOTO end_ansi_colors
+:set_ansi_colors
+for /F %%a in ('echo prompt $E ^| cmd') do (
+  set "ESC=%%a"
+)
+set header=%ESC%[4;95m
+set info_h1=%ESC%[93m
+set info_h2=%ESC%[33m
+set sucess=%ESC%[7;32m
+set fail=%ESC%[7;31m
+set ansi_end=%ESC%[0m
+:end_ansi_colors
+
+
 :: NSSM - the Non-Sucking Service Manager 
-IF EXIST %UserProfile%\Desota\Portables\nssm goto endofnssm 
+IF EXIST %UserProfile%\Desota\Portables\nssm goto endofnssm
+ECHO %info_h2%Installing NSSM...%ansi_end% 
 call mkdir %UserProfile%\Desota\Portables\nssm >NUL 2>NUL
 call cd %UserProfile%\Desota\Portables\nssm >NUL 2>NUL
-call powershell -command "Invoke-WebRequest -Uri https://nssm.cc/ci/nssm-2.24-101-g897c7ad.zip -OutFile ~\Desota\Portables\nssm.zip" &&  tar -xzvf %UserProfile%\Desota\Portables\nssm.zip -C %UserProfile%\Desota\Portables\nssm --strip-components 1 && del %UserProfile%\Desota\Portables\nssm.zip
+call powershell -command "Invoke-WebRequest -Uri %nssm_installer% -OutFile ~\Desota\Portables\nssm.zip" &&  tar -xzvf %UserProfile%\Desota\Portables\nssm.zip -C %UserProfile%\Desota\Portables\nssm --strip-components 1 && del %UserProfile%\Desota\Portables\nssm.zip
 :endofnssm
 
+ECHO %info_h2%Creating Service `%service_name%`...%ansi_end% 
 :: NSSM - exe path 
 IF %PROCESSOR_ARCHITECTURE%==AMD64 set nssm_exe=%UserProfile%\Desota\Portables\nssm\win64\nssm.exe
 IF %PROCESSOR_ARCHITECTURE%==x86 set nssm_exe=%UserProfile%\Desota\Portables\nssm\win32\nssm.exe
