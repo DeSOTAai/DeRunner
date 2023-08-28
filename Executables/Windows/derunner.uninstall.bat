@@ -4,6 +4,7 @@
 set model_path=%UserProfile%\Desota\DeRunner
 set service_name=derunner_service
 set nssm_path=%UserProfile%\Desota\Portables\nssm
+set model_name=Desota/DeRunner
 
 
 
@@ -59,7 +60,7 @@ IF EXIST %model_path% (
 :EOF_UN
 :: Inform Uninstall Completed
 IF EXIST %model_path% (
-    ECHO %fail%DeRunner Uninstall Fail%ansi_end%
+    ECHO %fail%%model_name% Uninstall Fail%ansi_end%
     PAUSE
 )
 exit
