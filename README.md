@@ -1,6 +1,6 @@
 # Instalation
 
-* If model allready instaled function as upgrade since the the installer crawl newest installer from github - Take a look into Installer Optional `Arguments`
+* If model allready installed this installer function as upgrade, since the the installer webrequest newest installer from github - Take a look into Installer Optional `Arguments`
 * Install python if not exist
 * Download miniconda, git and nssm as portables to Desota Folder
 * Clone GitHub Repository
