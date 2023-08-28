@@ -1,8 +1,9 @@
 @ECHO OFF
 :: Instalation VARS
-:: Model GIT
+:: - Model GIT
 set model_git=https://github.com/desotaai/derunner.git
 set model_git_branch=main
+set model_name=Desota/DeRunner
 :: - Model Path
 set model_path=%UserProfile%\Desota\DeRunner
 :: - Service Name
@@ -16,7 +17,7 @@ set model_start=%model_path%\executables\Windows\derunner.start.bat
 
 :: -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
 
-:: - Program Installers
+:: Program Installers
 set python64=https://www.python.org/ftp/python/3.11.4/python-3.11.4-amd64.exe
 set python32=https://www.python.org/ftp/python/3.11.4/python-3.11.4.exe
 set git64_portable=https://github.com/git-for-windows/git/releases/download/v2.41.0.windows.3/PortableGit-2.41.0.3-64-bit.7z.exe
@@ -28,7 +29,7 @@ set miniconda32=https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x8
 SET arg1=/reinstall
 SET arg2=/startrunner
 
-:: - .bat ANSI Colored CLI
+:: .BAT ANSI Colored CLI
 set header=
 set info=
 set sucess=
@@ -165,18 +166,13 @@ IF "%2" EQU "" GOTO EOF_IN
 IF %2 EQU %arg2% (
     GOTO startrunner
 )
-:: :nostartargs
-:: SET /P STARTRUNNER=Instalation Completed! Start Runner? (Y/[N])?
-:: IF /I "%STARTRUNNER%" NEQ "Y" GOTO startrunner
-:: IF /I "%STARTRUNNER%" NEQ "y" GOTO startrunner
-:: IF /I "%STARTRUNNER%" NEQ "yes" GOTO startrunner
 GOTO EOF_IN
 
 :startmodel
 start /B /WAIT %model_start%
-ECHO %sucess%DeRunner Installed & %model_service_name% - Started!%ansi_end%
+ECHO %sucess%%model_name% Installed & %model_service_name% - Started!%ansi_end%
 exit
 
 :EOF_IN
-ECHO %sucess%DeRunner Installed!%ansi_end%
+ECHO %sucess%%model_name% Installed!%ansi_end%
 exit

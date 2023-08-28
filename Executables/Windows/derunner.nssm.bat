@@ -1,8 +1,7 @@
 @ECHO OFF
 :: - Model Path
 set model_path=%UserProfile%\Desota\DeRunner
-:: Service VARS
-:: retrieved from https://nssm.cc/usage
+:: Service VARS - retrieved from https://nssm.cc/usage
 set model_name=DeRunner
 set service_name=derunner_service
 set exe_path=%model_path%\executables\Windows
