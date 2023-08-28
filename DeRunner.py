@@ -18,9 +18,12 @@ parser.add_argument('-hs', '--handshake',
                     help='Service Status Request',
                     action='store_true')
 
+user_path=os.path.expanduser('~')
+desota_root_path=os.path.join(user_path, "Desota")
+app_path=os.path.join(desota_root_path, "DeRunner")
 
 # Open the file and load the file
-with open('config.yaml') as f:
+with open(os.path.join(app_path, "config.yaml")) as f:
     configs = yaml.load(f, Loader=SafeLoader)
 API_KEY = configs['api_key']
 API_URL = configs['api_url']
