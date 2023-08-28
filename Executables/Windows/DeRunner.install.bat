@@ -53,10 +53,10 @@ set ansi_end=%ESC%[0m
 ECHO %header%Welcome to DeRunner Installer!%ansi_end%
 
 :: Re-instalation Check
-ECHO %info_h1%Step 1/9 - Check Re-Instalation%ansi_end%
+ECHO %info_h1%Step 1/7 - Check Re-Instalation%ansi_end%
 IF NOT EXIST %model_path% (
-    ECHO %info_h2%New install%ansi_end%
-    GOTO endofreinstall
+    ECHO %sucess%New install%ansi_end%
+    GOTO noreinstallrequired
 )
 ECHO %info_h2%Re-Instalation required - Start Uninstall...%ansi_end%
 IF "%1" EQU "" GOTO noreinstallargs
@@ -77,15 +77,16 @@ IF EXIST %model_path% (
 ) ELSE (
     ECHO %sucess%DeRunner Uninstall Sucess%ansi_end%
 )
+:noreinstallrequired
 
 :: Create Project Folder
-ECHO %info_h1%Step 2/9 - Create Project Folder%ansi_end%
+ECHO %info_h1%Step 2/7 - Create Project Folder%ansi_end%
 mkdir %model_path% >NUL 2>NUL
 call cd %model_path% >NUL 2>NUL
 
 
 :: Install Python if Required
-ECHO %info_h1%Step 3/9 - Install Python if required%ansi_end%
+ECHO %info_h1%Step 3/7 - Install Python if required%ansi_end%
 python --version >NUL 2>NUL
 IF errorlevel 1 (
     python3 --version >NUL 2>NUL
@@ -103,7 +104,7 @@ IF %PROCESSOR_ARCHITECTURE%==x86 powershell -command "Invoke-WebRequest -Uri %py
 :skipinstallpython
 
 :: GIT MODEL CLONE
-ECHO %info_h1%Step 4/9 - Get Project from GitHub%ansi_end%
+ECHO %info_h1%Step 4/7 - Get Project from GitHub%ansi_end%
 git --version >NUL 2>NUL
 IF NOT errorlevel 1 (
     ::  Clone Descraper Repository
@@ -128,7 +129,7 @@ call copy %model_path%\Assets\config_template.yaml %model_path%\config.yaml >NUL
 
 
 :: Install Conda if Required
-ECHO %info_h1%Step 5/9 - Create Virtual Environment for Project%ansi_end%
+ECHO %info_h1%Step 5/7 - Create Virtual Environment for Project%ansi_end%
 call mkdir %UserProfile%\Desota\Portables >NUL 2>NUL
 IF NOT EXIST %UserProfile%\Desota\Portables\miniconda3\condabin\conda.bat goto installminiconda
 goto skipinstallminiconda
@@ -145,12 +146,12 @@ call %UserProfile%\Desota\Portables\miniconda3\condabin\conda create --prefix ./
 call %UserProfile%\Desota\Portables\miniconda3\condabin\conda activate ./env >NUL 2>NUL
 
 :: Install required Libraries
-ECHO %info_h1%Step 6/9 - Install Project Packages%ansi_end%
+ECHO %info_h1%Step 6/7 - Install Project Packages%ansi_end%
 call pip install -r requirements.txt >NUL 2>NUL
 
 
 :: Install Service - NSSM  - the Non-Sucking Service Manager
-ECHO %info_h1%Step 7/9 - Create Project Service with NSSM%ansi_end%
+ECHO %info_h1%Step 7/7 - Create Project Service with NSSM%ansi_end%
 start /B /WAIT %model_service_install%
 
 
