@@ -62,3 +62,4 @@ IF EXIST %model_path% (
     ECHO %fail%DeRunner Uninstall Fail%ansi_end%
     PAUSE
 )
+exit

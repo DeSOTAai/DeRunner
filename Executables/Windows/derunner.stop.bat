@@ -35,3 +35,4 @@ IF %PROCESSOR_ARCHITECTURE%==x86 set nssm_exe=%UserProfile%\Desota\Portables\nss
 :: Stop service - retrieved from https://nssm.cc/commands
 ECHO %info_h2%Stopping Service `%service_name%`...%ansi_end% 
 call %nssm_exe% stop %service_name%
+exit
