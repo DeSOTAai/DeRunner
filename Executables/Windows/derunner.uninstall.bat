@@ -37,8 +37,9 @@ set ansi_end=%ESC%[0m
 :end_ansi_colors_un
 
 ECHO %header%%uninstaller_header%%ansi_end%
-ECHO    service name: %service_name%
 ECHO    model name  : %model_name%
+ECHO    service name: %service_name%
+
 :: NSSM - exe VAR 
 IF %PROCESSOR_ARCHITECTURE%==AMD64 set nssm_exe=%nssm_path%\win64\nssm.exe
 IF %PROCESSOR_ARCHITECTURE%==x86 set nssm_exe=%nssm_path%\win32\nssm.exe

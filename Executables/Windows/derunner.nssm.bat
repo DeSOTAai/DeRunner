@@ -52,7 +52,7 @@ call powershell -command "Invoke-WebRequest -Uri %nssm_installer% -OutFile ~\Des
 
 ECHO %info_h2%Creating Service..%ansi_end% 
 ECHO    service name: %service_name%
-ECHO    model name  : %model_name%
+
 :: NSSM - exe path 
 IF %PROCESSOR_ARCHITECTURE%==AMD64 set nssm_exe=%UserProfile%\Desota\Portables\nssm\win64\nssm.exe
 IF %PROCESSOR_ARCHITECTURE%==x86 set nssm_exe=%UserProfile%\Desota\Portables\nssm\win32\nssm.exe
@@ -99,4 +99,6 @@ call %nssm_exe% set %service_name% AppRotateBytes 1048576 >NUL 2>NUL
 :: Environment tab
 call %nssm_exe% set %service_name% AppEnvironmentExtra %model_env% >NUL 2>NUL
 
+ECHO %sucess%Service Created!%ansi_end% 
+ECHO %info_h2%    service name: %model_service_name%%ansi_end% 
 exit
