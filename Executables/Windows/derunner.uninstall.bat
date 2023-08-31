@@ -5,6 +5,7 @@ set model_path=%UserProfile%\Desota\DeRunner
 set service_name=derunner_service
 set nssm_path=%UserProfile%\Desota\Portables\nssm
 set model_name=Desota/DeRunner
+set uninstaller_header=DeRunner Uninstaller - Sad to say goodbye ):
 
 
 
@@ -35,24 +36,31 @@ set fail=%ESC%[7;31m
 set ansi_end=%ESC%[0m
 :end_ansi_colors_un
 
+ECHO %header%%uninstaller_header%%ansi_end%
+ECHO    service name: %service_name%
+ECHO    model name  : %model_name%
 :: NSSM - exe VAR 
 IF %PROCESSOR_ARCHITECTURE%==AMD64 set nssm_exe=%nssm_path%\win64\nssm.exe
 IF %PROCESSOR_ARCHITECTURE%==x86 set nssm_exe=%nssm_path%\win32\nssm.exe
 
 IF "%1" EQU "" GOTO noargs
 IF %1 EQU /Q (
+	ECHO %info_h1%Stoping DeSOTA Services%ansi_end%
     :: Delete Model Service - retrieved from https://nssm.cc/commands
     call %nssm_exe% remove %service_name% confirm >NUL 2>NUL
     :: Delete Project Folder
+	ECHO %info_h1%Deleting Project Folder%ansi_end%
     IF EXIST %model_path% rmdir /S /Q %model_path% >NUL 2>NUL
     GOTO EOF_UN
 )
 
 :noargs
 :: Delete Model Service - retrieved from https://nssm.cc/commands
+ECHO %info_h1%Stoping DeSOTA Services%ansi_end%
 call %nssm_exe% remove %service_name%
 :: Delete Project Folder
 IF EXIST %model_path% (
+	ECHO %info_h1%Deleting Project Folder%ansi_end%
     rmdir /S %model_path%
     GOTO EOF_UN
 )

@@ -50,7 +50,9 @@ call cd %UserProfile%\Desota\Portables\nssm >NUL 2>NUL
 call powershell -command "Invoke-WebRequest -Uri %nssm_installer% -OutFile ~\Desota\Portables\nssm.zip" &&  tar -xzvf %UserProfile%\Desota\Portables\nssm.zip -C %UserProfile%\Desota\Portables\nssm --strip-components 1 && del %UserProfile%\Desota\Portables\nssm.zip
 :endofnssm
 
-ECHO %info_h2%Creating Service `%service_name%`...%ansi_end% 
+ECHO %info_h2%Creating Service..%ansi_end% 
+ECHO    service name: %service_name%
+ECHO    model name  : %model_name%
 :: NSSM - exe path 
 IF %PROCESSOR_ARCHITECTURE%==AMD64 set nssm_exe=%UserProfile%\Desota\Portables\nssm\win64\nssm.exe
 IF %PROCESSOR_ARCHITECTURE%==x86 set nssm_exe=%UserProfile%\Desota\Portables\nssm\win32\nssm.exe

@@ -51,7 +51,7 @@ set fail=%ESC%[7;31m
 set ansi_end=%ESC%[0m
 :end_ansi_colors
 
-ECHO %header%Welcome to DeRunner Installer!%ansi_end%
+ECHO %header%Welcome to %model_name% Installer!%ansi_end%
 
 :: Re-instalation Check
 ECHO %info_h1%Step 1/7 - Check Re-Instalation%ansi_end%
