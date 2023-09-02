@@ -1,5 +1,5 @@
 ## Latest Configs URL
-latest_services_raw: 
+latest_services_raw: https://raw.githubusercontent.com/DeSOTAai/DeRunner/main/Assets/latest_services.congig.yaml
 
 ## Services Status
 #param: Get to know if all Services Status, inclusively if running in derunner
