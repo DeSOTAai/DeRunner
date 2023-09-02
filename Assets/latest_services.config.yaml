@@ -60,7 +60,7 @@ services_params: {
             starter: neuralqa.start.bat,
             stoper: neuralqa.stop.bat,
             status: neuralqa.status.bat,
-            version: 1.0.0
+            version: 1.0.1
         },
         lin: {
             service_path: Desota\Desota_Models\NeuraQA\neuralqa\executables\Linux,
