@@ -1,0 +1,189 @@
+## Latest Configs URL
+latest_services_raw: 
+
+## Services Status
+#param: Get to know if all Services Status, inclusively if running in derunner
+#type: dict{ str(model): int(status) } -> status ( 0=STOPPED | 1=STARTED | 2=RUNNING )
+services_status: {
+    desotaai/derunner: 2
+}
+
+## DeSOTA Services Params
+services_params: {
+    # DeSOTA models runner
+    desotaai/derunner: {
+        win: {
+            service_path: Desota\DeRunner\executables\Windows,
+            installer: https://raw.githubusercontent.com/DeSOTAai/DeRunner/main/Executables/Windows/DeRunner.install.bat,
+            uninstaller: derunner.uninstall.bat,
+            installer_args: [/reinstall],
+            uninstaller_args: [/Q],
+            starter: derunner.start.bat,
+            stoper: derunner.stop.bat,
+            status: derunner.status.bat,
+            version: 1.0.0
+        },
+        lin: {
+            service_path: Desota\DeRunner\executables\Linux,
+            installer: ,
+            uninstaller: ,
+            installer_args: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+            version:
+        },
+        mac: {
+            service_path: Desota\DeRunner\executables\MacOS,
+            installer: ,
+            uninstaller: ,
+            installer_args: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+            version:
+            
+        },
+        source_code: https://github.com/desotaai/derunner,
+        description: https://github.com/desotaai/derunner/blob/main/README.md,
+        short_description: Desota Client for Models Requests,
+        run_constantly: true,
+        submodel: false
+    },
+    # Models
+    franciscomvargas/neuralqa/qa: {
+        win: {
+            service_path: Desota\Desota_Models\NeuralQA\neuralqa\executables\Windows,
+            installer: https://raw.githubusercontent.com/franciscomvargas/neuralqa/master/neuralqa/executables/Windows/neuralqa.install.bat,
+            uninstaller: neuralqa.uninstall.bat,
+            installer_args: [/reinstall],
+            uninstaller_args: [/Q],
+            starter: neuralqa.start.bat,
+            stoper: neuralqa.stop.bat,
+            status: neuralqa.status.bat,
+            version: 1.0.0,
+            derunner_method: C:sjdnflnsdlnkfs/.py
+        },
+        lin: {
+            service_path: Desota\Desota_Models\NeuraQA\neuralqa\executables\Linux,
+            installer: ,
+            uninstaller: ,
+            installer_args: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+            version:
+        },
+        mac: {
+            service_path: Desota\Desota_Models\NeuraQA\neuralqa\executables\MacOS,
+            installer: ,
+            uninstaller: ,
+            installer_args: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+            version:
+            
+        },
+        source_code: https://github.com/franciscomvargas/neuralqa,
+        description: https://github.com/franciscomvargas/neuralqa/blob/master/README_original.md,
+        short_description: Library for Question Answering on Large Datasets with BERT,
+        model_ui: http://127.0.0.1:8888/,
+        handshake_req: http://127.0.0.1:8888/api/handshake/,
+        handshake_res: {
+            status: ready
+        },
+        run_constantly: false,
+        submodel: false
+    },
+    franciscomvargas/neuralqa/expansion: {
+        submodel: true,
+        parentmodel: franciscomvargas/neuralqa/qa
+    },
+    franciscomvargas/descraper/url: {
+        win: {
+            service_path: Desota\Desota_Models\DeScraper\executables\Windows,
+            installer: https://raw.githubusercontent.com/franciscomvargas/descraper/main/executables/Windows/descraper.install.bat,
+            uninstaller: descraper.uninstall.bat,
+            installer_args: [/reinstall],
+            uninstaller_args: [/Q],
+            starter: descraper.start.bat,
+            stoper: descraper.stop.bat,
+            status: descraper.status.bat,
+            version: 1.0.0
+        },
+        lin: {
+            service_path: Desota\Desota_Models\DeScraper\executables\Linux,
+            installer: ,
+            uninstaller: ,
+            installer_args: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+            version:
+        },
+        mac: {
+            service_path: Desota\Desota_Models\DeScraper\executables\MacOS,
+            installer: ,
+            uninstaller: ,
+            installer_args: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+            version:
+            
+        },
+        source_code: https://github.com/franciscomvargas/descraper,
+        description: https://github.com/franciscomvargas/descraper/blob/main/README.md,
+        short_description: WebScrape with assistance of AI Models,
+        model_ui: http://127.0.0.1:8880/,
+        handshake_req: http://127.0.0.1:8880/api/handshake/,
+        handshake_res: {
+            status: ready
+        },
+        run_constantly: true,
+        submodel: false
+    },
+    franciscomvargas/descraper/html: {
+        submodel: true,
+        parentmodel: franciscomvargas/descraper/url
+    },
+}
+
+## DeSOTA Manager Tools Params
+manager_params: {
+    win: {
+        service_path: Desota\DeManagerTools\executables\Windows,
+        installer: https://raw.githubusercontent.com/DeSOTAai/DeManagerTools/main/executables/Windows/demanagertools.install.bat,
+        uninstaller: demanagertools.uninstall.bat,
+        installer_args: [],
+        uninstaller_args: [/Q],
+        version: 1.0.0
+    },
+    lin: {
+        service_path: Desota\Desota_Models\DeScraper\executables\Linux,
+        installer: ,
+        uninstaller: ,
+        installer_args: ,
+        uninstaller_args: ,
+        version:
+    },
+    mac: {
+        service_path: Desota\Desota_Models\DeScraper\executables\MacOS,
+        installer: ,
+        uninstaller: ,
+        installer_args: ,
+        uninstaller_args: ,
+        version:
+    },
+    source_code: https://github.com/desotaai/demanagertools,
+    description: https://github.com/desotaai/demanagertools/blob/main/README.md,
+    short_description: DeSOTA Manager and Tools for Clients Servers,
+    service_config: https://raw.githubusercontent.com/DeSOTAai/DeManagerTools/main/Assets/services.config_template.yaml,
+}
