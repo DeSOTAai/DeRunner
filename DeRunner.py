@@ -1,5 +1,6 @@
 import time
 import requests
+import subprocess
 from subprocess import check_output
 from subprocess import check_call, call, CalledProcessError
 from subprocess import Popen, CREATE_NEW_CONSOLE
@@ -18,38 +19,43 @@ parser.add_argument('-hs', '--handshake',
                     help='Service Status Request',
                     action='store_true')
 
-user_path=os.path.expanduser('~')
-desota_root_path=os.path.join(user_path, "Desota")
-app_path=os.path.join(desota_root_path, "DeRunner")
+I=0
+DEBUG = True
+
+# :: os.getcwd() = C:\users\[user]\Desota\DeRunner
+WORKING_FOLDER = os.getcwd()
+USER_PATH = "\\".join(WORKING_FOLDER.split("\\")[:-2])
+DESOTA_ROOT_PATH = os.path.join(USER_PATH, "Desota")
+APP_PATH = os.path.join(DESOTA_ROOT_PATH, "DeRunner")
+CONFIG_PATH = os.path.join(DESOTA_ROOT_PATH, "Configs")
+USER_CONF_PATH = os.path.join(CONFIG_PATH, "user.config.yaml")
+SERV_CONF_PATH = os.path.join(CONFIG_PATH, "services.config.yaml")
 
 # Open the file and load the file
-with open(os.path.join(app_path, "config.yaml")) as f:
-    configs = yaml.load(f, Loader=SafeLoader)
-API_KEY = configs['api_key']
-API_URL = configs['api_url']
-API_UP =  configs['api_up']
-models = configs['models']
-MODEL_TO_METHOD = configs['model_to_method']
-I=0
-DEBUG = False
+if not os.path.isfile(USER_CONF_PATH) or not os.path.isfile(SERV_CONF_PATH):
+    raise EnvironmentError()
+
+with open(USER_CONF_PATH) as f:
+    USER_CONF = yaml.load(f, Loader=SafeLoader)
+with open(SERV_CONF_PATH) as f:
+    SERV_CONF = yaml.load(f, Loader=SafeLoader)
+API_KEY = USER_CONF['api_key']
+
+API_URL = "http://129.152.27.36/assistant/api.php"
+API_UP =  "http://129.152.27.36/assistant/api_uploads"
+
+USER_MODELS = USER_CONF['models']
+IGNORE_MODELS = ["desotaai/derunner"] # DeSOTA Tools Services that don't run with DeRunner
+
+# MODEL_TO_METHOD = configs['model_to_method']
+
 # models=['audio-classification-efficientat', 'whisper-small-en', 'coqui-tts-male', 'lllyasviel/sd-controlnet-seg-text-to-image','lllyasviel/sd-controlnet-openpose-text-to-image','lllyasviel/sd-controlnet-normal-text-to-image','lllyasviel/sd-controlnet-mlsd-text-to-image','lllyasviel/sd-controlnet-hed-text-to-image','lllyasviel/sd-controlnet-depth-text-to-image','lllyasviel/sd-controlnet-canny-text-to-image','lllyasviel/sd-controlnet-openpose-control','lllyasviel/sd-controlnet-normal-control','lllyasviel/sd-controlnet-mlsd-control','lllyasviel/sd-controlnet-hed-control','lllyasviel/sd-controlnet-canny-control','lllyasviel/sd-controlnet-text','clip','basic-vid2vid','basic-txt2vid','watch-video','talking-heads','clip-2','clip-2']
 
-# Utils Funcs
-#   > Find JSON OBJ in STR
-def find_json(s):
-    s = s.replace("\'", "\"")
-    start = s.find("{")
-    end = s.rfind("}")
-    res = s[start:end+1]
-    res = res.replace("\n", "")
-    return res
-#   > Conditional print
-def cprint(query, condition):
-    if condition:
-        print(query)
 
 
-# Models Methods
+
+# Models Methods > DEPRECATED
+'''
 class ModelsRunner(object):
     # question-answering-large-dataset
     def run_neuralqa_qa(self, model_request_dict):
@@ -62,7 +68,7 @@ class ModelsRunner(object):
     # url-to-text
     def run_descraper_url(self, model_request_dict):
         # Time when grabed
-        start_time = time.time()
+        start_time = int(time.time())
 
         # API Response URL
         send_task_url = f"{API_URL}?api_key={API_KEY}&model={model_request_dict['task_model']}&send_task=" + model_request_dict['task_id']
@@ -115,9 +121,12 @@ class ModelsRunner(object):
     # html-to-text
     def run_descraper_html(self, model_request_dict):
         print('Hello')
+'''
+
 
 # Monitor API Model Request 
-# TODO - MOVE TO Models Methods
+# TODO - MOVE TO dynamic Model runner
+'''
 def run_models(model_request_dict):
     selected_task = model_request_dict['selected_task']
     send_task_url = f"{API_URL}?api_key={API_KEY}&model={model}&send_task="+selected_task['id']
@@ -376,7 +385,7 @@ def run_models(model_request_dict):
         data = {
             "api_key":API_KEY,
             "model":model,
-            "select_task":i
+            "select_task":I
         }
         select_task = requests.post(API_URL, data=data)
         if select_task.status_code==200:
@@ -389,11 +398,11 @@ def run_models(model_request_dict):
 
                 task_dic = ast.literal_eval(str(selected_task['task']))
                 if(task_dic != int(0)):
-                    for file_type in task_dic:
+                    for file_type, file_value in task_dic.items():
                         if file_type in ["image", "audio", "video"]:
-                            selected_filename=str(task_dic[file_type])
+                            selected_filename=str(file_value)
                         else:
-                            task_text_prompt=str(task_dic[file_type])
+                            task_text_prompt=str(file_value)
                         #selected_file_url = f"{API_UP}/{selected_filename}"
                         task_text_prompt = ""
                         if "text" in task_dic:
@@ -489,11 +498,11 @@ def run_models(model_request_dict):
 
                 task_dic = ast.literal_eval(str(selected_task['task']))
                 if(task_dic != int(0)):
-                    for file_type in task_dic:
+                    for file_type, file_value in task_dic:
                         if file_type in ["image", "audio", "video"]:
-                            selected_filename=str(task_dic[file_type])
+                            selected_filename=str(file_value)
                         else:
-                            task_text_prompt=str(task_dic[file_type])
+                            task_text_prompt=str(file_value)
                         #file_url = f"{API_UP}/{selected_filename}"
                         task_text_prompt = ""
                         if "text" in task_dic:
@@ -559,10 +568,47 @@ def run_models(model_request_dict):
     print(f"Will start this thing again hehe!")
     
     time.sleep(1)
+'''
 
-# Monitor API Model Request 
+
+
+# Utils Funcs
+#   > Find JSON OBJ in STR
+def find_json(s):
+    s = s.replace("\'", "\"")
+    start = s.find("{")
+    end = s.rfind("}")
+    res = s[start:end+1]
+    res = res.replace("\n", "")
+    return res
+#   > Conditional print
+def cprint(query, condition):
+    if condition:
+        print(query)
+#   > Get child models and remove desota tools (IGNORE_MODELS)
+def grab_all_user_models():
+    all_user_models = list(USER_MODELS.keys())
+    for model in list(USER_MODELS.keys()):
+        if model in IGNORE_MODELS:
+            all_user_models.pop(all_user_models.index(model))
+            continue
+
+        _model_params = SERV_CONF["services_params"][model]
+        _child_models = None if "child_models" not in _model_params and not _model_params["child_models"] else _model_params["child_models"]
+        if _child_models:
+            if isinstance(_child_models, str):
+                _child_models = [_child_models]
+            if isinstance(_child_models, list):
+                for _child_model in _child_models:
+                    if _child_model in SERV_CONF["services_params"] and _child_model not in all_user_models:
+                        all_user_models.append(_child_model)
+    return all_user_models
+
+     
+# DeRunner Methods
+#   > Monitor API Model Request 
 def monitor_model_request(debug=False):
-    global models, I
+    global I
     I+=1
     
     cprint(f"Running...{I}", debug) # Conditional Print
@@ -575,12 +621,85 @@ def monitor_model_request(debug=False):
         "task_dep": None,
         "task_args": None,
         "task_id": None,
-        "filename": None,       # FILE VARS
-        "file_url": None,
-        "text_prompt": None     # TXT VAR
     }
+    '''
+    Additional model_request_dict keys:
+    {
+        "input_args":{          # INPUT VARS
+            "file": {
+                "file_name": ,
+                "file_url":
+            },
+            "image": {
+                "file_name": ,
+                "file_url":
+            },
+            "audio": {
+                "file_name": ,
+                "file_url":
+            },
+            "video": {
+                "file_name": ,
+                "file_url":
+            },
+            "text_prompt": "What is the content of this file? "
+            **aditional iputs .. test and see
+        },       
+        "dep_args":{            # DEPENDENCIES VARS
+            [dep_id_0]:{
+                "file": {
+                    "file_name": ,
+                    "file_url":
+                },
+                "image": {
+                    "file_name": ,
+                    "file_url":
+                },
+                "audio": {
+                    "file_name": ,
+                    "file_url":
+                },
+                "video": {
+                    "file_name": ,
+                    "file_url":
+                },
+                "text_prompt": "What is the content of this file? "
+                **aditional iputs .. test and see
+            }
+            [dep_id_1]:{
+                "file": {
+                    "file_name": ,
+                    "file_url":
+                },
+                "image": {
+                    "file_name": ,
+                    "file_url":
+                },
+                "audio": {
+                    "file_name": ,
+                    "file_url":
+                },
+                "video": {
+                    "file_name": ,
+                    "file_url":
+                },
+                "text_prompt": "What is the content of this file? "
+                **aditional iputs .. test and see
+            }
+            (...)
+        }
+    }
+    '''
     
-    for model in models:
+    # Grab Models + Child Models (services.config.yaml)
+    _all_user_models = grab_all_user_models()
+                    
+    cprint(f"[ INFO ] -> All User Models: {json.dumps(_all_user_models, indent=4)}", debug)
+
+    if not _all_user_models:
+        return None
+    
+    for model in _all_user_models:
         '''
         Send a POST request to API to get a task
             Return: `task`
@@ -642,57 +761,70 @@ def monitor_model_request(debug=False):
             
             cprint(selected_task, debug)     # Conditional Print
             #cprint(selected_task['task'], debug)
-            model_request_dict['filename'] = 0
-            task_dic = ast.literal_eval(str(selected_task['task']))
-            if(task_dic != int(0)):
-                for file_type in task_dic:
-                    #print(file_type)
-                    if file_type in ["image", "audio", "video"]:
-                        model_request_dict['filename']=str(task_dic[file_type])
-                        model_request_dict['file_url'] = f"{API_UP}/{model_request_dict['filename']}"
-                        cprint(f"file name select 1: {model_request_dict['filename']}", debug)   # Conditional Print
-                    else:
-                        cprint(f'text select on 0', debug)   # Conditional Print
-                        task_text_prompt=str(task_dic[file_type])
-                        #model_request_dict['file_url'] = f"{API_UP}/{model_request_dict['filename']}"
-                    if "text" in task_dic:
-                        cprint(f'text select on 1', debug)   # Conditional Print
-                        task_text_prompt = task_dic['text']
+            
+            try:
+                task_dic = ast.literal_eval(str(selected_task['task']))
+            except:
+                task_dic = None
 
+            if isinstance(task_dic, dict) and task_dic:
+                model_request_dict['input_args'] = {}
+                for file_type, file_value in task_dic.items():
+                    #print(file_type)
+                    if file_type == "text":
+                        # cprint(f'text select on 0', debug)   # Conditional Print
+                        model_request_dict['input_args']['text_prompt'] = str(file_value)
+                    elif file_type in ['image', 'video', 'audio', 'file']:
+                        model_request_dict['input_args'][file_type] = {}
+                        model_request_dict['input_args'][file_type]['file_name'] = str(file_value)
+                        model_request_dict['input_args'][file_type]['file_url'] = f"{API_UP}/{file_value}"
+                    else:
+                        model_request_dict['input_args'][file_type] = str(file_value)
+                        
+                cprint(f"Request INPUT Files: {json.dumps(model_request_dict['input_args'], indent=2)}", debug)
                     
                 model_request_dict["task_type"] = selected_task['type']
                 task_dep = str(selected_task['dep']).replace("\\\\n", "").replace("\\", "")
                 task_dep = ast.literal_eval(task_dep)
                 model_request_dict["task_dep"] = task_dep
                 cprint(f"task type is {model_request_dict['task_type']}", debug)     # Conditional Print
-                cprint(f"task deps are {task_dep}", debug)   # Conditional Print
+                cprint(f"task deps are {task_dep} {type(task_dep[0])}", debug)   # Conditional Print
                 #if json.loads(str(task_dep.decode('UTF-8'))):
-                if task_dep != "[-1]":
+                if task_dep != [-1]:
                     cprint("Dependencies:", debug)   # Conditional Print
                     #deps = json.loads(str(task_dep.decode('UTF-8')))
+                    model_request_dict['dep_args'] = {}
                     for dep in task_dep:
                         try:
                             dep_dic = json.loads(str(task_dep[dep]))
                         except:
-                            dep_dic = find_json(str(task_dep[dep]))
-                            dep_dic = json.loads(dep_dic)
-                        try:
-                            for file_type in dep_dic:
-                                model_request_dict['filename']=str(dep_dic[file_type])
-                                model_request_dict['file_url'] = f"{API_UP}/{model_request_dict['filename']}"
-                                cprint(model_request_dict['filename'], debug)    # Conditional Print
-                        except:
-                            if not model_request_dict['filename'] and debug:
-                                print("no filename found")
+                            try:
+                                dep_dic = find_json(str(task_dep[dep]))                        
+                            
+                                dep_dic = json.loads(dep_dic)
+                                model_request_dict['dep_args'][dep] = {}
+                                for file_type, file_value in dep_dic.items():
+                                    #print(file_type)
+                                    if file_type in ['image', 'video', 'audio', 'file']:
+                                        model_request_dict['dep_args'][dep][file_type] = {}
+                                        model_request_dict['dep_args'][dep][file_type]['file_name'] = str(file_value)
+                                        model_request_dict['dep_args'][dep][file_type]['file_url'] = f"{API_UP}/{file_value}"
+                                    else:
+                                        model_request_dict['dep_args'][dep][file_type] = str(file_value)
+                                            
+                            except:
+                                if not model_request_dict['dep_args'] and debug:
+                                    print("no filename found")
+                    
+                    cprint(f"Request DEP Files: {json.dumps(model_request_dict['dep_args'], indent=2)}", debug)
+                    
 
                 cprint("No Dependencies!", debug)    # Conditional Print
                 #exit()
-                model_request_dict['text_prompt'] = task_text_prompt
 
             cprint(f"No task for {model}!", debug)   # Conditional Print
             #exit()
 
-            cprint(task_text_prompt, debug)  # Conditional Print
 
         model_request_dict["task_model"] = model    # Return Model to work on
 
@@ -712,12 +844,133 @@ def monitor_model_request(debug=False):
     #}
     #sendTask = requests.post(API_URL, data=data)
 
-    if model_request_dict["task_type"] in ["image-to-image", "seg-image-to-image", "canny-image-to-image", "softedge-image-to-image", "lines-image-to-image", "normals-image-to-image", "pose-image-to-image"]:
-        if (not model_request_dict['filename'].endswith('.jpg')) and (not model_request_dict['filename'].endswith('.png')) and (not model_request_dict['filename'].endswith('.png')) and (not model_request_dict['filename'].endswith('.gif')) and (not model_request_dict['filename'].endswith('.bmp')):
-            model_request_dict['text_prompt'] = model_request_dict['filename']
-            model_request_dict["task_type"] = model_request_dict["task_type"].replace("image-to-", "text-to-")
+    # TODO: Sorry Kris :')
+    # if model_request_dict["task_type"] in ["image-to-image", "seg-image-to-image", "canny-image-to-image", "softedge-image-to-image", "lines-image-to-image", "normals-image-to-image", "pose-image-to-image"]:
+    #     for file_type, file_value in model_request_dict['input_args']:
+    #         if (not model_request_dict['files'].endswith('.jpg')) and (not model_request_dict['files'].endswith('.png')) and (not model_request_dict['files'].endswith('.png')) and (not model_request_dict['files'].endswith('.gif')) and (not model_request_dict['files'].endswith('.bmp')):
+    #             model_request_dict['text_prompt'] = model_request_dict['files']
+    #             model_request_dict["task_type"] = model_request_dict["task_type"].replace("image-to-", "text-to-")
     
     return model_request_dict
+#   > Handle Model Service
+def start_model_serv(model_id):
+    _opsys = USER_CONF["system"]
+    _model_params = SERV_CONF["services_params"][model_id]
+
+    if not _model_params["submodel"]:
+        _model_serv = SERV_CONF["services_params"][model_id][_opsys]
+    else:
+        _model_serv = SERV_CONF["services_params"][ _model_params["parent_model"] ][_opsys]
+
+    _model_starter = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["starter"])
+    if DEBUG:
+        print(f'Model start cmd:\n\t{_model_starter}')
+        _sproc = Popen(
+            [_model_starter]
+        )
+    else:
+        _sproc = Popen(
+            [_model_starter],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+    _sproc.wait()
+
+    ret_code = _sproc.returncode
+    if ret_code != 0:
+        print(f"[ WARNING ] -> Something went wrong while attempting to start model service:\n\tmodel_name:{model_id}\n\tstarter_path:{_model_starter}\n\treturn code:{ret_code}")
+        raise ChildProcessError(model_id)
+    
+    return
+def stop_model_serv(model_id):
+    _opsys = USER_CONF["system"]
+    _model_params = SERV_CONF["services_params"][model_id]
+
+    if not _model_params["submodel"]:
+        _model_params = SERV_CONF["services_params"][model_id]
+    else:
+        _model_params = SERV_CONF["services_params"][ _model_params["parent_model"] ]
+    
+    if _model_params["run_constantly"]:
+        return
+    
+    _model_serv = _model_params[_opsys]
+
+    _model_stoper = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["stoper"])
+    if DEBUG:
+        print(f'Model stop cmd:\n\t{_model_stoper}')
+        _sproc = Popen(
+            [_model_stoper]
+        )
+    else:
+        _sproc = Popen(
+            [_model_stoper],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+    _sproc.wait()
+
+    ret_code = _sproc.returncode
+    if ret_code != 0:
+        print(f"[ WARNING ] -> Something went wrong while attempting to stop model service:\n\tmodel_name:{model_id}\n\tstoper_path:{_model_stoper}\n\treturn code:{ret_code}")
+        raise ChildProcessError(model_id)
+    
+    return
+#   > Call Model Runner
+def call_model(model_req):
+    # Create tmp model_req.yaml with request params for model runner
+    _tmp_req_path = os.path.join(APP_PATH, f"tmp_model_req{int(time.time())}.yaml")
+    with open(_tmp_req_path, 'w',) as fw:
+        yaml.dump(model_req,fw,sort_keys=False)
+
+    # Model Vars
+    _opsys = USER_CONF["system"]                                                    # Operating system (win | lin | mac)
+    _model_id = model_req['task_model']                                             # Model Name
+    _model_runner_param = SERV_CONF["services_params"][_model_id][_opsys]           # Model params from services.config.yaml
+    _model_runner = os.path.join(USER_PATH, _model_runner_param["runner"])          # Model runner path
+    _model_runner_py = os.path.join(USER_PATH, _model_runner_param["runner_py"])    # Python with model runner packages
+
+    # API Response URL
+    _model_res_url = f"{API_URL}?api_key={API_KEY}&model={model_req['task_model']}&send_task=" + model_req['task_id']
+    
+    # Start / Wait Model
+    # retrieved from https://stackoverflow.com/a/62226026
+    if DEBUG:
+        print(f'Model runner cmd:\n\t{" ".join([_model_runner_py, _model_runner, "--model_req", _tmp_req_path, "--model_res_url", _model_res_url])}')
+        _sproc = Popen(
+            [
+                _model_runner_py, _model_runner, 
+                "--model_req", _tmp_req_path, 
+                "--model_res_url", _model_res_url
+            ]
+        )
+    else:
+        _sproc = Popen(
+            [
+                _model_runner_py, _model_runner, 
+                "--model_req", _tmp_req_path, 
+                "--model_res_url", _model_res_url
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.STDOUT,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+    # TODO: implement model timeout
+    while True:
+        _ret_code = _sproc.poll()
+        if _ret_code != None:
+            break
+        continue
+
+    if os.path.isfile(_tmp_req_path):
+        os.remove(_tmp_req_path)
+
+    print(f"[ INFO ] -> Model `{model_req['task_model']}` returncode = {_ret_code}")
+    
+    return _ret_code
+
 
 # Main Loop
 def main(args):
@@ -728,29 +981,49 @@ def main(args):
     
     print("Runner Up!")
     '''Get Configurations'''
-    config_2_print = { k:v for k,v in configs.items() if k in ["api_key", "models"] }
-    print(f"[ INFO ] -> Configurations:\n{json.dumps(config_2_print, indent=2)}")
+    print(f"[ INFO ] -> Configurations:\n{json.dumps(USER_CONF, indent=2)}")
     while True:
-        # clear()
-        model_req = monitor_model_request(DEBUG)
-        if model_req == None:
-            continue
-        print(f"[ INFO ] -> Incoming Model Request:\n{json.dumps(model_req, indent=2)}")
+        try:
+            # clear()
+            # TODO : Check for new installed models . Run Tester here
+            model_req = monitor_model_request(False)
+            if model_req == None:
+                continue
+            print("*"*80)
+            print(f"[ INFO ] -> Incoming Model Request:\n{json.dumps(model_req, indent=2)}")
 
-        
-        models_runner = ModelsRunner()  # Models Methods Class
-        try:    # Inspired in https://stackoverflow.com/questions/7936572/python-call-a-function-from-string-name
+            start_model_serv(model_req['task_model'])
+            
+            model_res = call_model(model_req)
 
-            # Find Model Method
-            req_method_str = MODEL_TO_METHOD[ model_req['task_model'] ]
-            model_method = getattr(models_runner, req_method_str)
-            # Run Model Method
-            model_method(model_req)
+            # TODO : Handle process return code
+            if model_res == 1:
+                print(f"[ TODO ] -> Model INPUT ERROR (Write exec_state = 9)")
+            elif model_res == 2:
+                print(f"[ TODO ] -> Model OUTPUT ERROR (Retry in another server)")
+            elif model_res == 3:
+                # TODO: Is Possible here that server lost internet connectivity:
+                #   - Test internet acess - Idle DeRunner until internet connection (STOP ALL DESOTA WHILE INDLING, START AFTER)
+                #   - API Model Request TIMEOUT (additionally DeSOTA can ping server every 10 sec - 3 error ping consider server down [ DeRunner can handle this while model is running in backgroud inside `call_model()` ! ])
+                print(f"[ TODO ] -> Write Result to DeSOTA ERROR (Retry in another server)")
+            elif model_res != 0:
+                raise ChildProcessError(model_req['task_model'])
+            
+            stop_model_serv(model_req['task_model'])
 
-        except AttributeError:
-            raise NotImplementedError("Class `{}` does not implement `{}`".format(models_runner.__class__.__name__, req_method_str))
-        except KeyError:
-            raise KeyError(f"Task Type `{model_req['task_type']}` not found in configs.yaml `task-to-method`: {list(MODEL_TO_METHOD.keys())}")
+        except ChildProcessError as cpe:
+            #cpe = model name
+            # TODO: Inform DeSOTA API that this server can no longer continue this request!
+            print(f"[ WARNING ] -> Re-Install Model in background: {cpe}")
+            pass
+        except ConnectionError as ce:
+            print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {ce}")
+            pass
+        except Exception as e:
+            print(f"[ CRITICAL FAIL ] -> Re-Install DeRunner: {e}")
+            pass
+        # if DEBUG:
+        #     break
 
 if __name__ == "__main__":
     args = parser.parse_args()
