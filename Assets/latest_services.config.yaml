@@ -52,6 +52,9 @@ services_params: {
     # Models
     franciscomvargas/neuralqa/qa: {
         win: {
+            version: 1.0.1,
+            runner: Desota\Desota_Models\NeuralQA\neuralqa\qa_runner.py,
+            runner_py: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe,
             service_path: Desota\Desota_Models\NeuralQA\neuralqa\executables\Windows,
             installer: https://raw.githubusercontent.com/franciscomvargas/neuralqa/master/neuralqa/executables/Windows/neuralqa.install.bat,
             uninstaller: neuralqa.uninstall.bat,
@@ -59,10 +62,12 @@ services_params: {
             uninstaller_args: [/Q],
             starter: neuralqa.start.bat,
             stoper: neuralqa.stop.bat,
-            status: neuralqa.status.bat,
-            version: 1.0.1
+            status: neuralqa.status.bat
         },
         lin: {
+            version: ,
+            runner: ,
+            runner_py: ,
             service_path: Desota\Desota_Models\NeuraQA\neuralqa\executables\Linux,
             installer: ,
             uninstaller: ,
@@ -70,10 +75,12 @@ services_params: {
             uninstaller_args: ,
             starter: ,
             stoper: ,
-            status: ,
-            version:
+            status:
         },
         mac: {
+            version: ,
+            runner: ,
+            runner_py: ,
             service_path: Desota\Desota_Models\NeuraQA\neuralqa\executables\MacOS,
             installer: ,
             uninstaller: ,
@@ -81,9 +88,7 @@ services_params: {
             uninstaller_args: ,
             starter: ,
             stoper: ,
-            status: ,
-            version:
-            
+            status:
         },
         source_code: https://github.com/franciscomvargas/neuralqa,
         report_issue: https://github.com/franciscomvargas/neuralqa/issues,
@@ -95,14 +100,24 @@ services_params: {
             status: ready
         },
         run_constantly: false,
-        submodel: false
+        submodel: false,
+        child_models: [
+            franciscomvargas/neuralqa/expansion
+        ]
     },
     franciscomvargas/neuralqa/expansion: {
+        win: {
+            runner: Desota\Desota_Models\NeuralQA\neuralqa\expansion_runner.py,
+            runner_py: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe
+        },
         submodel: true,
-        parentmodel: franciscomvargas/neuralqa/qa
+        parent_model: franciscomvargas/neuralqa/qa
     },
     franciscomvargas/descraper/url: {
         win: {
+            version: 1.0.0,
+            runner: Desota\Desota_Models\DeScraper\url_runner.py,
+            runner_py: Desota\Desota_Models\DeScraper\env\python.exe,
             service_path: Desota\Desota_Models\DeScraper\executables\Windows,
             installer: https://raw.githubusercontent.com/franciscomvargas/descraper/main/executables/Windows/descraper.install.bat,
             uninstaller: descraper.uninstall.bat,
@@ -110,10 +125,12 @@ services_params: {
             uninstaller_args: [/Q],
             starter: descraper.start.bat,
             stoper: descraper.stop.bat,
-            status: descraper.status.bat,
-            version: 1.0.0
+            status: descraper.status.bat
         },
         lin: {
+            version: ,
+            runner: ,
+            runner_py: ,
             service_path: Desota\Desota_Models\DeScraper\executables\Linux,
             installer: ,
             uninstaller: ,
@@ -121,10 +138,12 @@ services_params: {
             uninstaller_args: ,
             starter: ,
             stoper: ,
-            status: ,
-            version:
+            status:
         },
         mac: {
+            version: ,
+            runner: ,
+            runner_py: ,
             service_path: Desota\Desota_Models\DeScraper\executables\MacOS,
             installer: ,
             uninstaller: ,
@@ -132,8 +151,7 @@ services_params: {
             uninstaller_args: ,
             starter: ,
             stoper: ,
-            status: ,
-            version:
+            status:
             
         },
         source_code: https://github.com/franciscomvargas/descraper,
@@ -146,39 +164,46 @@ services_params: {
             status: ready
         },
         run_constantly: true,
-        submodel: false
+        submodel: false,
+        child_models: [
+            franciscomvargas/descraper/html
+        ]
     },
     franciscomvargas/descraper/html: {
+        win: {
+            runner: Desota\Desota_Models\DeScraper\html_runner.py,
+            runner_py: Desota\Desota_Models\DeScraper\env\python.exe,
+        },
         submodel: true,
-        parentmodel: franciscomvargas/descraper/url
+        parent_model: franciscomvargas/descraper/url
     },
 }
 
 ## DeSOTA Manager Tools Params
 manager_params: {
     win: {
+        version: 1.0.0,
         service_path: Desota\DeManagerTools\executables\Windows,
         installer: https://raw.githubusercontent.com/DeSOTAai/DeManagerTools/main/executables/Windows/demanagertools.install.bat,
         uninstaller: demanagertools.uninstall.bat,
         installer_args: [],
-        uninstaller_args: [/Q],
-        version: 1.0.0
+        uninstaller_args: [/Q]
     },
     lin: {
+        version: ,
         service_path: Desota\Desota_Models\DeScraper\executables\Linux,
         installer: ,
         uninstaller: ,
         installer_args: ,
-        uninstaller_args: ,
-        version:
+        uninstaller_args:
     },
     mac: {
+        version: ,
         service_path: Desota\Desota_Models\DeScraper\executables\MacOS,
         installer: ,
         uninstaller: ,
         installer_args: ,
-        uninstaller_args: ,
-        version:
+        uninstaller_args:
     },
     source_code: https://github.com/desotaai/demanagertools,
     report_issue: https://github.com/desotaai/demanagertools/issues,
