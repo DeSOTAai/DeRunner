@@ -2,8 +2,6 @@
 :: - User Path
 :: %~dp0 = C:\users\[user]\Desota\DeRunner\executables\Windows
 for %%a in ("%~dp0..\..\..\..") do set "root_path=%%~fa"
-echo root_path = %root_path%
-PAUSE
 set model_path=%root_path%\Desota\DeRunner
 :: Service VARS - retrieved from https://nssm.cc/usage
 set model_name=DeRunner
