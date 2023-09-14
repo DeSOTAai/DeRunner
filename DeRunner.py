@@ -23,23 +23,37 @@ I=0
 DEBUG = True
 
 # :: os.getcwd() = C:\users\[user]\Desota\DeRunner
-WORKING_FOLDER = os.getcwd()
+# WORKING_FOLDER = os.getcwd()
+WORKING_FOLDER = os.path.dirname(os.path.realpath(__file__))
+
 USER_PATH = "\\".join(WORKING_FOLDER.split("\\")[:-2])
 DESOTA_ROOT_PATH = os.path.join(USER_PATH, "Desota")
+
 APP_PATH = os.path.join(DESOTA_ROOT_PATH, "DeRunner")
+MANAGER_TOOLS_PATH = os.path.join(DESOTA_ROOT_PATH, "DeManagerTools")
 CONFIG_PATH = os.path.join(DESOTA_ROOT_PATH, "Configs")
+
 USER_CONF_PATH = os.path.join(CONFIG_PATH, "user.config.yaml")
 SERV_CONF_PATH = os.path.join(CONFIG_PATH, "services.config.yaml")
+LAST_SERV_CONF_PATH = os.path.join(CONFIG_PATH, "latest_services_config.yaml")
+SERVICE_TOOLS_PATH = os.path.join(CONFIG_PATH, "Services")
 
 # Open the file and load the file
-if not os.path.isfile(USER_CONF_PATH) or not os.path.isfile(SERV_CONF_PATH):
+if not os.path.isfile(USER_CONF_PATH) or not os.path.isfile(SERV_CONF_PATH) or not os.path.isfile(LAST_SERV_CONF_PATH):
+    print(f" [USER_CONF_PATH] -> {USER_CONF_PATH}")
+    print(f" [SERV_CONF_PATH] -> {SERV_CONF_PATH}")
+    print(f" [LAST_SERV_CONF_PATH] -> {LAST_SERV_CONF_PATH}")
     raise EnvironmentError()
 
 with open(USER_CONF_PATH) as f:
     USER_CONF = yaml.load(f, Loader=SafeLoader)
 with open(SERV_CONF_PATH) as f:
     SERV_CONF = yaml.load(f, Loader=SafeLoader)
+with open(LAST_SERV_CONF_PATH) as f:
+    LAST_SERV_CONF = yaml.load(f, Loader=SafeLoader)
+
 API_KEY = USER_CONF['api_key']
+USER_SYSTEM = USER_CONF["system"]
 
 API_URL = "http://129.152.27.36/assistant/api.php"
 API_UP =  "http://129.152.27.36/assistant/api_uploads"
@@ -51,77 +65,6 @@ IGNORE_MODELS = ["desotaai/derunner"] # DeSOTA Tools Services that don't run wit
 
 # models=['audio-classification-efficientat', 'whisper-small-en', 'coqui-tts-male', 'lllyasviel/sd-controlnet-seg-text-to-image','lllyasviel/sd-controlnet-openpose-text-to-image','lllyasviel/sd-controlnet-normal-text-to-image','lllyasviel/sd-controlnet-mlsd-text-to-image','lllyasviel/sd-controlnet-hed-text-to-image','lllyasviel/sd-controlnet-depth-text-to-image','lllyasviel/sd-controlnet-canny-text-to-image','lllyasviel/sd-controlnet-openpose-control','lllyasviel/sd-controlnet-normal-control','lllyasviel/sd-controlnet-mlsd-control','lllyasviel/sd-controlnet-hed-control','lllyasviel/sd-controlnet-canny-control','lllyasviel/sd-controlnet-text','clip','basic-vid2vid','basic-txt2vid','watch-video','talking-heads','clip-2','clip-2']
 
-
-
-
-# Models Methods > DEPRECATED
-'''
-class ModelsRunner(object):
-    # question-answering-large-dataset
-    def run_neuralqa_qa(self, model_request_dict):
-        print('Hello')
-    
-    # query-expansion
-    def run_neuralqa_expansion(self, model_request_dict):
-        print('Hello')
-
-    # url-to-text
-    def run_descraper_url(self, model_request_dict):
-        # Time when grabed
-        start_time = int(time.time())
-
-        # API Response URL
-        send_task_url = f"{API_URL}?api_key={API_KEY}&model={model_request_dict['task_model']}&send_task=" + model_request_dict['task_id']
-        
-        # File Path
-        dir_path = os.path.dirname(os.path.realpath(__file__))
-        out_filepath = os.path.join(dir_path, f"url-to-text_{start_time}.txt")
-        
-        # Descraper Request Preparation
-        descraper_url = "http://127.0.0.1:8880/api/scraper"
-        payload = {
-            "url": model_request_dict["task_args"]['url'] if 'url' in model_request_dict["task_args"] else model_request_dict["task_args"]['text'],
-            "html_text": True,
-            "overwrite_files": False
-        }
-        headers = {
-            "Accept": "application/json, text/javascript, */*; q=0.01",
-            "Connection": "keep-alive",
-            "Content-Type": "application/json; charset=UTF-8"
-        }
-        # Descraper Request
-        print(f"[ INFO ] -> Descraper Request Payload:\n{json.dumps(payload, indent=2)}")
-        descraper_response = requests.request("POST", descraper_url, json=payload, headers=headers)
-        descraper_res = descraper_response.json()
-        print(f"[ INFO ] -> Descraper Response:\n{json.dumps(descraper_res, indent=2)}")
-
-        if descraper_response.status_code != 200:
-            print(f"[ ERROR ] -> Descraper Request Failed (Info):\npayload:{json.dumps(payload, indent=2)}\nResponse Code:{descraper_response.status_code}")
-            return False
-        
-        # DeSOTA API Response Preparation
-        with open(out_filepath, 'w', encoding="utf-8") as fw:
-            fw.write(descraper_res["html_text"] if "html_text" in descraper_res else json.dumps(descraper_res))
-        files = []
-        with open(out_filepath, 'rb') as fr:
-            files.append(('upload[]', fr))
-            # DeSOTA API Response Post
-            send_task = requests.post(url = send_task_url, files=files)
-            print(f"[ INFO ] -> DeSOTA API Upload:\n{json.dumps(send_task.json(), indent=2)}")
-        # Delete temporary file
-        os.remove(out_filepath)
-
-        if send_task.status_code != 200:
-            print(f"[ ERROR ] -> Descraper Post Failed (Info):\files: {files}\nResponse Code: {send_task.status_code}")
-            return False
-        
-        print("TASK OK!")
-        return True
-
-    # html-to-text
-    def run_descraper_html(self, model_request_dict):
-        print('Hello')
-'''
 
 
 # Monitor API Model Request 
@@ -586,10 +529,10 @@ def cprint(query, condition):
     if condition:
         print(query)
 #   > Get child models and remove desota tools (IGNORE_MODELS)
-def grab_all_user_models():
+def grab_all_user_models(ignore_models=IGNORE_MODELS):
     all_user_models = list(USER_MODELS.keys())
     for model in list(USER_MODELS.keys()):
-        if model in IGNORE_MODELS:
+        if model in ignore_models:
             all_user_models.pop(all_user_models.index(model))
             continue
 
@@ -607,7 +550,7 @@ def grab_all_user_models():
      
 # DeRunner Methods
 #   > Monitor API Model Request 
-def monitor_model_request(debug=False):
+def monitor_model_request(ignore_models=IGNORE_MODELS, debug=False):
     global I
     I+=1
     
@@ -692,7 +635,7 @@ def monitor_model_request(debug=False):
     '''
     
     # Grab Models + Child Models (services.config.yaml)
-    _all_user_models = grab_all_user_models()
+    _all_user_models = grab_all_user_models(ignore_models)
                     
     cprint(f"[ INFO ] -> All User Models: {json.dumps(_all_user_models, indent=4)}", debug)
 
@@ -788,34 +731,39 @@ def monitor_model_request(debug=False):
                 task_dep = ast.literal_eval(task_dep)
                 model_request_dict["task_dep"] = task_dep
                 cprint(f"task type is {model_request_dict['task_type']}", debug)     # Conditional Print
-                cprint(f"task deps are {task_dep} {type(task_dep[0])}", debug)   # Conditional Print
+                # cprint(f"task deps are {task_dep} {type(task_dep[0])}", debug)   # Conditional Print
+                cprint(f"task deps are {task_dep}", debug)   # Conditional Print
                 #if json.loads(str(task_dep.decode('UTF-8'))):
                 if task_dep != [-1]:
                     cprint("Dependencies:", debug)   # Conditional Print
                     #deps = json.loads(str(task_dep.decode('UTF-8')))
                     model_request_dict['dep_args'] = {}
-                    for dep in task_dep:
+                    for dep_key, dep_args in task_dep.items():
                         try:
-                            dep_dic = json.loads(str(task_dep[dep]))
+                            dep_id = int(dep_key)
+                            dep_dic = json.loads(str(dep_args))
                         except:
                             try:
-                                dep_dic = find_json(str(task_dep[dep]))                        
-                            
-                                dep_dic = json.loads(dep_dic)
-                                model_request_dict['dep_args'][dep] = {}
-                                for file_type, file_value in dep_dic.items():
-                                    #print(file_type)
-                                    if file_type in ['image', 'video', 'audio', 'file']:
-                                        model_request_dict['dep_args'][dep][file_type] = {}
-                                        model_request_dict['dep_args'][dep][file_type]['file_name'] = str(file_value)
-                                        model_request_dict['dep_args'][dep][file_type]['file_url'] = f"{API_UP}/{file_value}"
-                                    else:
-                                        model_request_dict['dep_args'][dep][file_type] = str(file_value)
-                                            
+                                dep_dic = find_json(str(dep_args))
+                                dep_dic = json.loads(dep_dic)   
                             except:
+                                dep_dic = None
                                 if not model_request_dict['dep_args'] and debug:
                                     print("no filename found")
-                    
+                        if dep_dic:
+                            model_request_dict['dep_args'][dep_id] = {}
+                            for file_type, file_value in dep_dic.items():
+                                #print(file_type)
+                                if file_type == "text":
+                                    # cprint(f'text select on 0', debug)   # Conditional Print
+                                    model_request_dict['dep_args'][dep_id]['text_prompt'] = str(file_value)
+                                elif file_type in ['image', 'video', 'audio', 'file']:
+                                    model_request_dict['dep_args'][dep_id][file_type] = {}
+                                    model_request_dict['dep_args'][dep_id][file_type]['file_name'] = str(file_value)
+                                    model_request_dict['dep_args'][dep_id][file_type]['file_url'] = f"{API_UP}/{file_value}"
+                                else:
+                                    model_request_dict['dep_args'][dep_id][file_type] = str(file_value)
+                                         
                     cprint(f"Request DEP Files: {json.dumps(model_request_dict['dep_args'], indent=2)}", debug)
                     
 
@@ -852,15 +800,16 @@ def monitor_model_request(debug=False):
     #             model_request_dict["task_type"] = model_request_dict["task_type"].replace("image-to-", "text-to-")
     
     return model_request_dict
+
+
 #   > Handle Model Service
 def start_model_serv(model_id):
-    _opsys = USER_CONF["system"]
     _model_params = SERV_CONF["services_params"][model_id]
 
     if not _model_params["submodel"]:
-        _model_serv = SERV_CONF["services_params"][model_id][_opsys]
+        _model_serv = SERV_CONF["services_params"][model_id][USER_SYSTEM]
     else:
-        _model_serv = SERV_CONF["services_params"][ _model_params["parent_model"] ][_opsys]
+        _model_serv = SERV_CONF["services_params"][ _model_params["parent_model"] ][USER_SYSTEM]
 
     _model_starter = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["starter"])
     if DEBUG:
@@ -883,8 +832,8 @@ def start_model_serv(model_id):
         raise ChildProcessError(model_id)
     
     return
+
 def stop_model_serv(model_id):
-    _opsys = USER_CONF["system"]
     _model_params = SERV_CONF["services_params"][model_id]
 
     if not _model_params["submodel"]:
@@ -895,7 +844,7 @@ def stop_model_serv(model_id):
     if _model_params["run_constantly"]:
         return
     
-    _model_serv = _model_params[_opsys]
+    _model_serv = _model_params[USER_SYSTEM]
 
     _model_stoper = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["stoper"])
     if DEBUG:
@@ -918,6 +867,90 @@ def stop_model_serv(model_id):
         raise ChildProcessError(model_id)
     
     return
+
+
+def create_model_reinstalation(model_id):
+    if USER_SYSTEM == "win":
+        target_path = os.path.join(DESOTA_ROOT_PATH, f"tmi.bat")
+        # 1 - CRAWL LAST SERV CONF
+
+        # 2 - BAT HEADER
+        _tmp_file_lines = ["@ECHO OFF\n"]
+        _tmp_file_lines += [
+            "net session >NUL 2>NUL\n",
+            "IF %errorLevel% NEQ 0 (\n",
+            "\tgoto UACPrompt\n",
+            ") ELSE (\n",
+            "\tgoto gotAdmin\n",
+            ")\n",
+            ":UACPrompt\n",
+            'powershell -Command "Start-Process -Wait -Verb RunAs -FilePath \'%0\' -ArgumentList \'am_admin\'" \n',
+            "exit /B\n",
+            ":gotAdmin\n",
+            'pushd "%CD%"\n',
+            f'CD /D "{DESOTA_ROOT_PATH}"\n'
+        ]
+        
+        # 2.1 - Wait DeRunner Service STOP
+        derunner_status_path = os.path.join(APP_PATH, "executables", "Windows", "derunner.status.bat")
+        derunner_status_res = os.path.join(APP_PATH, "derunner_status.txt")
+        _tmp_file_lines += [
+            ":wait_derunner_stop\n",
+            f"start /B /WAIT {derunner_status_path} {derunner_status_res}\n",
+            f"set /p derunner_status=<{derunner_status_res}\n",
+            "IF %derunner_status% NEQ SERVICE_STOPPED (\n",
+            "\tgoto wait_derunner_stop\n",
+            ") ELSE (\n",
+            f"\tdel {derunner_status_res}\n",
+            ")\n",
+        ]
+
+        # 3 - Stop All Services
+        _gen_serv_stoper = os.path.join(SERVICE_TOOLS_PATH, "models_stopper.bat")
+        if os.path.isfile(_gen_serv_stoper):
+            _tmp_file_lines.append(f"start /B /WAIT {_gen_serv_stoper}\n")
+
+
+        # 4.1 - Append Model Installer
+        _model_params = LAST_SERV_CONF['services_params'][model_id][USER_SYSTEM]
+        _installer_url = _model_params['installer']
+        _installer_args = _model_params['installer_args']
+        _model_version = _model_params['version']
+        _installer_name = _installer_url.split('/')[-1]
+        _tmp_install_path = os.path.join(USER_PATH, _installer_name)
+        
+        _tmp_file_lines.append(f'powershell -command "Invoke-WebRequest -Uri {_installer_url} -OutFile {_tmp_install_path}"\n')
+        _tmp_file_lines.append(f'start /B /WAIT {_tmp_install_path} {" ".join(_installer_args)}\n')
+        _tmp_file_lines.append(f'del {_tmp_install_path}\n')
+        
+        # 4.2 - Update user models
+        _new_model = json.dumps({
+            model_id: _model_version
+        }).replace(" ", "").replace('"', '\\"')
+        
+        _tmp_file_lines.append(f'call {MANAGER_TOOLS_PATH}\env\python {MANAGER_TOOLS_PATH}\Tools\SetUserConfigs.py --key models --value "{_new_model}"  > NUL 2>NUL\n')
+        
+        ## after instalation!!
+        #   > Update Services Config with params from Latest Services Config
+        #   > Update Models Starter for Run constantly models
+        #   > Update Models Stoper
+        _tmp_file_lines.append(f'call {APP_PATH}\env\python {APP_PATH}\Tools\\after_model_reinstall.py > NUL 2>NUL\n')
+
+        # 5 - Create Start Run Constantly Services
+        _gen_serv_starter = os.path.join(SERVICE_TOOLS_PATH, "models_starter.bat")
+        _tmp_file_lines.append(f"IF EXIST {_gen_serv_starter} start /B /WAIT {_gen_serv_starter}\n")
+        
+        # 5 - Delete Bat at end of instalation - retrieved from https://stackoverflow.com/a/20333152
+        _tmp_file_lines.append('(goto) 2>nul & del "%~f0"\n')
+        #_tmp_file_lines.append("PAUSE\n") # DEBUG
+
+        # 6 - Create Installer Bat
+        with open(target_path, "w") as fw:
+            fw.writelines(_tmp_file_lines)
+            
+        return target_path
+
+
 #   > Call Model Runner
 def call_model(model_req):
     # Create tmp model_req.yaml with request params for model runner
@@ -926,9 +959,8 @@ def call_model(model_req):
         yaml.dump(model_req,fw,sort_keys=False)
 
     # Model Vars
-    _opsys = USER_CONF["system"]                                                    # Operating system (win | lin | mac)
     _model_id = model_req['task_model']                                             # Model Name
-    _model_runner_param = SERV_CONF["services_params"][_model_id][_opsys]           # Model params from services.config.yaml
+    _model_runner_param = SERV_CONF["services_params"][_model_id][USER_SYSTEM]           # Model params from services.config.yaml
     _model_runner = os.path.join(USER_PATH, _model_runner_param["runner"])          # Model runner path
     _model_runner_py = os.path.join(USER_PATH, _model_runner_param["runner_py"])    # Python with model runner packages
 
@@ -982,11 +1014,14 @@ def main(args):
     print("Runner Up!")
     '''Get Configurations'''
     print(f"[ INFO ] -> Configurations:\n{json.dumps(USER_CONF, indent=2)}")
+    ignore_models = IGNORE_MODELS.copy()
+    _reinstall_model = None
     while True:
         try:
             # clear()
             # TODO : Check for new installed models . Run Tester here
-            model_req = monitor_model_request(False)
+            
+            model_req = monitor_model_request(ignore_models=ignore_models, debug=False)
             if model_req == None:
                 continue
             print("*"*80)
@@ -997,33 +1032,71 @@ def main(args):
             model_res = call_model(model_req)
 
             # TODO : Handle process return code
+            error_level = None
             if model_res == 1:
                 print(f"[ TODO ] -> Model INPUT ERROR (Write exec_state = 9)")
+                error_level = 9
+                error_msg = "Model INPUT ERROR"
             elif model_res == 2:
                 print(f"[ TODO ] -> Model OUTPUT ERROR (Retry in another server)")
+                raise ChildProcessError(model_req['task_model'])    # DEBUG
+                error_level = 8
+                error_msg = "Model OUTPUT ERROR"
             elif model_res == 3:
-                # TODO: Is Possible here that server lost internet connectivity:
-                #   - Test internet acess - Idle DeRunner until internet connection (STOP ALL DESOTA WHILE INDLING, START AFTER)
-                #   - API Model Request TIMEOUT (additionally DeSOTA can ping server every 10 sec - 3 error ping consider server down [ DeRunner can handle this while model is running in backgroud inside `call_model()` ! ])
                 print(f"[ TODO ] -> Write Result to DeSOTA ERROR (Retry in another server)")
+                error_level = 8
+                error_msg = "Write Result to DeSOTA ERROR"
             elif model_res != 0:
                 raise ChildProcessError(model_req['task_model'])
-            
             stop_model_serv(model_req['task_model'])
 
         except ChildProcessError as cpe:
             #cpe = model name
             # TODO: Inform DeSOTA API that this server can no longer continue this request!
             print(f"[ WARNING ] -> Re-Install Model in background: {cpe}")
+            error_level = 8
+            error_msg = f"Model CRITICAL ERROR: {cpe}"
+            _reinstall_model = str(cpe)
             pass
         except ConnectionError as ce:
             print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {ce}")
+            error_level = 8
+            error_msg = "ConnectionError"
+            #TODO: implement
             pass
         except Exception as e:
             print(f"[ CRITICAL FAIL ] -> Re-Install DeRunner: {e}")
+            error_level = 8
+            error_msg = f"DeRunner CRITICAL FAIL: {e}"
+            _reinstall_model = "desotaai/derunner"
             pass
-        # if DEBUG:
-        #     break
+        
+        if error_level:
+            error_url = f"{API_URL}?api_key={API_KEY}&model={model_req['task_model']}&send_task={model_req['task_id']}&error={error_level}&error_msg={error_msg}" 
+            error_res = requests.post(url = error_url)
+            print(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {error_url}\n\tRES: {json.dumps(error_res.json(), indent=2)}")
+            time.sleep(.8)
+
+        
+        if _reinstall_model:
+            _reinstall_path = create_model_reinstalation(_reinstall_model)
+            print(f" [ WARNING ] -> Model Reinstalation required:\n\tmodel: {_reinstall_model}\n\treinstall_path = {_reinstall_path}")
+
+            # os.spawnl(os.P_OVERLAY, str(_reinstall_path), )
+            if USER_SYSTEM == "win":
+                # retrieved from https://stackoverflow.com/a/14797454
+                CREATE_NEW_PROCESS_GROUP = 0x00000200
+                DETACHED_PROCESS = 0x00000008
+                Popen(
+                    [_reinstall_path],
+                    stdout=subprocess.PIPE,
+                    stdin=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+                )
+                    
+            # STOP SERVICE
+            exit(666)
 
 if __name__ == "__main__":
     args = parser.parse_args()
