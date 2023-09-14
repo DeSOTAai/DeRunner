@@ -4,9 +4,6 @@ set service_name=derunner_service
 :: - User Path
 :: %~dp0 = C:\users\[user]\Desota\DeRunner\executables\Windows
 for %%a in ("%~dp0..\..\..\..") do set "root_path=%%~fa"
-ECHO IN - %~dp0
-ECHO OUT- %root_path%
-pause
 
 :: -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
 :: Bat Requires as argument the Target where status will be written
