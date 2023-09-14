@@ -27,9 +27,10 @@ set git32_portable=https://github.com/git-for-windows/git/releases/download/v2.4
 set miniconda64=https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86_64.exe
 set miniconda32=https://repo.anaconda.com/miniconda/Miniconda3-latest-Windows-x86.exe
 
-:: IPUT ARGS - /reinstall="overwrite model + remove service" ; /startmodel="Start Model Service"
+:: IPUT ARGS - /reinstall="overwrite model + remove service" ; /startmodel="Start Model Service" ; /fromrunner="Ignore Non Portable Sftwr Instalation (eg: python)"
 SET arg1=/reinstall
 SET arg2=/startrunner
+SET arg3=/fromrunner
 
 :: .BAT ANSI Colored CLI
 set header=
@@ -78,7 +79,12 @@ IF "%1" EQU "" GOTO noreinstallargs
 IF %1 EQU %arg1% (
     GOTO reinstall
 )
+IF "%2" EQU "" GOTO noreinstallargs
 IF %2 EQU %arg1% (
+    GOTO reinstall
+)
+IF "%3" EQU "" GOTO noreinstallargs
+IF %3 EQU %arg1% (
     GOTO reinstall
 )
 :noreinstallargs
@@ -101,6 +107,19 @@ call cd %model_path% >NUL 2>NUL
 
 
 :: Install Python if Required
+IF "%1" EQU "" GOTO checkinstallpython
+IF %1 EQU %arg3% (
+    GOTO skipinstallpython
+)
+IF "%2" EQU "" GOTO checkinstallpython
+IF %2 EQU %arg3% (
+    GOTO skipinstallpython
+)
+IF "%3" EQU "" GOTO checkinstallpython
+IF %3 EQU %arg3% (
+    GOTO skipinstallpython
+)
+:checkinstallpython
 ECHO %info_h1%Step 3/7 - Install Python if required%ansi_end%
 python --version >NUL 2>NUL
 IF errorlevel 1 (
@@ -177,11 +196,15 @@ start /B /WAIT %model_service_install%
 :: Start Runner Service?
 IF "%1" EQU "" GOTO EOF_IN
 IF %1 EQU %arg2% (
-    GOTO startrunner
+    GOTO startmodel
 )
 IF "%2" EQU "" GOTO EOF_IN
 IF %2 EQU %arg2% (
-    GOTO startrunner
+    GOTO startmodel
+)
+IF "%3" EQU "" GOTO EOF_IN
+IF %3 EQU %arg2% (
+    GOTO startmodel
 )
 GOTO EOF_IN
 

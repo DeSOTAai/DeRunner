@@ -871,7 +871,7 @@ def stop_model_serv(model_id):
 
 def create_model_reinstalation(model_id):
     if USER_SYSTEM == "win":
-        target_path = os.path.join(DESOTA_ROOT_PATH, f"tmi.bat")
+        target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bat")
         # 1 - CRAWL LAST SERV CONF
 
         # 2 - BAT HEADER
@@ -914,7 +914,8 @@ def create_model_reinstalation(model_id):
         # 4.1 - Append Model Installer
         _model_params = LAST_SERV_CONF['services_params'][model_id][USER_SYSTEM]
         _installer_url = _model_params['installer']
-        _installer_args = _model_params['installer_args']
+        _installer_args = _model_params['installer_args'] if 'installer_args' in _model_params and _model_params['installer_args'] else []
+        _installer_args += ["/fromrunner"]
         _model_version = _model_params['version']
         _installer_name = _installer_url.split('/')[-1]
         _tmp_install_path = os.path.join(USER_PATH, _installer_name)
@@ -1080,7 +1081,8 @@ def main(args):
         
         if _reinstall_model:
             _reinstall_path = create_model_reinstalation(_reinstall_model)
-            print(f" [ WARNING ] -> Model Reinstalation required:\n\tmodel: {_reinstall_model}\n\treinstall_path = {_reinstall_path}")
+            _reinstall_cmd = [_reinstall_path]
+            print(f" [ WARNING ] -> Model Reinstalation required:\n\tmodel: {_reinstall_model}\n\treinstall cmd: {' '.join(_reinstall_cmd)}")
 
             # os.spawnl(os.P_OVERLAY, str(_reinstall_path), )
             if USER_SYSTEM == "win":
@@ -1088,7 +1090,7 @@ def main(args):
                 CREATE_NEW_PROCESS_GROUP = 0x00000200
                 DETACHED_PROCESS = 0x00000008
                 Popen(
-                    [_reinstall_path],
+                    _reinstall_cmd,
                     stdout=subprocess.PIPE,
                     stdin=subprocess.PIPE,
                     stderr=subprocess.PIPE,
