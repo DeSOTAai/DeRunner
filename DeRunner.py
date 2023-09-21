@@ -39,18 +39,47 @@ LAST_SERV_CONF_PATH = os.path.join(CONFIG_PATH, "latest_services_config.yaml")
 SERVICE_TOOLS_PATH = os.path.join(CONFIG_PATH, "Services")
 
 # Open the file and load the file
-if not os.path.isfile(USER_CONF_PATH) or not os.path.isfile(SERV_CONF_PATH) or not os.path.isfile(LAST_SERV_CONF_PATH):
-    print(f" [USER_CONF_PATH] -> {USER_CONF_PATH}")
-    print(f" [SERV_CONF_PATH] -> {SERV_CONF_PATH}")
-    print(f" [LAST_SERV_CONF_PATH] -> {LAST_SERV_CONF_PATH}")
+def get_user_config():
+    if not os.path.isfile(USER_CONF_PATH):
+        return None
+    with open( USER_CONF_PATH ) as f_user:
+        return yaml.load(f_user, Loader=SafeLoader)
+USER_CONF = get_user_config()
+if not (USER_CONF):
+    print(f" [USER_CONF] Not found-> {USER_CONF_PATH}")
     raise EnvironmentError()
 
-with open(USER_CONF_PATH) as f:
-    USER_CONF = yaml.load(f, Loader=SafeLoader)
-with open(SERV_CONF_PATH) as f:
-    SERV_CONF = yaml.load(f, Loader=SafeLoader)
-with open(LAST_SERV_CONF_PATH) as f:
-    LAST_SERV_CONF = yaml.load(f, Loader=SafeLoader)
+# Services Configurations - Latest version URL
+LATEST_SERV_CONF_RAW = "https://raw.githubusercontent.com/DeSOTAai/DeRunner/main/Assets/latest_services.config.yaml"
+
+def get_services_config(ignore_update=False):
+    if ignore_update:
+        if not (os.path.isfile(SERV_CONF_PATH) or os.path.isfile(LAST_SERV_CONF_PATH)):
+            return None, None
+        with open( SERV_CONF_PATH ) as f_curr:
+            with open(LAST_SERV_CONF_PATH) as f_last:
+                return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
+    _req_res = requests.get(LATEST_SERV_CONF_RAW)
+    if _req_res.status_code != 200:
+        return None, None
+    else:
+        # Create Latest Services Config File
+        with open(LAST_SERV_CONF_PATH, "w") as fw:
+            fw.write(_req_res.text)
+
+        # Create Services Config File if don't exist
+        if not os.path.isfile(SERV_CONF_PATH):
+            with open(LAST_SERV_CONF_PATH, "w") as fw:
+                fw.write(_req_res.text)
+
+        with open( SERV_CONF_PATH ) as f_curr:
+            with open(LAST_SERV_CONF_PATH) as f_last:
+                return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
+SERV_CONF, LAST_SERV_CONF = get_services_config()
+if not (SERV_CONF and LAST_SERV_CONF):
+    print(f" [SERV_CONF] Not found-> {SERV_CONF_PATH}")
+    print(f" [LAST_SERV_CONF] Not found-> {LAST_SERV_CONF_PATH}")
+    raise EnvironmentError()
 
 API_KEY = USER_CONF['api_key']
 USER_SYSTEM = USER_CONF["system"]
@@ -530,6 +559,11 @@ def cprint(query, condition):
         print(query)
 #   > Get child models and remove desota tools (IGNORE_MODELS)
 def grab_all_user_models(ignore_models=IGNORE_MODELS):
+    USER_CONF = get_user_config()
+    if not (USER_CONF):
+        print(f" [USER_CONF] Not found-> {USER_CONF_PATH}")
+        raise EnvironmentError()
+    USER_MODELS = USER_CONF['models']
     all_user_models = list(USER_MODELS.keys())
     for model in list(USER_MODELS.keys()):
         if model in ignore_models:
@@ -872,8 +906,17 @@ def stop_model_serv(model_id):
 def create_model_reinstalation(model_id):
     if USER_SYSTEM == "win":
         target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bat")
-        # 1 - CRAWL LAST SERV CONF
-
+        # 1 - CRAWL CONFS
+        USER_CONF = get_user_config()
+        if not (USER_CONF):
+            print(f" [USER_CONF] Not found-> {USER_CONF_PATH}")
+            raise EnvironmentError()
+        USER_MODELS = USER_CONF['models']
+        SERV_CONF, LAST_SERV_CONF = get_services_config()
+        if not (SERV_CONF and LAST_SERV_CONF):
+            print(f" [SERV_CONF] Not found-> {SERV_CONF}")
+            print(f" [LAST_SERV_CONF] Not found-> {LAST_SERV_CONF}")
+            raise EnvironmentError()
         # 2 - BAT HEADER
         _tmp_file_lines = ["@ECHO OFF\n"]
         _tmp_file_lines += [
@@ -1040,7 +1083,6 @@ def main(args):
                 error_msg = "Model INPUT ERROR"
             elif model_res == 2:
                 print(f"[ TODO ] -> Model OUTPUT ERROR (Retry in another server)")
-                raise ChildProcessError(model_req['task_model'])    # DEBUG
                 error_level = 8
                 error_msg = "Model OUTPUT ERROR"
             elif model_res == 3:
