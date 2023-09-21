@@ -1,12 +1,12 @@
 <details open>
     <summary><h1>Instalation</h1></summary>
 
-* If model allready installed this installer function as upgrade, since the the installer webrequest newest installer from github - Take a look into Installer Optional `Arguments`
+* If model allready installed this installer function as upgrade, since the the installer webrequest newest installer from github - Take a look into [Installer Optional Arguments](#installer-optional-arguments)
 * Install python if not exist
 * Download miniconda, git and nssm as portables to Desota Folder
 * Clone GitHub Repository
 * Create a virtual environment with miniconda
-* Start Server after instalation - Take a look into Installer Optional `Arguments`
+* Start Server after instalation - Take a look into [Installer Optional Arguments](#installer-optional-arguments)
 
 <details open>
     <summary><h2>Use DeSOTA official <a href="https://github.com/DeSOTAai/DeManagerTools/">Manager Tools</a></h2></summary>
@@ -33,7 +33,7 @@
     powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner/raw/main/Executables/Windows/DeRunner.install.bat -OutFile ~\derunner_installer.bat" && call %UserProfile%\derunner_installer.bat && del %UserProfile%\derunner_installer.bat
 
     ```
-    * Installer Optional `Arguments`
+### Installer Optional Arguments
 
         <table>
             <thead>
