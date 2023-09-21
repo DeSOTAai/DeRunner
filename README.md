@@ -35,37 +35,37 @@
     ```
 ### Installer Optional Arguments
 
-        <table>
-            <thead>
-                <tr>
-                    <th>arg</th>
-                    <th>Description</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td rowspan=3>/reinstall</td>
-                    <td>Overwrite project when re-installing</td>
-                </tr>
-                <tr>
-                    <td>Delete project service when re-installing</td>
-                </tr>
-                <tr>
-                    <td>Install without requiring user interaction</td>
-                </tr>
-                <tr>
-                    <td>/startmodel</td>
-                    <td>Start project service after instalation</td>
-                </tr>
-            </tbody>
-        </table>
+<table>
+    <thead>
+        <tr>
+            <th>arg</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan=3>/reinstall</td>
+            <td>Overwrite project when re-installing</td>
+        </tr>
+        <tr>
+            <td>Delete project service when re-installing</td>
+        </tr>
+        <tr>
+            <td>Install without requiring user interaction</td>
+        </tr>
+        <tr>
+            <td>/startmodel</td>
+            <td>Start project service after instalation</td>
+        </tr>
+    </tbody>
+</table>
 
-        `Install with overwrite permission and start server after instalation`
-        
-        ```cmd
-        powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner/raw/main/Executables/Windows/DeRunner.install.bat -OutFile ~\derunner_installer.bat" && call %UserProfile%\derunner_installer.bat /reinstall /startmodel && del %UserProfile%\derunner_installer.bat
+`Install with overwrite permission and start server after instalation`
 
-        ```
+```cmd
+powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner/raw/main/Executables/Windows/DeRunner.install.bat -OutFile ~\derunner_installer.bat" && call %UserProfile%\derunner_installer.bat /reinstall /startmodel && del %UserProfile%\derunner_installer.bat
+
+```
     
     
 </details>
