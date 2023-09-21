@@ -5,7 +5,6 @@
 * Install python if not exist
 * Download miniconda, git and nssm as portables to Desota Folder
 * Clone GitHub Repository
-* Copy config_template into User main config.yaml
 * Create a virtual environment with miniconda
 * Start Server after instalation - Take a look into Installer Optional `Arguments`
 
