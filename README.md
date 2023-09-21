@@ -1,4 +1,5 @@
-# Instalation
+<details open>
+    <summary><h1>Instalation</h1></summary>
 
 * If model allready installed this installer function as upgrade, since the the installer webrequest newest installer from github - Take a look into Installer Optional `Arguments`
 * Install python if not exist
@@ -8,8 +9,20 @@
 * Create a virtual environment with miniconda
 * Start Server after instalation - Take a look into Installer Optional `Arguments`
 
-<details>
-    <summary><h2>Windows</h2></summary>
+<details open>
+    <summary><h2>Use DeSOTA official <a href="https://github.com/DeSOTAai/DeManagerTools/">Manager Tools</a></h2></summary>
+
+[![Install DeManagerTools](https://img.shields.io/static/v1?label=Desota%20-%20Manager%20Tools&message=Install&color=blue&logo=windows)](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/DeSOTAai/DeManagerTools/blob/main/executables/Windows/demanagertools.install.bat)
+
+<!-- TODO: Convert desota host into HTTPS -->
+<!-- [![Install DeManagerTools](https://img.shields.io/static/v1?label=Desota%20-%20Manager%20Tools&message=Install&color=blue&logo=windows)](http://129.152.27.36/assistant/download.php?system=win&file=demanagertools) -->
+
+1. Uncompress File
+2. Run .BAT file
+</details>
+
+<details open>
+    <summary><h2>Manual Windows Instalation</h2></summary>
 
 * Go to CMD as Administrator (command prompt):
     * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
@@ -57,12 +70,15 @@
     
     
 </details>
+</details>
 
-# Service Operations
+<details open>
+    <summary><h1>Service Operations</h1></summary>
+    
 
 * Start/Stop Service
 
-<details>
+<details open>
     <summary><h2>Windows</h2></summary>
 
 * Go to CMD (command prompt):
@@ -83,14 +99,18 @@
 
     ```
 </details>
+</details>
 
-# Uninstalation
+<details open>
+    <summary><h1>Uninstalation</h1></summary>
 
 * Delete Service
 * Delete DeRunner Folder
 
-<details>
-    <summary><h2>Windows</h2></summary>
+## Use DeSOTA official [Manager Tools](https://github.com/DeSOTAai/DeManagerTools/)
+
+<details open>
+    <summary><h2>Manual Windows Uninstalation</h2></summary>
 
 * Go to CMD (command prompt):
   * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
@@ -116,8 +136,10 @@
         ```
       
 </details>
+</details>
 
-# Credits / Lincense
+<details open>
+    <summary><h1>Credits / Lincense</h1></summary>
 
 ## [DeSOTA](#coming-soon)
 ```sh
