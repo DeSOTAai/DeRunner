@@ -74,9 +74,6 @@
 
 <details open>
     <summary><h1>Service Operations</h1></summary>
-    
-
-* Start/Stop Service
 
 <details open>
     <summary><h2>Windows</h2></summary>
