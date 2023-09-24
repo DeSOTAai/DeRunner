@@ -20,7 +20,7 @@ parser.add_argument('-hs', '--handshake',
                     action='store_true')
 
 I=0
-DEBUG = True
+DEBUG = False
 
 # :: os.getcwd() = C:\users\[user]\Desota\DeRunner
 # WORKING_FOLDER = os.getcwd()
@@ -523,6 +523,7 @@ def cprint(query, condition=DEBUG):
 
 # DeRunner Class
 class Derunner():
+    # Configurations
     def __init__(self) -> None:
         self.serv_conf, self.last_serv_conf = self.get_services_config()
         self.user_conf = self.get_user_config()
@@ -530,16 +531,16 @@ class Derunner():
         self.user_models = self.user_conf['models']
         self.user_api_key = self.user_conf['api_key']
 
-    # Configurations
     #   > Grab User Configurations
-    def get_user_config(self):
+    def get_user_config(self) -> dict:
         if not os.path.isfile(USER_CONF_PATH):
             print(f" [USER_CONF] Not found-> {USER_CONF_PATH}")
             raise EnvironmentError()
         with open( USER_CONF_PATH ) as f_user:
             return yaml.load(f_user, Loader=SafeLoader)
+    
     #   > Return latest_services.config.yaml(write if not ignore_update)
-    def get_services_config(self, ignore_update=False):
+    def get_services_config(self, ignore_update=False) -> (dict, dict):
         if ignore_update:
             if not (os.path.isfile(SERV_CONF_PATH) or os.path.isfile(LAST_SERV_CONF_PATH)):
                 print(f" [SERV_CONF] Not found-> {SERV_CONF_PATH}")
@@ -570,13 +571,14 @@ class Derunner():
 
     # DeSOTA API Monitor
     #   > Get child models and remove desota tools (IGNORE_MODELS)
-    def grab_all_user_models(self, ignore_models=IGNORE_MODELS):
+    def grab_all_user_models(self, ignore_models=IGNORE_MODELS) -> list:
         all_user_models = []
         
         for model in list(self.user_models.keys()):
             if model in ignore_models:
                 continue
-
+            
+            all_user_models.append(model)
             _model_params = self.serv_conf["services_params"][model]
             # print(f" [ DEBUG ALL USER MODELS ] - {model} params = {json.dumps(_model_params, indent=2)}")
 
@@ -590,8 +592,9 @@ class Derunner():
                         if _child_model in self.serv_conf["services_params"] and _child_model not in all_user_models:
                             all_user_models.append(_child_model)
         return all_user_models
-
-    def monitor_model_request(self, ignore_models=IGNORE_MODELS, debug=False):
+    
+    #   > Check for model request
+    def monitor_model_request(self, ignore_models=IGNORE_MODELS, debug=False) -> dict:
         global I
         I += 1
         
@@ -843,7 +846,8 @@ class Derunner():
    
 
     # Handle Model Service
-    def start_model_serv(self, model_id):
+    #   > Start Service
+    def start_model_serv(self, model_id) -> None:
         _model_params = self.serv_conf["services_params"][model_id]
 
         if not _model_params["submodel"]:
@@ -872,8 +876,9 @@ class Derunner():
             raise ChildProcessError(model_id)
         
         return
-
-    def stop_model_serv(self, model_id):
+    
+    #   > Stop Service 
+    def stop_model_serv(self, model_id) -> None:
         _model_params = self.serv_conf["services_params"][model_id]
 
         if not _model_params["submodel"]:
@@ -911,7 +916,7 @@ class Derunner():
 
     # Services Upgrade Methods
     #   > Check if is time for upgrade
-    def handle_upgrade_timer(self, create=False):
+    def handle_upgrade_timer(self, create=False) -> str:
         if not os.path.isfile(LAST_UP_EPOCH) or create:
             cprint(f"[ TIMER DEBUG ] - MEMORY DOESN'T EXIST", False)
             with open(LAST_UP_EPOCH, "w") as fw:
@@ -928,8 +933,8 @@ class Derunner():
             return "go for it"
         return None
 
-    #   > Create Model(s) .bat installer for reinstalation
-    def create_model_reinstalation(self, model_ids):
+    #   > Create Model(s) installer for reinstalation
+    def create_model_reinstalation(self, model_ids) -> str:
         if self.user_system == "win":
             # 1 - CRAWL CONFS
             target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bat")
@@ -1016,7 +1021,7 @@ class Derunner():
             return target_path
 
     #   > Request Model(s) reinstalation
-    def request_model_reinstall(self, _reinstall_model, init=False):
+    def request_model_reinstall(self, _reinstall_model, init=False) -> int:
         if init:
             # UPGRADE CONFIGURATIONS (Target: self.last_serv_conf)
             self.__init__()
@@ -1040,7 +1045,7 @@ class Derunner():
         return 0
     
     #   > Check for upgrades
-    def req_service_upgrade(self):
+    def req_service_upgrade(self) -> int:
         # Timer check
         upgrade_timer = self.handle_upgrade_timer()
         if upgrade_timer != "go for it":
@@ -1069,7 +1074,7 @@ class Derunner():
 
 
     # Call Model Runner
-    def call_model(self, model_req):
+    def call_model(self, model_req) -> int:
         # Create tmp model_req.yaml with request params for model runner
         _tmp_req_path = os.path.join(APP_PATH, f"tmp_model_req{int(time.time())}.yaml")
         with open(_tmp_req_path, 'w',) as fw:
@@ -1121,8 +1126,8 @@ class Derunner():
         return _ret_code
 
 
-    # Main Loop
-    def mainloop(self, args):
+    # Main DeRunner Loop
+    def mainloop(self, args) -> None:
         # Handshake - Service checker
         if args.handshake:
             print('{"status":"ready"}')
@@ -1210,17 +1215,6 @@ class Derunner():
                 if req_reinstall == 0:
                     # STOP SERVICE
                     exit(666)
-
-    def debug(self, args):
-        # Print Configurations
-        print("Runner Up!")
-        print(f"[ INFO ] -> Configurations:\n{json.dumps(self.user_conf, indent=2)}")
-
-        # DEBUG BELLOW
-        while True:
-            req_serv_upg = self.req_service_upgrade()
-            print(f" [DEBUG RES] - self.req_service_upgrade() = {req_serv_upg}")
-            time.sleep(2)
 
 if __name__ == "__main__":
     args = parser.parse_args()
