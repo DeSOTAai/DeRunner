@@ -177,6 +177,58 @@ services_params: {
         submodel: true,
         parent_model: franciscomvargas/descraper/url
     },
+    franciscomvargas/deurlcruncher: {
+        win: {
+            version: 1.0.0,
+            runner: Desota\Desota_Models\DeUrlCruncher\runner.py,
+            runner_py: Desota\Desota_Models\DeUrlCruncher\env\python.exe,
+            service_path: Desota\Desota_Models\DeUrlCruncher\executables\Windows,
+            installer: https://raw.githubusercontent.com/franciscomvargas/DeUrlCruncher/main/executables/Windows/deurlcruncher.install.bat,
+            uninstaller: deurlcruncher.uninstall.bat,
+            installer_args: [/reinstall],
+            uninstaller_args: [/Q],
+            starter: ,
+            stoper: ,
+            status:
+        },
+        lin: {
+            version: ,
+            runner: ,
+            runner_py: ,
+            service_path: Desota\Desota_Models\DeScraper\executables\Linux,
+            installer: ,
+            uninstaller: ,
+            installer_args: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status:
+        },
+        mac: {
+            version: ,
+            runner: ,
+            runner_py: ,
+            service_path: Desota\Desota_Models\DeScraper\executables\MacOS,
+            installer: ,
+            uninstaller: ,
+            installer_args: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status:
+            
+        },
+        source_code: https://github.com/franciscomvargas/DeUrlCruncher,
+        report_issue: https://github.com/franciscomvargas/DeUrlCruncher/issues,
+        description: https://github.com/franciscomvargas/DeUrlCruncher/blob/main/README.md,
+        short_description: Get google URL results from string query,
+        model_ui: ,
+        handshake_req: ,
+        handshake_res: ,
+        run_constantly: false,
+        submodel: false,
+        child_models:
+    },
 }
 
 ## DeSOTA Manager Tools Params

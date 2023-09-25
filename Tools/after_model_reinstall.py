@@ -79,9 +79,10 @@ def upd_model_start():
 
             _model_serv_path = service_params[USER_SYSTEM]["service_path"]
             _model_serv_start = service_params[USER_SYSTEM]["starter"]
-            _model_start_path = os.path.join(USER_PATH, _model_serv_path, _model_serv_start)
-            
-            _tmp_file_lines.append(f"start /B /WAIT {_model_start_path}\n")
+            if _model_serv_start:
+                _model_start_path = os.path.join(USER_PATH, _model_serv_path, _model_serv_start)
+                
+                _tmp_file_lines.append(f"start /B /WAIT {_model_start_path}\n")
 
         if not _exist_run_constantly_model:
             if os.path.isfile(SERVICES_START_PATH):
@@ -114,9 +115,10 @@ def upd_model_stop():
 
             _model_serv_path = service_params[USER_SYSTEM]["service_path"]
             _model_serv_stop = service_params[USER_SYSTEM]["stoper"]
-            _model_stop_path = os.path.join(USER_PATH, _model_serv_path, _model_serv_stop)
-            
-            _tmp_file_lines.append(f"start /B /WAIT {_model_stop_path}\n")
+            if _model_serv_stop:
+                _model_stop_path = os.path.join(USER_PATH, _model_serv_path, _model_serv_stop)
+                
+                _tmp_file_lines.append(f"start /B /WAIT {_model_stop_path}\n")
 
         if not _exist_model2stop:
             if os.path.isfile(SERVICES_STOP_PATH):

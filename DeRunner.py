@@ -855,7 +855,10 @@ class Derunner():
         else:
             _model_serv = self.serv_conf["services_params"][ _model_params["parent_model"] ][self.user_system]
 
-        _model_starter = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["starter"])
+        _model_starter = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["starter"]) if _model_serv["starter"] else None
+        if not _model_starter:
+            return
+        
         if DEBUG:
             print(f'Model start cmd:\n\t{_model_starter}')
             _sproc = Popen(
@@ -891,7 +894,10 @@ class Derunner():
         
         _model_serv = _model_params[self.user_system]
 
-        _model_stoper = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["stoper"])
+        _model_stoper = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["stoper"]) if _model_serv["stoper"] else None
+        if not _model_stoper:
+            return None
+        
         if DEBUG:
             print(f'Model stop cmd:\n\t{_model_stoper}')
             _sproc = Popen(
