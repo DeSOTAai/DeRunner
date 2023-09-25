@@ -189,7 +189,11 @@ services_params: {
             uninstaller_args: [/Q],
             starter: ,
             stoper: ,
-            status:
+            status: ,
+            cli: [
+                Desota\Desota_Models\DeUrlCruncher\env\python.exe,
+                Desota\Desota_Models\DeUrlCruncher\main.py
+            ]
         },
         lin: {
             version: ,
@@ -223,6 +227,7 @@ services_params: {
         description: https://github.com/franciscomvargas/DeUrlCruncher/blob/main/README.md,
         short_description: Get google URL results from string query,
         model_ui: ,
+        model_cli: cli,
         handshake_req: ,
         handshake_res: ,
         run_constantly: false,
