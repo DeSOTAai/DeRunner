@@ -519,6 +519,22 @@ def find_json(s):
 def cprint(query, condition=DEBUG):
     if condition:
         print(query)
+#   > Log to service.log
+def delogger(query):
+    _log_path = os.path.join(WORKING_FOLDER, "service.log")
+    if not os.path.isfile(_log_path):
+        with open(_log_path, "w") as fw:
+            fw.write(f"File Forced Creation by DeRunner\n")
+
+    with open(_log_path, "a") as fa:
+        if isinstance(query, str):
+            fa.write(query, "\n")
+        elif isinstance(query, int) or isinstance(query, float):
+            fa.write(str(query), "\n")
+        elif isinstance(query, list):
+            fa.writelines(query)
+        elif isinstance(query, dict):
+            fa.write(json.dumps(query, indent=2), "\n")
 
 
 # DeRunner Class
@@ -1128,6 +1144,7 @@ class Derunner():
             os.remove(_tmp_req_path)
 
         print(f"[ INFO ] -> Model `{model_req['task_model']}` returncode = {_ret_code}")
+        delogger(f"[ INFO ] -> Model `{model_req['task_model']}` returncode = {_ret_code}")
         
         return _ret_code
 
@@ -1141,7 +1158,10 @@ class Derunner():
         
         # Print Configurations
         print("Runner Up!")
+        delogger("Runner Up!")
+        
         print(f"[ INFO ] -> Configurations:\n{json.dumps(self.user_conf, indent=2)}")
+        delogger(f"[ INFO ] -> Configurations:\n{json.dumps(self.user_conf, indent=2)}")
 
         _ignore_models = IGNORE_MODELS.copy()
         _reinstall_model = None
@@ -1160,8 +1180,9 @@ class Derunner():
 
                 if model_req == None:
                     continue
-                print("*"*80)
+                delogger("*"*80)
                 print(f"[ INFO ] -> Incoming Model Request:\n{json.dumps(model_req, indent=2)}")
+                delogger(f"[ INFO ] -> Incoming Model Request:\n{json.dumps(model_req, indent=2)}")
 
                 self.start_model_serv(model_req['task_model'])
                 
@@ -1192,6 +1213,7 @@ class Derunner():
                 #cpe = model name
                 # Inform DeSOTA API that this server can no longer continue this request!
                 print(f"[ WARNING ] -> Re-Install Model in background: {cpe}")
+                delogger(f"[ WARNING ] -> Re-Install Model in background: {cpe}")
                 error_level = 8
                 error_msg = f"Model CRITICAL ERROR: {cpe}"
                 _reinstall_model = str(cpe)
@@ -1204,6 +1226,7 @@ class Derunner():
                 pass
             except Exception as e:
                 print(f"[ CRITICAL FAIL ] -> Re-Install DeRunner: {e}")
+                delogger(f"[ CRITICAL FAIL ] -> Re-Install DeRunner: {e}")
                 error_level = 8
                 error_msg = f"DeRunner CRITICAL FAIL: {e}"
                 _reinstall_model = "desotaai/derunner"
@@ -1213,6 +1236,7 @@ class Derunner():
                 error_url = f"{API_URL}?api_key={self.user_api_key}&model={model_req['task_model']}&send_task={model_req['task_id']}&error={error_level}&error_msg={error_msg}" 
                 error_res = requests.post(url = error_url)
                 print(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {error_url}\n\tRES: {json.dumps(error_res.json(), indent=2)}")
+                delogger(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {error_url}\n\tRES: {json.dumps(error_res.json(), indent=2)}")
                 time.sleep(.8)
 
             
