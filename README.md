@@ -22,7 +22,7 @@ Derunner consists on a python scrip running as service to:
 
 
 
-<details open>
+<details>
     <summary><h2>Manual Windows Instalation</h2></summary>
 
 ### Installer Description:
@@ -114,7 +114,7 @@ powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner
 
 ## Use DeSOTA official [Manager Tools](https://github.com/DeSOTAai/DeManagerTools#models--tools-dashboard)
 
-<details open>
+<details>
     <summary><h2>Manual Windows Uninstalation</h2></summary>
 
 ### Uninstaller Description:
