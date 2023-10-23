@@ -1,22 +1,31 @@
 @ECHO OFF
-:: Service VARS
-set service_name=derunner_service
+
+:: -- Edit bellow vvvv DeSOTA DEVELOPER EXAMPLe (PythonAsService - Tool): miniconda + pip pckgs + NSSM
+
 :: - User Path
 :: %~dp0 = C:\users\[user]\Desota\DeRunner\executables\Windows
-for %%a in ("%~dp0..\..\..\..") do set "root_path=%%~fa"
+for %%a in ("%~dp0..\..\..\..") do set "user_path=%%~fa"
+
+:: Service VARS
+set service_name=derunner_service
+
+:: NSSM VARS
+set nssm_path=%user_path%\Desota\Portables\nssm
+
+
+
 
 :: -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
-:: Bat Requires as argument the Target where status will be written
-IF "%1" EQU "" (
-    GOTO exit_bat
-)
 
 :: NSSM - exe path 
-IF %PROCESSOR_ARCHITECTURE%==AMD64 set nssm_exe=%root_path%\Desota\Portables\nssm\win64\nssm.exe
-IF %PROCESSOR_ARCHITECTURE%==x86 set nssm_exe=%root_path%\Desota\Portables\nssm\win32\nssm.exe
+IF %PROCESSOR_ARCHITECTURE%==AMD64 set nssm_exe=%nssm_path%\win64\nssm.exe
+IF %PROCESSOR_ARCHITECTURE%==x86 set nssm_exe=%nssm_path%\win32\nssm.exe
 
 :: Status service - retrieved from https://nssm.cc/commands
+:: Bat Requires as argument the Target where status will be written
+IF "%1" EQU "" GOTO noargs
 %nssm_exe% status %service_name% >%1
-
-:exit_bat
 exit
+:noargs
+%nssm_exe% status %service_name%
+PAUSE
