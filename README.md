@@ -12,158 +12,297 @@ Derunner consists on a python scrip running as service to:
 
 </details>
 
+
+
+
 <details open>
     <summary><h1>Instalation</h1></summary>
+
+## Use DeSOTA official [Manager & Tools](https://github.com/DeSOTAai/DeManagerTools#readme)
+
+1. Choose Platform:
+
+    [![Install DeManagerTools](https://img.shields.io/static/v1?label=Desota%20-%20Manager%20Tools&message=Install&color=blue&logo=windows)](https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.0.2/dmt_installer-v0.0.2-win64.zip)
     
+    <!-- [![Install DeManagerTools](https://img.shields.io/static/v1?label=Desota%20-%20Manager%20Tools&message=Install&color=blue&logo=linux)](https://github.com/DeSOTAai/DeManagerTools#instalation) -->
+  
+2. **Open** [`Models Instalation`](https://github.com/DeSOTAai/DeManagerTools/#install--upgrade-desota-models-and-tools) tab
 
-## Use DeSOTA official [Manager & Tools](https://github.com/DeSOTAai/DeManagerTools#instalation)
+3. **Select** the Available Tool `desotaai/derunner`
 
-[![Install DeManagerTools](https://img.shields.io/static/v1?label=Desota%20-%20Manager%20Tools&message=Install&color=blue&logo=windows)](https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.0.2/dmt_installer-v0.0.2-win64.zip)
-
-<!--
-TODO
-[![Install DeManagerTools](https://img.shields.io/static/v1?label=Desota%20-%20Manager%20Tools&message=Install&color=blue&logo=windows)](https://desota.net/assistant/download.php?file=demanagertools&system=win)
--->
-
-
+4. **Press** `Start Instalation`
 
 <details>
     <summary><h2>Manual Windows Instalation</h2></summary>
 
-### Installer Description:
-
-* If model allready installed this installer function as upgrade, since the the installer webrequest newest installer from github - Take a look into [Installer Optional Arguments](#installer-optional-arguments)
-* Install python if not exist
-* Download miniconda, git and nssm as portables to Desota Folder
-* Clone GitHub Repository
-* Create a virtual environment with miniconda
-* Start Server after instalation - Take a look into [Installer Optional Arguments](#installer-optional-arguments)
-
-### Installer Procedure:
-
 * Go to CMD (command prompt):
-    * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
-    * Enter: `cmd` 
+  * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
+  * Enter: `cmd` 
+  * <kbd>↵ Enter</kbd>
 
-* Copy-Paste the following comand: 
-    ```cmd
-    powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner/raw/main/Executables/Windows/DeRunner.install.bat -OutFile ~\derunner_installer.bat" && call %UserProfile%\derunner_installer.bat && del %UserProfile%\derunner_installer.bat
+### Download:
 
-    ```
-### Installer Optional Arguments:
-
-<table>
-    <thead>
-        <tr>
-            <th>arg</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td rowspan=3>/reinstall</td>
-            <td>Overwrite project when re-installing</td>
-        </tr>
-        <tr>
-            <td>Delete project service when re-installing</td>
-        </tr>
-        <tr>
-            <td>Install without requiring user interaction</td>
-        </tr>
-        <tr>
-            <td>/startmodel</td>
-            <td>Start project service after instalation</td>
-        </tr>
-    </tbody>
-</table>
-
-`Install with overwrite permission and start service after instalation`
-
+1. Create Model Folder:
 ```cmd
-powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner/raw/main/Executables/Windows/DeRunner.install.bat -OutFile ~\derunner_installer.bat" && call %UserProfile%\derunner_installer.bat /reinstall /startmodel && del %UserProfile%\derunner_installer.bat
+rmdir /S /Q %UserProfile%\Desota\DeRunner
+mkdir %UserProfile%\Desota\DeRunner
 
 ```
+
+2. Download Last Release:
+```cmd
+powershell -command "Invoke-WebRequest -Uri https://github.com/desotaai/derunner/archive/refs/tags/v0.0.0.zip -OutFile %UserProfile%\DeRunner_release.zip" 
+
+```
+
+3. Uncompress Release:
+```cmd
+tar -xzvf %UserProfile%\DeRunner_release.zip -C %UserProfile%\Desota\DeRunner --strip-components 1 
+
+```
+
+4. Delete Compressed Release:
+```cmd
+del %UserProfile%\DeRunner_release.zip
+
+```
+
+### Setup:
+
+5. Setup:
+```cmd
+%UserProfile%\Desota\DeRunner\executables\Windows\derunner.setup.bat
+
+```
+
+*  Optional Arguments:
+    <table>
+        <thead>
+            <tr>
+                <th>arg</th>
+                <th>Description</th>
+                <th>Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>/debug</td>
+                <td>Log everything (useful for debug)</td>
+                <td><code>%UserProfile%\Desota\DeRunner\executables\Windows\derunner.setup.bat /debug</code></td>
+            </tr>
+            <tr>
+                <td>/manualstart</td>
+                <td>Don't start at end of setup</td>
+                <td><code>%UserProfile%\Desota\DeRunner\executables\Windows\derunner.setup.bat /manualstart</code></td>
+            </tr>
+        </tbody>
+    </table>
+    
+</details>
+
+
+
+<details>
+    <summary><h2>Manual Linux Instalation</h2></summary>
+
+* Go to Terminal:
+    * <kbd> Ctrl </kbd> + <kbd> Alt </kbd> + <kbd>T</kbd>
+
+### Download:
+
+1. Create Model Folder:
+```cmd
+rm -rf ~/Desota/DeRunner
+mkdir -p ~/Desota/DeRunner
+
+```
+
+2. Download Last Release:
+```cmd
+wget https://github.com/franciscomvargas/descraper/archive/refs/tags/v0.0.0.zip -O ~/DeRunner_release.zip
+
+```
+
+3. Uncompress Release:
+```cmd
+sudo apt install libarchive-tools -y && bsdtar -xzvf ~/DeRunner_release.zip -C ~/Desota/DeRunner --strip-components=1
+
+```
+
+4. Delete Compressed Release:
+```cmd
+rm -rf ~/DeRunner_release.zip
+
+```
+
+### Setup:
+
+5. Setup:
+```cmd
+sudo bash ~/Desota/DeRunner/executables/Linux/derunner.setup.bash
+
+```
+
+*  Optional Arguments:
+    <table>
+        <thead>
+            <tr>
+                <th>arg</th>
+                <th>Description</th>
+                <th>Example</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>-d</td>
+                <td>Setup with debug Echo ON</td>
+                <td><code>sudo bash ~/Desota/DeRunner/executables/Linux/derunner.setup.bash -d</code></td>
+            </tr>
+            <tr>
+                <td>-m</td>
+                <td>Don't start service at end of setup</td>
+                <td><code>sudo bash ~/Desota/DeRunner/executables/Linux/derunner.setup.bash -m</code></td>
+            </tr>
+        </tbody>
+    </table>
     
     
 </details>
 </details>
+
+
+
 
 <details open>
     <summary><h1>Service Operations</h1></summary>
 
-<details open>
+<details>
     <summary><h2>Windows</h2></summary>
 
-* Go to CMD (command prompt):
+* Go to CMD as Administrator (command prompt):
   * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
-  * Search: `cmd` 
+  * Enter: `cmd` 
   * <kbd>Ctrl</kbd> + <kbd>⇧ Shift</kbd> + <kbd>↵ Enter</kbd>
 
 ### Start Service
-* Copy-Paste the following comands: 
-    ```cmd
-    %UserProfile%\Desota\DeRunner\executables\Windows\derunner.start.bat
+```cmd
+%UserProfile%\Desota\DeRunner\executables\Windows\derunner.start.bat
 
-    ```
+```
+
 ### Stop Service
-* Copy-Paste the following comands: 
-    ```cmd
-    %UserProfile%\Desota\DeRunner\executables\Windows\derunner.stop.bat
+```cmd
+%UserProfile%\Desota\DeRunner\executables\Windows\derunner.stop.bat
 
-    ```
+```
+
+### Status Service
+```cmd
+%UserProfile%\Desota\DeRunner\executables\Windows\derunner.status.bat
+
+```
+
+</details>
+
+
+
+<details>
+    <summary><h2>Linux</h2></summary>
+
+* Go to Terminal:
+    * <kbd> Ctrl </kbd> + <kbd> Alt </kbd> + <kbd>T</kbd>
+
+### Start Service
+```cmd
+sudo systemctl start derunner.service
+
+```
+    
+### Stop Service
+```cmd
+sudo systemctl stop derunner.service
+
+```
+
+### Status Service
+```cmd
+systemctl status derunner.service
+
+```
+
 </details>
 </details>
+
+
+
 
 <details open>
     <summary><h1>Uninstalation</h1></summary>
 
-## Use DeSOTA official [Manager Tools](https://github.com/DeSOTAai/DeManagerTools#models--tools-dashboard)
+## Use DeSOTA official [Manager & Tools](https://github.com/DeSOTAai/DeManagerTools#readme)
+
+1. **Open** [`Models Dashboard`](https://github.com/DeSOTAai/DeManagerTools/#models--tools-dashboard) tab
+
+2. **Select** the model `franciscomvargas/descraper`
+
+3. **Press** `Uninstall`
 
 <details>
     <summary><h2>Manual Windows Uninstalation</h2></summary>
 
-### Uninstaller Description:
+* Go to CMD as Administrator (command prompt):
+  * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
+  * Enter: `cmd` 
+  * <kbd>Ctrl</kbd> + <kbd>⇧ Shift</kbd> + <kbd>↵ Enter</kbd>
 
-* Delete Service
-* Delete DeRunner Folder
+```cmd
+%UserProfile%\Desota\DeRunner\executables\Windows\derunner.uninstall.bat
 
-### Uninstaller Procedure:
+```
 
-* Go to CMD (command prompt):
-    * <kbd>⊞ Win</kbd> + <kbd>R</kbd>
-    * Enter: `cmd` 
+* Optional `Arguments`
 
-* Copy-Paste the following comands: 
-    ```cmd
-    %UserProfile%\Desota\DeRunner\executables\Windows\derunner.uninstall.bat
+    |arg|Description|Example
+    |---|---|---|
+    |/Q|Uninstall without requiring user interaction|`%UserProfile%\Desota\DeRunner\executables\Windows\derunner.uninstall.bat /Q`
+      
+</details>
 
-    ```
-    * Uninstaller Optional `Arguments`
 
-        |arg|Description|
-        |---|---|
-        |/Q|Uninstall without requiring user interaction|
-        
-        `Uninstall Quietly`
-        
-        ```cmd
-        %UserProfile%\Desota\Desota_Models\NeuralQA\neuralqa\executables\Windows\neuralqa.uninstall.bat /Q
 
-        ```
+<details>
+    <summary><h2>Manual Linux Uninstalation</h2></summary>
+
+* Go to Terminal:
+    * <kbd> Ctrl </kbd> + <kbd> Alt </kbd> + <kbd>T</kbd>
+
+```cmd
+sudo bash ~/Desota/DeRunner/executables/Linux/derunner.uninstall.bash
+
+```
+
+* Optional `Arguments`
+
+    |arg|Description|Example
+    |---|---|---|
+    |-q|Uninstall without requiring user interaction|`sudo bash ~/Desota/DeRunner/executables/Linux/derunner.uninstall.bash -q`
       
 </details>
 </details>
 
+
+
+
 <details open>
     <summary><h1>Credits / Lincense</h1></summary>
 
-## [DeSOTA](#coming-soon)
+## [DeSOTA](https://desota.net/)
 ```sh
 @credit{
   ai2023desota,
   title = "DeRunner: Main Runner for Desota Servers",
   authors = ["Kristian Atanasov", "Francisco Vargas"],
-  url = "https://github.com/desotaai/derunner/",  #eventually the desota webpage
+  url = "https://desota.net/",
   year = 2023
 }
 ```
