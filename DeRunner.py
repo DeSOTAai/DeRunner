@@ -527,14 +527,13 @@ def delogger(query):
             fw.write(f"File Forced Creation by DeRunner\n")
 
     with open(_log_path, "a") as fa:
-        if isinstance(query, str):
-            fa.write(query, "\n")
-        elif isinstance(query, int) or isinstance(query, float):
-            fa.write(str(query), "\n")
+        if isinstance(query, str) or isinstance(query, int) or isinstance(query, float):
+            fa.write(f"{query}\n")
         elif isinstance(query, list):
             fa.writelines(query)
         elif isinstance(query, dict):
             fa.write(json.dumps(query, indent=2), "\n")
+            fa.write("\n")
 
 
 # DeRunner Class
