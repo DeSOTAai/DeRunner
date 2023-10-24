@@ -112,6 +112,7 @@ def delogger(query):
         elif isinstance(query, dict):
             fa.write(json.dumps(query, indent=2))
             fa.write("\n")
+    user_chown(_log_path)
 
 # DeRunner Class
 class Derunner():
