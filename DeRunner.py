@@ -1,15 +1,15 @@
-import time
-import requests
-import subprocess
+import sys, os, io, shutil, time
+import json, ast, re
+
+import subprocess, requests
 from subprocess import check_output
 from subprocess import check_call, call, CalledProcessError
-from subprocess import Popen, CREATE_NEW_CONSOLE
-import ast
-import json
-import io
-import os
-import re
-import shutil
+from subprocess import Popen
+try: 
+    from subprocess import CREATE_NEW_CONSOLE
+except:
+    pass
+    
 # import pyyaml module
 import yaml
 from yaml.loader import SafeLoader
@@ -25,18 +25,43 @@ DEBUG = False
 # :: os.getcwd() = C:\users\[user]\Desota\DeRunner
 # WORKING_FOLDER = os.getcwd()
 WORKING_FOLDER = os.path.dirname(os.path.realpath(__file__))
+def user_chown(path):
+    if sys.platform == "linux" or sys.platform == "linux2":
+        #CURR_PATH=/home/[USER]/Desota/DeRunner
+        USER=str(WORKING_FOLDER).split("/")[-3]
+        os.system(f"chown -R {USER} {path}")
+    return
 
-USER_PATH = "\\".join(WORKING_FOLDER.split("\\")[:-2])
+# inspired inhttps://stackoverflow.com/a/13874620
+def get_platform():
+    _platform = sys.platform
+    _win_res=["win32", "cygwin", "msys"]
+    _lin_res=["linux", "linux2"]
+    _user_sys = "win" if _platform in _win_res else "lin" if _platform in _lin_res else None
+    if not _user_sys:
+        raise EnvironmentError(f"Plataform `{_platform}` can not be parsed to DeSOTA Options: Windows={_win_res}; Linux={_lin_res}")
+    return _user_sys
+    
+USER_SYS=get_platform()
+if USER_SYS == "win":
+    USER_PATH = "\\".join(WORKING_FOLDER.split("\\")[:-2])
+elif USER_SYS == "lin":
+    USER_PATH = "/".join(WORKING_FOLDER.split("/")[:-2])
 DESOTA_ROOT_PATH = os.path.join(USER_PATH, "Desota")
 
 APP_PATH = os.path.join(DESOTA_ROOT_PATH, "DeRunner")
 MANAGER_TOOLS_PATH = os.path.join(DESOTA_ROOT_PATH, "DeManagerTools")
 CONFIG_PATH = os.path.join(DESOTA_ROOT_PATH, "Configs")
-
+if not os.path.isdir(CONFIG_PATH):
+    os.mkdir(CONFIG_PATH)
+    user_chown(CONFIG_PATH)
+SERVICE_TOOLS_PATH = os.path.join(CONFIG_PATH, "Services")
+if not os.path.isdir(SERVICE_TOOLS_PATH):
+    os.mkdir(SERVICE_TOOLS_PATH)
+    user_chown(SERVICE_TOOLS_PATH)
 USER_CONF_PATH = os.path.join(CONFIG_PATH, "user.config.yaml")
 SERV_CONF_PATH = os.path.join(CONFIG_PATH, "services.config.yaml")
 LAST_SERV_CONF_PATH = os.path.join(CONFIG_PATH, "latest_services_config.yaml")
-SERVICE_TOOLS_PATH = os.path.join(CONFIG_PATH, "Services")
 LAST_UP_EPOCH = os.path.join(SERVICE_TOOLS_PATH, "last_upgrade_epoch.txt")
 
 #!!!! Upgrade Frequency in secs
@@ -83,25 +108,31 @@ def delogger(query):
         elif isinstance(query, list):
             fa.writelines(query)
         elif isinstance(query, dict):
-            fa.write(json.dumps(query, indent=2), "\n")
+            fa.write(json.dumps(query, indent=2))
             fa.write("\n")
-
 
 # DeRunner Class
 class Derunner():
     # Configurations
-    def __init__(self) -> None:
-        self.serv_conf, self.last_serv_conf = self.get_services_config()
+    def __init__(self, ignore_update=False) -> None:
+        self.serv_conf, self.last_serv_conf = self.get_services_config(ignore_update=ignore_update)
         self.user_conf = self.get_user_config()
-        self.user_system = self.user_conf["system"]
+        self.user_system = USER_SYS
         self.user_models = self.user_conf['models']
-        self.user_api_key = self.user_conf['api_key']
+        self.user_api_key = self.user_conf['user_api']
 
     #   > Grab User Configurations
     def get_user_config(self) -> dict:
         if not os.path.isfile(USER_CONF_PATH):
-            print(f" [USER_CONF] Not found-> {USER_CONF_PATH}")
-            raise EnvironmentError()
+            _template_user_conf={
+                "user_api": None,
+                "models":None,
+                "system": USER_SYS
+            }
+            with open(USER_CONF_PATH, 'w',) as fw:
+                yaml.dump(_template_user_conf,fw,sort_keys=False)
+            user_chown(USER_CONF_PATH)
+            return _template_user_conf
         with open( USER_CONF_PATH ) as f_user:
             return yaml.load(f_user, Loader=SafeLoader)
     
@@ -127,8 +158,11 @@ class Derunner():
 
             # Create Services Config File if don't exist
             if not os.path.isfile(SERV_CONF_PATH):
-                with open(LAST_SERV_CONF_PATH, "w") as fw:
+                with open(SERV_CONF_PATH, "w") as fw:
                     fw.write(_req_res.text)
+            
+            user_chown(LAST_SERV_CONF_PATH)
+            user_chown(SERV_CONF_PATH)
 
             with open( SERV_CONF_PATH ) as f_curr:
                 with open(LAST_SERV_CONF_PATH) as f_last:
@@ -139,7 +173,9 @@ class Derunner():
     #   > Get child models and remove desota tools (IGNORE_MODELS)
     def grab_all_user_models(self, ignore_models=IGNORE_MODELS) -> list:
         all_user_models = []
-        
+        if not self.user_models:
+            return all_user_models
+        self.__init__(ignore_update=True)
         for model in list(self.user_models.keys()):
             if model in ignore_models:
                 continue
@@ -409,7 +445,7 @@ class Derunner():
         #             model_request_dict["task_type"] = model_request_dict["task_type"].replace("image-to-", "text-to-")
         
         return model_request_dict
-   
+
 
     # Handle Model Service
     #   > Start Service
@@ -493,15 +529,16 @@ class Derunner():
             cprint(f"[ TIMER DEBUG ] - MEMORY DOESN'T EXIST", False)
             with open(LAST_UP_EPOCH, "w") as fw:
                 fw.write(str(time.time()))
+            user_chown(LAST_UP_EPOCH)
             return "go for it"
         
-        cprint(f"[ TIMER DEBUG ] - MEMORY EXIST", False)
+        cprint(f"[ TIMER DEBUG ] - MEMORY EXIST", DEBUG)
         with open(LAST_UP_EPOCH, "r") as fr:
             _last_up_ep = fr.read()
         _last_up_ep = float(_last_up_ep)
-
+        user_chown(LAST_UP_EPOCH)
         if time.time() - _last_up_ep >= UPG_FREQ:
-            cprint(f"[ TIMER DEBUG ] - SECS PASSED SINCE LAST UPG = {int(time.time() - _last_up_ep)}", False)
+            cprint(f"[ TIMER DEBUG ] - SECS PASSED SINCE LAST UPG = {int(time.time() - _last_up_ep)}", DEBUG)
             return "go for it"
         return None
 
@@ -627,7 +664,9 @@ class Derunner():
         print(f"[ INFO:{int(time.time())} ] - Searching for models upgrade.")
         # UPGRADE CONFIGURATIONS (Target: self.last_serv_conf)
         self.__init__()
-        
+        if not self.user_models:
+            print(f"[ INFO ] - Models upgrade completed. Next upgrade in {int(UPG_FREQ/3600)}h")
+            return None
         _upg_models = []
         for _model in list(self.user_models.keys()):
             curr_version = self.serv_conf["services_params"][_model][self.user_system]["version"]
@@ -726,9 +765,9 @@ class Derunner():
                     # STOP SERVICE
                     exit(666)
 
-                model_req = self.monitor_model_request(ignore_models=_ignore_models, debug=False)
+                model_req = self.monitor_model_request(ignore_models=_ignore_models, debug=DEBUG)
 
-                if model_req == None:
+                if not model_req:
                     continue
                 delogger("*"*80)
                 print(f"[ INFO ] -> Incoming Model Request:\n{json.dumps(model_req, indent=2)}")
