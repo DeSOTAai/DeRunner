@@ -22,16 +22,6 @@ parser.add_argument('-hs', '--handshake',
 I=0
 DEBUG = False
 
-# :: os.getcwd() = C:\users\[user]\Desota\DeRunner
-# WORKING_FOLDER = os.getcwd()
-WORKING_FOLDER = os.path.dirname(os.path.realpath(__file__))
-def user_chown(path):
-    if sys.platform == "linux" or sys.platform == "linux2":
-        #CURR_PATH=/home/[USER]/Desota/DeRunner
-        USER=str(WORKING_FOLDER).split("/")[-3]
-        os.system(f"chown -R {USER} {path}")
-    return
-
 # inspired inhttps://stackoverflow.com/a/13874620
 def get_platform():
     _platform = sys.platform
@@ -41,8 +31,20 @@ def get_platform():
     if not _user_sys:
         raise EnvironmentError(f"Plataform `{_platform}` can not be parsed to DeSOTA Options: Windows={_win_res}; Linux={_lin_res}")
     return _user_sys
-    
 USER_SYS=get_platform()
+    
+# :: os.getcwd() = C:\users\[user]\Desota\DeRunner
+# WORKING_FOLDER = os.getcwd()
+WORKING_FOLDER = os.path.dirname(os.path.realpath(__file__))
+def user_chown(path):
+    '''Remove root previleges for files and folders: Required for Linux'''
+    if USER_SYS == "lin":
+        #CURR_PATH=/home/[USER]/Desota/DeRunner
+        USER=str(WORKING_FOLDER).split("/")[-3]
+        os.system(f"chown -R {USER} {path}")
+    return
+
+
 if USER_SYS == "win":
     USER_PATH = "\\".join(WORKING_FOLDER.split("\\")[:-2])
 elif USER_SYS == "lin":
