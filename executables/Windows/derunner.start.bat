@@ -29,9 +29,7 @@ for %%a in ("%~dp0..\..\..\..") do set "user_path=%%~fa"
 set service_name=derunner_service
 
 :: Service waiter - Confirm Service is ready for requests
-set model_path_str=%user_path%\Desota\DeRunner
-set service_waiter=%model_path_str%\env\python %model_path_str%\DeRunner.py --handshake
-set shake_respose={"status":"ready"}
+set service_waiter=
 
 :: NSSM VARS
 set nssm_path=%user_path%\Desota\Portables\nssm
@@ -73,19 +71,37 @@ ECHO     service name: %service_name%
 call %nssm_exe% start %service_name% >NUL
 
 :: Wait for Service to be fully started
-ECHO %info_h2%Waiting for Service handshake...%ansi_end% 
-set /a x=0
+IF "%service_waiter%" EQU "" GOTO enofassetstart
+
+:: retrieved from https://stackoverflow.com/a/77363838/21896301
+for /F "tokens=1 delims=# " %%a in ('"prompt #$H# & echo on & for %%b in (1) do rem"') do set "BSPACE=%%a"
+<nul set /p =%info_h2%Waiting for Service HandShake -
+set /a x=1
 :waitloop
-ECHO       Curl Counter: %x%
-set /a x+=1
+
+IF %x% EQU 1 SET state=\
+IF %x% EQU 2 SET state=-
+IF %x% EQU 3 SET state=/
+IF %x% EQU 4 SET state=-
+IF %x% EQU 4 (
+  SET x=1
+) ELSE (
+  SET /a x+=1
+)
+<nul set /p =%BSPACE%
+<nul set /p =%state%
+
 %service_waiter% > %user_path%\tmpFile.txt 2>NUL
 set /p service_res= < %user_path%\tmpFile.txt
 del %user_path%\tmpFile.txt >NUL 2>NUL
 IF '%service_res%' NEQ '%shake_respose%' (
-    timeout 1 > NUL 2>NUL
-    GOTO waitloop
+  GOTO waitloop
 )
+<nul set /p =%BSPACE%
+<nul set /p =- done
+<nul set /p =%ansi_end%
 
-:: EOF
+:enofassetstart
+echo:
 call %nssm_exe% status %service_name%
 exit

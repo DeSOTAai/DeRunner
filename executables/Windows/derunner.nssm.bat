@@ -40,8 +40,7 @@ set model_dependencies=
 set model_log=%model_path%\service.log
 set model_env=
 
-ECHO %model_exe%
-PAUSE
+
 
 :: -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
 
