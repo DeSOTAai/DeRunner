@@ -103,11 +103,12 @@ services_params: {
         },
         mac: {
             version: ,
+            commit: ,
             project_dir: Desota/Desota_Models/NeuraQA/neuralqa,
             execs_path: executables/MacOS,
-            installer: ,
+            setup: ,
+            setup_args: ,
             uninstaller: ,
-            installer_args: ,
             uninstaller_args: ,
             starter: ,
             stoper: ,
@@ -196,10 +197,12 @@ services_params: {
         },
         mac: {
             version: ,
-            execs_path: Desota/Desota_Models/DeScraper/executables/MacOS,
-            installer: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/DeScraper,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
             uninstaller: ,
-            installer_args: ,
             uninstaller_args: ,
             starter: ,
             stoper: ,
@@ -207,7 +210,6 @@ services_params: {
 
             desota_runner: ,
             python_path:
-            
         },
         source_code: https://github.com/franciscomvargas/descraper,
         report_issue: https://github.com/franciscomvargas/descraper/issues,
@@ -245,8 +247,8 @@ services_params: {
     },
     franciscomvargas/deurlcruncher: {
         win: {
-            version: 1.0.0,
-            commit: 28dbd59b9a0929b38868705995bed92b364d59ac,
+            version: 1.0.1,
+            commit: e58784b39375f5ae6655d9ee1adde1e7385bf4f1,
             project_dir: Desota\Desota_Models\DeUrlCruncher,
             execs_path: executables\Windows,
             setup: deurlcruncher.setup.bat,
@@ -276,7 +278,7 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: 28dbd59b9a0929b38868705995bed92b364d59ac,
+            commit: e58784b39375f5ae6655d9ee1adde1e7385bf4f1,
             project_dir: Desota/Desota_Models/DeUrlCruncher,
             execs_path: executables/Linux,
             setup: deurlcruncher.setup.bat,
@@ -296,11 +298,12 @@ services_params: {
         },
         mac: {
             version: ,
+            commit: ,
             project_dir: Desota/Desota_Models/DeUrlCruncher,
             execs_path: executables/MacOS,
-            installer: ,
+            setup: ,
+            setup_args: ,
             uninstaller: ,
-            installer_args: ,
             uninstaller_args: ,
             starter: ,
             stoper: ,
@@ -308,7 +311,6 @@ services_params: {
 
             desota_runner: ,
             python_path:
-            
         },
         source_code: https://github.com/franciscomvargas/DeUrlCruncher,
         report_issue: https://github.com/franciscomvargas/DeUrlCruncher/issues,
