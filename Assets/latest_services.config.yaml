@@ -63,7 +63,7 @@ services_params: {
     franciscomvargas/neuralqa/qa: {
         win: {
             version: 1.0.1,
-            commit: 3d8aa3d6ba78844c3f29e0383daee8e363d20ae3,
+            commit: a5308ee661d40fc126c9a7f9f225a5ca9745aa45,
             install_dir: Desota\Desota_Models\NeuralQA, # OPTIONAL - `project_dir`as default 
             project_dir: Desota\Desota_Models\NeuralQA\neuralqa,
             execs_path: executables\Windows,
@@ -87,7 +87,7 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: 3d8aa3d6ba78844c3f29e0383daee8e363d20ae3,
+            commit: a5308ee661d40fc126c9a7f9f225a5ca9745aa45,
             project_dir: Desota/Desota_Models/NeuraQA/neuralqa,
             execs_path: executables/Linux,
             setup: neuralqa.setup.bat,
@@ -158,7 +158,7 @@ services_params: {
     franciscomvargas/descraper/url: {
         win: {
             version: 1.0.0,
-            commit: d1350fa1a8ebf25fe4bd7ea105d38f4ffb33ffa0,
+            commit: cb25cddae74e749134f7db61e3b7e48b73ef52e6,
             project_dir: Desota\Desota_Models\DeScraper,
             execs_path: executables\Windows,
             setup: descraper.setup.bat,
@@ -181,7 +181,7 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: d1350fa1a8ebf25fe4bd7ea105d38f4ffb33ffa0,
+            commit: cb25cddae74e749134f7db61e3b7e48b73ef52e6,
             project_dir: Desota/Desota_Models/DeScraper,
             execs_path: executables/Linux,
             setup: descraper.setup.bat,
@@ -248,7 +248,7 @@ services_params: {
     franciscomvargas/deurlcruncher: {
         win: {
             version: 1.0.1,
-            commit: e58784b39375f5ae6655d9ee1adde1e7385bf4f1,
+            commit: ff9da2e6f003bddd423b2dfdc0ee18d60bb1849b,
             project_dir: Desota\Desota_Models\DeUrlCruncher,
             execs_path: executables\Windows,
             setup: deurlcruncher.setup.bat,
@@ -278,7 +278,7 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: e58784b39375f5ae6655d9ee1adde1e7385bf4f1,
+            commit: ff9da2e6f003bddd423b2dfdc0ee18d60bb1849b,
             project_dir: Desota/Desota_Models/DeUrlCruncher,
             execs_path: executables/Linux,
             setup: deurlcruncher.setup.bat,
