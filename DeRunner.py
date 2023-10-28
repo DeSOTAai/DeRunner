@@ -95,6 +95,7 @@ def find_json(s):
     return res
 #   > Conditional print
 def cprint(query, condition=DEBUG):
+    '''Conditional print'''
     if condition:
         print(query)
 #   > Log to service.log
@@ -203,7 +204,7 @@ class Derunner():
         global I
         I += 1
         
-        cprint(f"Running...{I}", debug) # Conditional Print
+        cprint(f"Running...{I}", debug) 
 
         selected_task = False
         
@@ -301,7 +302,7 @@ class Derunner():
                 "model":model
             }
             task = requests.post(API_URL, data=data, timeout=30)
-            # print(f"Task Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {task.status_code}")
+            cprint(f"\nSignal DeSOTA that Model is wake up:\n{json.dumps(data, indent=2)}\nResponse Status = {task.status_code}", debug)
             if task.status_code != 200:
                 continue
 
@@ -314,20 +315,21 @@ class Derunner():
                 "model":model,
                 "select_task":I
             }
-            select_task = requests.post(API_URL, data=data)
-            # print(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {select_task.status_code}")
+            select_task = requests.post(API_URL, data=data, timeout=30)
+            cprint(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {select_task.status_code}", debug)
             if select_task.status_code != 200:
                 continue
             else:
-                cprint(f"MODEL: {model}", debug)     # Conditional Print
+                cprint(f"MODEL: {model}", debug)     
                 
                 cont = str(select_task.content.decode('UTF-8'))
                 # print(cont)
                 try:
                     # print(selected_task)
                     selected_task = json.loads(cont)
+                    print(json.dumps(selected_task, indent=2))
                 except:
-                    cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   # Conditional Print
+                    cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   
                     cont = cont.replace("FIXME!!!", "")
                     ''' 
                     cont = cont.replace("\n", "")
@@ -350,7 +352,7 @@ class Derunner():
                     selected_task = False
                     continue
                 
-                cprint(selected_task, debug)     # Conditional Print
+                cprint(selected_task, debug)     
                 #cprint(selected_task['task'], debug)
                 
                 try:
@@ -363,7 +365,7 @@ class Derunner():
                     for file_type, file_value in task_dic.items():
                         #print(file_type)
                         if file_type == "text":
-                            # cprint(f'text select on 0', debug)   # Conditional Print
+                            # cprint(f'text select on 0', debug)   
                             model_request_dict['input_args']['text_prompt'] = str(file_value)
                         elif file_type in ['image', 'video', 'audio', 'file']:
                             model_request_dict['input_args'][file_type] = {}
@@ -378,12 +380,12 @@ class Derunner():
                     task_dep = str(selected_task['dep']).replace("\\\\n", "").replace("\\", "")
                     task_dep = ast.literal_eval(task_dep)
                     model_request_dict["task_dep"] = task_dep
-                    cprint(f"task type is {model_request_dict['task_type']}", debug)     # Conditional Print
-                    # cprint(f"task deps are {task_dep} {type(task_dep[0])}", debug)   # Conditional Print
-                    cprint(f"task deps are {task_dep}", debug)   # Conditional Print
+                    cprint(f"task type is {model_request_dict['task_type']}", debug)     
+                    # cprint(f"task deps are {task_dep} {type(task_dep[0])}", debug)   
+                    cprint(f"task deps are {task_dep}", debug)   
                     #if json.loads(str(task_dep.decode('UTF-8'))):
                     if task_dep != [-1]:
-                        cprint("Dependencies:", debug)   # Conditional Print
+                        cprint("Dependencies:", debug)   
                         #deps = json.loads(str(task_dep.decode('UTF-8')))
                         model_request_dict['dep_args'] = {}
                         for dep_key, dep_args in task_dep.items():
@@ -403,7 +405,7 @@ class Derunner():
                                 for file_type, file_value in dep_dic.items():
                                     #print(file_type)
                                     if file_type == "text":
-                                        # cprint(f'text select on 0', debug)   # Conditional Print
+                                        # cprint(f'text select on 0', debug)   
                                         model_request_dict['dep_args'][dep_id]['text_prompt'] = str(file_value)
                                     elif file_type in ['image', 'video', 'audio', 'file']:
                                         model_request_dict['dep_args'][dep_id][file_type] = {}
@@ -415,10 +417,10 @@ class Derunner():
                         cprint(f"Request DEP Files: {json.dumps(model_request_dict['dep_args'], indent=2)}", debug)
                         
 
-                    cprint("No Dependencies!", debug)    # Conditional Print
+                    cprint("No Dependencies!", debug)    
                     #exit()
 
-                cprint(f"No task for {model}!", debug)   # Conditional Print
+                cprint(f"No task for {model}!", debug)   
                 #exit()
 
 
@@ -428,7 +430,7 @@ class Derunner():
                 break
         
         if not selected_task:
-            cprint("Byeeee\n", debug)    # Conditional Print
+            cprint("Byeeee\n", debug)    
             return None
 
         model_request_dict["task_args"] = task_dic
