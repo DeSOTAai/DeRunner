@@ -457,16 +457,16 @@ class Derunner():
         _model_params = self.serv_conf["services_params"][model_id]
 
         if not _model_params["submodel"]:
-            _model_serv = self.serv_conf["services_params"][model_id][self.user_system]
+            _model_serv = self.serv_conf["services_params"][model_id][USER_SYS]
         else:
-            _model_serv = self.serv_conf["services_params"][ _model_params["parent_model"] ][self.user_system]
+            _model_serv = self.serv_conf["services_params"][ _model_params["parent_model"] ][USER_SYS]
 
         _model_starter = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["starter"]) if _model_serv["starter"] else None
         if not _model_starter:
             return
         
-        if DEBUG:
-            print(f'Model start cmd:\n\t{_model_starter}')
+        if DEBUG or USER_SYS=="lin":
+            cprint(f'Model start cmd:\n\t{_model_starter}', DEBUG)
             _sproc = Popen(
                 [_model_starter]
             )
@@ -498,14 +498,14 @@ class Derunner():
         if _model_params["run_constantly"]:
             return
         
-        _model_serv = _model_params[self.user_system]
+        _model_serv = _model_params[USER_SYS]
 
         _model_stoper = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["stoper"]) if _model_serv["stoper"] else None
         if not _model_stoper:
             return None
         
-        if DEBUG:
-            print(f'Model stop cmd:\n\t{_model_stoper}')
+        if DEBUG or USER_SYS=="lin":
+            cprint(f'Model stop cmd:\n\t{_model_stoper}', DEBUG)
             _sproc = Popen(
                 [_model_stoper]
             )
@@ -548,28 +548,47 @@ class Derunner():
 
     #   > Create Model(s) installer for reinstalation
     def create_model_reinstalation(self, model_ids) -> str:
-        if self.user_system == "win":
-            # 1 - CRAWL CONFS
-            target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bat")
+        target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bat")
+        _log_prefix = "ECHO Automatic.Reinstall - "
+        # 1 - INIT + Scripts HEADER
+        if USER_SYS == "win":
+            '''I'm a windows nerd!'''
+            # Init
+            _start_cmd="start /W "
+            _call = "call "
+            _copy = "copy "
+            _rm = "del "
+            _app_python = os.path.join(APP_PATH, "env", "python")
+            _manager_python = os.path.join(MANAGER_TOOLS_PATH, "env", "python")
             
-            # 2 - BAT HEADER
+            # 1 - BAT HEADER
             _tmp_file_lines = ["@ECHO OFF\n"]
-            _tmp_file_lines += [
-                "net session >NUL 2>NUL\n",
-                "IF %errorLevel% NEQ 0 (\n",
-                "\tgoto UACPrompt\n",
-                ") ELSE (\n",
-                "\tgoto gotAdmin\n",
-                ")\n",
-                ":UACPrompt\n",
-                'powershell -Command "Start-Process -Wait -Verb RunAs -FilePath \'%0\' -ArgumentList \'am_admin\'" \n',
-                "exit /B\n",
-                ":gotAdmin\n",
-                'pushd "%CD%"\n',
-                f'CD /D "{DESOTA_ROOT_PATH}"\n'
-            ]
             
-            # 2.1 - Wait DeRunner Service STOP
+            # 1.1 - Wait DeRunner Service STOP
+            derunner_status_path = os.path.join(APP_PATH, "executables", "Windows", "derunner.status.bat")
+            derunner_status_res = os.path.join(APP_PATH, "derunner_status.txt")
+            _tmp_file_lines += [
+                ":wait_derunner_stop\n",
+                f"start /B /WAIT {derunner_status_path} {derunner_status_res}\n",
+                f"set /p derunner_status=<{derunner_status_res}\n",
+                "IF %derunner_status% NEQ SERVICE_STOPPED GOTO wait_derunner_stop\n",
+                f"del {derunner_status_res}\n",
+            ]
+        elif USER_SYS=="lin":
+            '''I know what i'm doing '''
+            # Init
+            _start_cmd="bash "
+            _call=""
+            _copy = "cp "
+            _rm = "rm -rf "
+            _app_python = os.path.join(APP_PATH, "env", "bin", "python3")
+            _manager_python = os.path.join(MANAGER_TOOLS_PATH, "env", "bin", "python3")
+
+             # 1 - BASH HEADER
+            _tmp_file_lines = ["#!/bin/bash\n"]
+            
+            '''
+            # 1.1 - Wait DeRunner Service STOP >>TODO<<
             derunner_status_path = os.path.join(APP_PATH, "executables", "Windows", "derunner.status.bat")
             derunner_status_res = os.path.join(APP_PATH, "derunner_status.txt")
             _tmp_file_lines += [
@@ -582,106 +601,173 @@ class Derunner():
                 f"\tdel {derunner_status_res}\n",
                 ")\n",
             ]
+            '''
 
-            # 3 - Stop All Services
-            _gen_serv_stoper = os.path.join(SERVICE_TOOLS_PATH, "models_stopper.bat")
-            if os.path.isfile(_gen_serv_stoper):
-                _tmp_file_lines.append(f"start /B /WAIT {_gen_serv_stoper}\n")
-
-            if isinstance(model_ids, str):
-                model_ids = [model_ids]
-            
-            if isinstance(model_ids, list):
-                for _model in model_ids:
-                    # 4.1 - Append Model Installer
-                    _model_params = self.last_serv_conf['services_params'][_model][self.user_system]
-                    _installer_url = _model_params['installer']
-                    _installer_args = _model_params['installer_args'] if 'installer_args' in _model_params and _model_params['installer_args'] else []
-                    _installer_args += ["/fromrunner"]
-                    _model_version = _model_params['version']
-                    _installer_name = _installer_url.split('/')[-1]
-                    _tmp_install_path = os.path.join(USER_PATH, _installer_name)
-                    
-                    _tmp_file_lines.append(f'powershell -command "Invoke-WebRequest -Uri {_installer_url} -OutFile {_tmp_install_path}"\n')
-                    _tmp_file_lines.append(f'start /B /WAIT {_tmp_install_path} {" ".join(_installer_args)}\n')
-                    _tmp_file_lines.append(f'del {_tmp_install_path}\n')
-                    
-                    # 4.2 - Update user models
-                    _new_model = json.dumps({
-                        _model: _model_version
-                    }).replace(" ", "").replace('"', '\\"')
-                    
-                    _tmp_file_lines.append(f'call {MANAGER_TOOLS_PATH}\env\python {MANAGER_TOOLS_PATH}\Tools\SetUserConfigs.py --key models --value "{_new_model}"  > NUL 2>NUL\n')
+        if isinstance(model_ids, str):
+            model_ids = [model_ids]
         
-            ## after instalation!!
-            #   > Update Services Config with params from Latest Services Config
-            #   > Update Models Starter for Run constantly models
-            #   > Update Models Stoper
-            _tmp_file_lines.append(f'call {APP_PATH}\env\python {APP_PATH}\Tools\\after_model_reinstall.py > NUL 2>NUL\n')
+        if not isinstance(model_ids, list):
+            return None
+        
+        # 2 - Uninstall <- Required Models
+        for _model in model_ids:
+            _asset_params=self.serv_conf["services_params"][_model][USER_SYS]
+            _asset_uninstaller = os.path.join(USER_PATH, _asset_params["project_dir"], _asset_params["execs_path"], _asset_params["uninstaller"])
+            _tmp_uninstaller = os.path.join(USER_PATH, _asset_params["uninstaller"])
+            if os.path.isfile(_asset_uninstaller):
+                _tmp_file_lines += [
+                    f"{_log_prefix}Uninstalling '{_model}'... >>{LOG_PATH}\n",
+                    f"{_copy}{_asset_uninstaller} {_tmp_uninstaller}\n",
+                    f'{_start_cmd}{_tmp_uninstaller} {" ".join(_asset_params["uninstaller_args"] if "uninstaller_args" in _asset_params and _asset_params["uninstaller_args"] else [])}{f" /automatic {USER_PATH}" if USER_SYS=="win" else "" if USER_SYS=="lin" else ""}\n',
+                    f'{_rm}{_tmp_uninstaller} 2>NUL\n'
+                ]
 
-            # 5 - Create Start Run Constantly Services
-            _gen_serv_starter = os.path.join(SERVICE_TOOLS_PATH, "models_starter.bat")
-            _tmp_file_lines.append(f"IF EXIST {_gen_serv_starter} start /B /WAIT {_gen_serv_starter}\n")
-            
-            # 5 - Delete Bat at end of instalation - retrieved from https://stackoverflow.com/a/20333152
-            _tmp_file_lines.append('(goto) 2>nul & del "%~f0"\n')
-            #_tmp_file_lines.append("PAUSE\n") # DEBUG
 
-            # 6 - Create Installer Bat
-            with open(target_path, "w") as fw:
-                fw.writelines(_tmp_file_lines)
+        # 3 - Download + Uncompress to target folder <- Required Models
+        for _count, _model in enumerate(model_ids):
+            _asset_params=self.last_serv_conf["services_params"][_model]
+            _asset_sys_params=_asset_params[USER_SYS]
+            _asset_repo=_asset_params["source_code"]
+            _asset_commit=_asset_sys_params["commit"]
+            _asset_project_dir = os.path.join(USER_PATH, _asset_sys_params["install_dir"] if "install_dir" in _asset_sys_params else _asset_sys_params["project_dir"])
+            _tmp_repo_dwnld_path=os.path.join(USER_PATH, f"DeRunner_Dwnld_{_count}.zip")
+            ## Download Commands
+            if USER_SYS == "win":
+                _mkdir="mkdir "
+                _download_cmd=f'powershell -command "Invoke-WebRequest -Uri {_asset_repo}/archive/{_asset_commit}.zip -OutFile {_tmp_repo_dwnld_path}"\n'
+                _uncompress_cmd=f'tar -xzvf {_tmp_repo_dwnld_path} -C {_asset_project_dir} --strip-components 1\n'
+            elif USER_SYS=="lin":
+                _mkdir="mkdir -p "
+                _download_cmd=f'wget {_asset_repo}/archive/{_asset_commit}.zip -O {_tmp_repo_dwnld_path}"\n'
+                _uncompress_cmd=f'apt install libarchive-tools -y && bsdtar -xzvf {_tmp_repo_dwnld_path} -C {_asset_project_dir} --strip-components=1\n'
+            _tmp_file_lines += [
+                f"{_log_prefix}Downlading '{_model}'... >>{LOG_PATH}\n",
+                f"{_mkdir}{_asset_project_dir}\n", # Create Asset Folder
+                _download_cmd,
+                _uncompress_cmd,
+                f'{_rm}{_tmp_repo_dwnld_path} 2>NUL\n'
+            ]
+
+
+        # 4 - Setup <- Required Models
+        for _model in model_ids:
+            _asset_sys_params=self.last_serv_conf["services_params"][_model][USER_SYS]
+            _asset_setup = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["setup"])
+            if os.path.isfile(_asset_setup):
+                _tmp_file_lines += [
+                    f"{_log_prefix}Installing '{_model}'... >>{LOG_PATH}\n",
+                    f'{_start_cmd}{_asset_setup} {" ".join(_asset_sys_params["setup_args"] if "setup_args" in _asset_sys_params and _asset_sys_params["setup_args"] else [])}\n'
+                ]
+
+
+        # 5 - Start `run_constantly` Models <- Required Models
+        for _model in model_ids:
+            if _model == "desotaai/derunner":
+                continue
+            _asset_params=self.last_serv_conf["services_params"][_model]
+            _asset_sys_params=_asset_params[USER_SYS]
+            if _asset_params["run_constantly"]:
+                _asset_start = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["starter"])
+                _tmp_file_lines += [
+                    f"{_log_prefix}Starting '{_model}'... >>{LOG_PATH}\n",
+                    f'{_start_cmd}{_asset_start}\n'
+                ]
+
+            # 5.1 - Update user.config model
+            _model_version=_asset_sys_params["version"]
+            _new_model = json.dumps({
+                _model: _model_version
+            }).replace(" ", "").replace('"', '\\"')
+            _manager_set_user_confs = os.path.join(MANAGER_TOOLS_PATH, "Tools", "SetUserConfigs.py")
+            _tmp_file_lines.append(f'{_call}{_manager_python} {_manager_set_user_confs} --key models --value "{_new_model}"  > NUL 2>NUL\n')
+        
+    
+        ## 5.1 - after asset instalation!!
+        #   > Update Services Config with params from Latest Services Config
+        _app_after_model_reinstall = os.path.join(APP_PATH, "Tools", "after_model_reinstall.py")
+        _tmp_file_lines.append(f'{_call}{_app_python} {_app_after_model_reinstall} > NUL 2>NUL\n')
+
+
+        # Force DeRunner Restart
+        if "desotaai/derunner" not in model_ids:
+            _asset_sys_params=self.last_serv_conf["services_params"]["desotaai/derunner"][USER_SYS]
+            _derunner_start = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["starter"])
+            _tmp_file_lines += [
+                f"{_log_prefix}Restarting DeRunner... >>{LOG_PATH}\n",
+                f'{_start_cmd}{_derunner_start}\n'
+            ]
+
+
+        ## END OF FILE - Delete Bat at end of instalation 
+        ### WINDOWS - retrieved from https://stackoverflow.com/a/20333152
+        ### LINUX   - ...
+        _tmp_file_lines.append('(goto) 2>nul & del "%~f0"\n'if USER_SYS == "win" else f'rm -rf {target_path}\n' if USER_SYS == "lin" else "")
+
+
+        # 6 - Create Installer Bat
+        with open(target_path, "w") as fw:
+            fw.writelines(_tmp_file_lines)
                 
-            return target_path
+        return target_path
 
     #   > Request Model(s) reinstalation
-    def request_model_reinstall(self, _reinstall_model, init=False) -> int:
+    def request_model_reinstall(self, _reinstall_model, init=False):
         if init:
             # UPGRADE CONFIGURATIONS (Target: self.last_serv_conf)
             self.__init__()
 
         _reinstall_path = self.create_model_reinstalation(_reinstall_model)
-        _reinstall_cmd = [_reinstall_path]
+        _reinstall_cmd = [_reinstall_path] if USER_SYS == "win" else ['nohup', _reinstall_path] if USER_SYS == "lin" else None
         print(f" [ WARNING ] -> Model Reinstalation required:\n\tmodel: {_reinstall_model}\n\treinstall cmd: {' '.join(_reinstall_cmd)}")
+        if not _reinstall_cmd:
+            return None
 
         # os.spawnl(os.P_OVERLAY, str(_reinstall_path), )
-        if self.user_system == "win":
-            # retrieved from https://stackoverflow.com/a/14797454
+
+        # retrieved from https://stackoverflow.com/a/14797454
+        if USER_SYS == "win":
             CREATE_NEW_PROCESS_GROUP = 0x00000200
             DETACHED_PROCESS = 0x00000008
             Popen(
                 _reinstall_cmd,
                 stdout=subprocess.PIPE,
-                stdin=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
-            )
+            ).poll()
+        elif USER_SYS == "lin":
+            Popen(
+                _reinstall_cmd,
+                stdout=None, 
+                stderr=None,
+                preexec_fn=os.setpgrp 
+            ).poll()
         return 0
     
     #   > Check for upgrades
-    def req_service_upgrade(self) -> int:
+    def req_service_upgrade(self):
         # Timer check
         upgrade_timer = self.handle_upgrade_timer()
         if upgrade_timer != "go for it":
             return None
         
 
-        print(f"[ INFO:{int(time.time())} ] - Searching for models upgrade.")
+        delogger(f"[ INFO:{int(time.time())} ] - Searching for models upgrade.")
         # UPGRADE CONFIGURATIONS (Target: self.last_serv_conf)
         self.__init__()
         if not self.user_models:
-            print(f"[ INFO ] - Models upgrade completed. Next upgrade in {int(UPG_FREQ/3600)}h")
+            delogger(f"[ INFO ] - Models upgrade completed. Next upgrade in {int(UPG_FREQ/3600)}h")
             return None
         _upg_models = []
         for _model in list(self.user_models.keys()):
-            curr_version = self.serv_conf["services_params"][_model][self.user_system]["version"]
-            last_version = self.last_serv_conf["services_params"][_model][self.user_system]["version"]
+            curr_version = self.serv_conf["services_params"][_model][USER_SYS]["version"]
+            last_version = self.last_serv_conf["services_params"][_model][USER_SYS]["version"]
             if curr_version != last_version:
                 _upg_models.append(_model)
         if not _upg_models:
             self.handle_upgrade_timer(create=True)
             return None
         
-        print(f"[ INFO:{int(time.time())} ] - Founded the following models to upgrade: {_upg_models}")
+        delogger(f"[ INFO:{int(time.time())} ] - Founded the following models to upgrade: {_upg_models}")
         req_reinstall = self.request_model_reinstall(_upg_models)
         if req_reinstall == 0:
             self.handle_upgrade_timer(create=True)
@@ -689,7 +775,7 @@ class Derunner():
 
 
     # Call Model Runner
-    def call_model(self, model_req) -> int:
+    def call_model(self, model_req):
         # Create tmp model_req.yaml with request params for model runner
         _tmp_req_path = os.path.join(APP_PATH, f"tmp_model_req{int(time.time())}.yaml")
         with open(_tmp_req_path, 'w',) as fw:
@@ -697,17 +783,17 @@ class Derunner():
 
         # Model Vars
         _model_id = model_req['task_model']                                             # Model Name
-        _model_runner_param = self.serv_conf["services_params"][_model_id][self.user_system]      # Model params from services.config.yaml
-        _model_runner = os.path.join(USER_PATH, _model_runner_param["runner"])          # Model runner path
-        _model_runner_py = os.path.join(USER_PATH, _model_runner_param["runner_py"])    # Python with model runner packages
+        _model_runner_param = self.serv_conf["services_params"][_model_id][USER_SYS]      # Model params from services.config.yaml
+        _model_runner = os.path.join(USER_PATH, _model_runner_param["project_dir"], _model_runner_param["desota_runner"])          # Model runner path
+        _model_runner_py = os.path.join(USER_PATH, _model_runner_param["python_path"])    # Python with model runner packages
 
         # API Response URL
         _model_res_url = f"{API_URL}?api_key={self.user_api_key}&model={model_req['task_model']}&send_task=" + model_req['task_id']
         
         # Start / Wait Model
         # retrieved from https://stackoverflow.com/a/62226026
-        if DEBUG:
-            print(f'Model runner cmd:\n\t{" ".join([_model_runner_py, _model_runner, "--model_req", _tmp_req_path, "--model_res_url", _model_res_url])}')
+        if DEBUG or USER_SYS == "lin":
+            cprint(f'Model runner cmd:\n\t{" ".join([_model_runner_py, _model_runner, "--model_req", _tmp_req_path, "--model_res_url", _model_res_url])}', DEBUG)
             _sproc = Popen(
                 [
                     _model_runner_py, _model_runner, 
@@ -715,7 +801,7 @@ class Derunner():
                     "--model_res_url", _model_res_url
                 ]
             )
-        else:
+        elif USER_SYS == "win":
             _sproc = Popen(
                 [
                     _model_runner_py, _model_runner, 
@@ -726,6 +812,8 @@ class Derunner():
                 stderr=subprocess.STDOUT,
                 creationflags=subprocess.CREATE_NO_WINDOW
             )
+        else:
+            return
         # TODO: implement model timeout
         while True:
             _ret_code = _sproc.poll()
