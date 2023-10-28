@@ -120,9 +120,8 @@ class Derunner():
     def __init__(self, ignore_update=False) -> None:
         self.serv_conf, self.last_serv_conf = self.get_services_config(ignore_update=ignore_update)
         self.user_conf = self.get_user_config()
-        self.user_system = USER_SYS
         self.user_models = self.user_conf['models']
-        self.user_api_key = self.user_conf['user_api']
+        self.user_api_key = self.user_conf['api_key']
 
     #   > Grab User Configurations
     def get_user_config(self) -> dict:
