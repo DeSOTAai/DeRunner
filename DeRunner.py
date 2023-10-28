@@ -36,6 +36,7 @@ USER_SYS=get_platform()
 # :: os.getcwd() = C:\users\[user]\Desota\DeRunner
 # WORKING_FOLDER = os.getcwd()
 WORKING_FOLDER = os.path.dirname(os.path.realpath(__file__))
+LOG_PATH = os.path.join(WORKING_FOLDER, "service.log")
 def user_chown(path):
     '''Remove root previleges for files and folders: Required for Linux'''
     if USER_SYS == "lin":
