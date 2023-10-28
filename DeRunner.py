@@ -100,12 +100,11 @@ def cprint(query, condition=DEBUG):
         print(query)
 #   > Log to service.log
 def delogger(query):
-    _log_path = os.path.join(WORKING_FOLDER, "service.log")
-    if not os.path.isfile(_log_path):
-        with open(_log_path, "w") as fw:
+    if not os.path.isfile(LOG_PATH):
+        with open(LOG_PATH, "w") as fw:
             fw.write(f"File Forced Creation by DeRunner\n")
 
-    with open(_log_path, "a") as fa:
+    with open(LOG_PATH, "a") as fa:
         if isinstance(query, str) or isinstance(query, int) or isinstance(query, float):
             fa.write(f"{query}\n")
         elif isinstance(query, list):
@@ -113,7 +112,7 @@ def delogger(query):
         elif isinstance(query, dict):
             fa.write(json.dumps(query, indent=2))
             fa.write("\n")
-    user_chown(_log_path)
+    user_chown(LOG_PATH)
 
 # DeRunner Class
 class Derunner():
