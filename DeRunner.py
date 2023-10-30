@@ -54,20 +54,14 @@ DESOTA_ROOT_PATH = os.path.join(USER_PATH, "Desota")
 LOG_PATH = os.path.join(DESOTA_ROOT_PATH, "demanager.log")
 
 APP_PATH = os.path.join(DESOTA_ROOT_PATH, "DeRunner")
-MANAGER_TOOLS_PATH = os.path.join(DESOTA_ROOT_PATH, "DeManagerTools")
-#TODO! Install DeManagerTools if folder don't exist, required some tools
 CONFIG_PATH = os.path.join(DESOTA_ROOT_PATH, "Configs")
 if not os.path.isdir(CONFIG_PATH):
     os.mkdir(CONFIG_PATH)
     user_chown(CONFIG_PATH)
-SERVICE_TOOLS_PATH = os.path.join(CONFIG_PATH, "Services")
-if not os.path.isdir(SERVICE_TOOLS_PATH):
-    os.mkdir(SERVICE_TOOLS_PATH)
-    user_chown(SERVICE_TOOLS_PATH)
 USER_CONF_PATH = os.path.join(CONFIG_PATH, "user.config.yaml")
 SERV_CONF_PATH = os.path.join(CONFIG_PATH, "services.config.yaml")
 LAST_SERV_CONF_PATH = os.path.join(CONFIG_PATH, "latest_services.config.yaml")
-LAST_UP_EPOCH = os.path.join(SERVICE_TOOLS_PATH, "last_upgrade_epoch.txt")
+LAST_UP_EPOCH = os.path.join(CONFIG_PATH, "last_upgrade_epoch.txt")
 
 #!!!! Upgrade Frequency in secs
 UPG_FREQ = 86400    # 24h
@@ -565,7 +559,6 @@ class Derunner():
             _noecho=" >NUL 2>NUL"
             _log_prefix = "ECHO Automatic.Reinstall - "
             _app_python = os.path.join(APP_PATH, "env", "python")
-            _manager_python = os.path.join(MANAGER_TOOLS_PATH, "env", "python")
             # 1 - BAT HEADER
             _tmp_file_lines = ["@ECHO OFF\n"]
             
@@ -587,7 +580,6 @@ class Derunner():
             _noecho=" &>/dev/nul"
             _log_prefix = "echo Automatic.Reinstall - "
             _app_python = os.path.join(APP_PATH, "env", "bin", "python3")
-            _manager_python = os.path.join(MANAGER_TOOLS_PATH, "env", "bin", "python3")
 
              # 1 - BASH HEADER
             _tmp_file_lines = ["#!/bin/bash\n"]
@@ -678,8 +670,8 @@ class Derunner():
             _new_model = json.dumps({
                 _model: _model_version
             }).replace(" ", "").replace('"', '\\"')
-            _manager_set_user_confs = os.path.join(MANAGER_TOOLS_PATH, "Tools", "SetUserConfigs.py")
-            _tmp_file_lines.append(f'{_call}{_manager_python} {_manager_set_user_confs} --key models --value "{_new_model}"{_noecho}\n')
+            _manager_set_user_confs = os.path.join(APP_PATH, "Tools", "SetUserConfigs.py")
+            _tmp_file_lines.append(f'{_call}{_app_python} {_manager_set_user_confs} --key models --value "{_new_model}"{_noecho}\n')
         
     
         ## 5.1 - after asset instalation!!
@@ -837,11 +829,6 @@ class Derunner():
 
     # Main DeRunner Loop
     def mainloop(self, args) -> None:
-        # Handshake - Service checker
-        if args.handshake:
-            print('{"status":"ready"}')
-            return 0
-        
         # Print Configurations
         print("Runner Up!")
         delogger("Runner Up!")
