@@ -9,7 +9,7 @@ for %%a in ("%~dp0..\..") do set "model_path_serv=%%~fa"
 call cd %model_path_serv%
 call %model_path_serv%\env\python DeRunner.py
 
-IF errorlevel 666 GOTO exit_mainloop
+IF errorlevel 66 GOTO exit_mainloop
 
 GOTO mainloop
 

@@ -22,9 +22,8 @@ IF %PROCESSOR_ARCHITECTURE%==x86 set nssm_exe=%nssm_path%\win32\nssm.exe
 
 :: Status service - retrieved from https://nssm.cc/commands
 :: Bat Requires as argument the Target where status will be written
-IF "%1" EQU "" GOTO noargs
-%nssm_exe% status %service_name% >%1
+%nssm_exe% status %service_name%
+IF "%1" NEQ "/nopause" GOTO noargs
 exit
 :noargs
-%nssm_exe% status %service_name%
 PAUSE

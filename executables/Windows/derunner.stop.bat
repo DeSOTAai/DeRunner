@@ -31,7 +31,6 @@ set service_name=derunner_service
 
 :: NSSM VARS
 set nssm_path=%user_path%\Desota\Portables\nssm
-set model_status_path=%model_path%\derunner_status.txt
 
 
 
@@ -68,15 +67,4 @@ ECHO %info_h2%Stopping Service...%ansi_end%
 ECHO     service name: %service_name%
 
 call %nssm_exe% stop %service_name%
-
-:wait4stop
-%nssm_exe% status %service_name% >%model_status_path%
-set /p model_status=<%model_status_path%
-ECHO %model_status%
-IF %model_status% NEQ SERVICE_STOPPED (
-	goto :wait4stop
-) ELSE (
-	del %model_status_path%
-)
-
 exit

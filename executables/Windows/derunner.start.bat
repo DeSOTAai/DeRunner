@@ -102,6 +102,6 @@ IF '%service_res%' NEQ '%shake_respose%' (
 <nul set /p =%ansi_end%
 
 :enofassetstart
-echo:
+ECHO.
 call %nssm_exe% status %service_name%
 exit
