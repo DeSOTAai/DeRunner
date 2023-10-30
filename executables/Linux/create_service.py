@@ -25,10 +25,12 @@ TARGET_SERV_FILE = os.path.join(CURR_PATH, "derunner.service")
 
 MODEL_PATH=os.path.join(USER_PATH, "Desota", "DeRunner")
 MODEL_ENV=os.path.join(MODEL_PATH, "env")
+MODEL_EXECS=os.path.join(MODEL_PATH, "executables", "Linux")
 SERV_DESC="Desota/DeRunner - Main Runner of Desota Services"
 SERV_PORT=8880
 SERV_RUN_CMD=f"/bin/bash {TARGET_RUN_FILE}"
 PYTHON_MAIN_CMD=f"{MODEL_ENV}/bin/python3 {MODEL_PATH}/DeRunner.py"
+STOP_DERUNNER=f"bash {MODEL_EXECS}/derunner.stop.bash"
 
 
 
@@ -37,12 +39,19 @@ PYTHON_MAIN_CMD=f"{MODEL_ENV}/bin/python3 {MODEL_PATH}/DeRunner.py"
 # SERVICE RUNNER
 TEMPLATE_SERVICE_RUNNER=f'''#!/bin/bash
 # GET USER PATH
-while true
+STATE=0
+while [ "$STATE" -eq "0" ]
 do
     {PYTHON_MAIN_CMD}
+    derunner_res=$?
+    if [ "$derunner_res" -eq "66" ]; then
+        echo "DeRunner Requested EXIT !"
+        STATE=66
+    fi
 done
-# Inform Crawl Finish
-echo Service as Terminated !'''
+{STOP_DERUNNER}
+echo "Service as been Terminated !"
+exit'''
 
 with open(TARGET_RUN_FILE, "w") as fw:
     fw.write(TEMPLATE_SERVICE_RUNNER)
@@ -60,6 +69,7 @@ Type=simple
 Restart=always
 RestartSec=2
 ExecStart={SERV_RUN_CMD}
+KillMode=process
 
 [Install]
 WantedBy=multi-user.target'''

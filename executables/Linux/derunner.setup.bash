@@ -28,6 +28,8 @@ CREATE_SERV=$EXECS_PATH/create_service.py
 SERV_NAME=derunner.service
 SERV_PATH=$EXECS_PATH/$SERV_NAME
 
+# Please Review - >>Libraries required<<
+
 
 
 # -- Edit bellow if you're felling lucky ;) -- https://youtu.be/5NV6Rdv1a3I
@@ -43,6 +45,11 @@ SERV_PATH=$EXECS_PATH/$SERV_NAME
     echo "    [] = Optional";
     exit 1;
 }
+
+# >>Libraries required<<
+echo "Step 0/4 - Check Required apt instalations"
+echo "    libarchive-tools"
+apt install libarchive-tools -y &>/dev/nul
 
 # Program Installers
 #   - Miniconda
@@ -107,8 +114,6 @@ fi
 
 # Install Conda IF Required
 echo
-
-
 echo "Step 2/4 - Install Miniconda for Project"
 # Install Conda if Required - https://developers.google.com/earth-engine/guides/python_install-conda#linux
 # Miniconda Instalation Status
@@ -201,6 +206,7 @@ fi
 
 echo
 echo
+chown -R $USER $MODEL_PATH
 echo 'Setup Completed!'
 exit
     

@@ -51,9 +51,11 @@ if USER_SYS == "win":
 elif USER_SYS == "lin":
     USER_PATH = "/".join(WORKING_FOLDER.split("/")[:-2])
 DESOTA_ROOT_PATH = os.path.join(USER_PATH, "Desota")
+LOG_PATH = os.path.join(DESOTA_ROOT_PATH, "demanager.log")
 
 APP_PATH = os.path.join(DESOTA_ROOT_PATH, "DeRunner")
 MANAGER_TOOLS_PATH = os.path.join(DESOTA_ROOT_PATH, "DeManagerTools")
+#TODO! Install DeManagerTools if folder don't exist, required some tools
 CONFIG_PATH = os.path.join(DESOTA_ROOT_PATH, "Configs")
 if not os.path.isdir(CONFIG_PATH):
     os.mkdir(CONFIG_PATH)
@@ -64,7 +66,7 @@ if not os.path.isdir(SERVICE_TOOLS_PATH):
     user_chown(SERVICE_TOOLS_PATH)
 USER_CONF_PATH = os.path.join(CONFIG_PATH, "user.config.yaml")
 SERV_CONF_PATH = os.path.join(CONFIG_PATH, "services.config.yaml")
-LAST_SERV_CONF_PATH = os.path.join(CONFIG_PATH, "latest_services_config.yaml")
+LAST_SERV_CONF_PATH = os.path.join(CONFIG_PATH, "latest_services.config.yaml")
 LAST_UP_EPOCH = os.path.join(SERVICE_TOOLS_PATH, "last_upgrade_epoch.txt")
 
 #!!!! Upgrade Frequency in secs
@@ -149,25 +151,26 @@ class Derunner():
             with open( SERV_CONF_PATH ) as f_curr:
                 with open(LAST_SERV_CONF_PATH) as f_last:
                     return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
+        
         _req_res = requests.get(LATEST_SERV_CONF_RAW)
         if _req_res.status_code != 200:
             print(f" [SERV_CONF] Not found-> {SERV_CONF_PATH}")
             print(f" [LAST_SERV_CONF] Not found-> {LAST_SERV_CONF_PATH}")
             raise EnvironmentError()
-        else:
-            # Create Latest Services Config File
-            with open(LAST_SERV_CONF_PATH, "w") as fw:
+        
+        # Create Latest Services Config File
+        with open(LAST_SERV_CONF_PATH, "w") as fw:
+            fw.write(_req_res.text)
+
+        # Create Services Config File if don't exist
+        if not os.path.isfile(SERV_CONF_PATH):
+            with open(SERV_CONF_PATH, "w") as fw:
                 fw.write(_req_res.text)
+        
+        user_chown(LAST_SERV_CONF_PATH)
+        user_chown(SERV_CONF_PATH)
 
-            # Create Services Config File if don't exist
-            if not os.path.isfile(SERV_CONF_PATH):
-                with open(SERV_CONF_PATH, "w") as fw:
-                    fw.write(_req_res.text)
-            
-            user_chown(LAST_SERV_CONF_PATH)
-            user_chown(SERV_CONF_PATH)
-
-            with open( SERV_CONF_PATH ) as f_curr:
+        with open( SERV_CONF_PATH ) as f_curr:
                 with open(LAST_SERV_CONF_PATH) as f_last:
                     return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
 
@@ -326,7 +329,7 @@ class Derunner():
                 try:
                     # print(selected_task)
                     selected_task = json.loads(cont)
-                    print(json.dumps(selected_task, indent=2))
+                    # print(json.dumps(selected_task, indent=2))
                 except:
                     cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   
                     cont = cont.replace("FIXME!!!", "")
@@ -343,15 +346,15 @@ class Derunner():
                         selected_task = json.loads(cont)
                     except:
                         selected_task = "error"
-                        print(selected_task)
+                        # print(selected_task)
 
                 if "error" in selected_task:
                     #error = selected_task['error']
-                    # print(f"[ WARNING ] -> API Model Request fail for model `{model}`")
+                    cprint(f"[ WARNING ] -> API Model Request fail for model `{model}`", debug)
                     selected_task = False
                     continue
                 
-                cprint(selected_task, debug)     
+                # cprint(selected_task, debug)     
                 #cprint(selected_task['task'], debug)
                 
                 try:
@@ -398,7 +401,7 @@ class Derunner():
                                 except:
                                     dep_dic = None
                                     if not model_request_dict['dep_args'] and debug:
-                                        print("no filename found")
+                                        cprint("no filename found" , debug)
                             if dep_dic:
                                 model_request_dict['dep_args'][dep_id] = {}
                                 for file_type, file_value in dep_dic.items():
@@ -548,60 +551,54 @@ class Derunner():
 
     #   > Create Model(s) installer for reinstalation
     def create_model_reinstalation(self, model_ids) -> str:
-        target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bat")
-        _log_prefix = "ECHO Automatic.Reinstall - "
         # 1 - INIT + Scripts HEADER
         if USER_SYS == "win":
             '''I'm a windows nerd!'''
             # Init
+            target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bat")
             _start_cmd="start /W "
             _call = "call "
             _copy = "copy "
             _rm = "del "
+            _noecho=" >NUL 2>NUL"
+            _log_prefix = "ECHO Automatic.Reinstall - "
             _app_python = os.path.join(APP_PATH, "env", "python")
             _manager_python = os.path.join(MANAGER_TOOLS_PATH, "env", "python")
-            
             # 1 - BAT HEADER
             _tmp_file_lines = ["@ECHO OFF\n"]
             
             # 1.1 - Wait DeRunner Service STOP
             derunner_status_path = os.path.join(APP_PATH, "executables", "Windows", "derunner.status.bat")
-            derunner_status_res = os.path.join(APP_PATH, "derunner_status.txt")
             _tmp_file_lines += [
                 ":wait_derunner_stop\n",
-                f"start /B /WAIT {derunner_status_path} {derunner_status_res}\n",
-                f"set /p derunner_status=<{derunner_status_res}\n",
-                "IF %derunner_status% NEQ SERVICE_STOPPED GOTO wait_derunner_stop\n",
-                f"del {derunner_status_res}\n",
+                f'FOR /F "tokens=*" %%g IN (\'{derunner_status_path} /nopause\') do (SET derunner_status=%%g)\n',
+                "IF %derunner_status% EQU SERVICE_RUNNING GOTO wait_derunner_stop\n"
             ]
         elif USER_SYS=="lin":
             '''I know what i'm doing '''
             # Init
+            target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bash")
             _start_cmd="bash "
             _call=""
             _copy = "cp "
             _rm = "rm -rf "
+            _noecho=" &>/dev/nul"
+            _log_prefix = "echo Automatic.Reinstall - "
             _app_python = os.path.join(APP_PATH, "env", "bin", "python3")
             _manager_python = os.path.join(MANAGER_TOOLS_PATH, "env", "bin", "python3")
 
              # 1 - BASH HEADER
             _tmp_file_lines = ["#!/bin/bash\n"]
             
-            '''
-            # 1.1 - Wait DeRunner Service STOP >>TODO<<
-            derunner_status_path = os.path.join(APP_PATH, "executables", "Windows", "derunner.status.bat")
-            derunner_status_res = os.path.join(APP_PATH, "derunner_status.txt")
+            # 1.1 - Wait DeRunner Service STOP
+            derunner_status_path = os.path.join(APP_PATH, "executables", "Linux", "derunner.status.bash")
             _tmp_file_lines += [
-                ":wait_derunner_stop\n",
-                f"start /B /WAIT {derunner_status_path} {derunner_status_res}\n",
-                f"set /p derunner_status=<{derunner_status_res}\n",
-                "IF %derunner_status% NEQ SERVICE_STOPPED (\n",
-                "\tgoto wait_derunner_stop\n",
-                ") ELSE (\n",
-                f"\tdel {derunner_status_res}\n",
-                ")\n",
+                f"_serv_status=$(bash {derunner_status_path})\n",
+                'while [ "$_serv_status" = "SERVICE_RUNNING" ]\n',
+                "do\n",
+                f"\t_serv_status=$(bash {derunner_status_path})\n",
+                "done\n",
             ]
-            '''
 
         if isinstance(model_ids, str):
             model_ids = [model_ids]
@@ -611,15 +608,16 @@ class Derunner():
         
         # 2 - Uninstall <- Required Models
         for _model in model_ids:
-            _asset_params=self.serv_conf["services_params"][_model][USER_SYS]
-            _asset_uninstaller = os.path.join(USER_PATH, _asset_params["project_dir"], _asset_params["execs_path"], _asset_params["uninstaller"])
-            _tmp_uninstaller = os.path.join(USER_PATH, _asset_params["uninstaller"])
+            _asset_sys_params=self.serv_conf["services_params"][_model][USER_SYS]
+            _asset_uninstaller = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["uninstaller"])
+            _uninstaller_bn = os.path.basename(_asset_uninstaller)
+            _tmp_uninstaller = os.path.join(USER_PATH, f'{int(time.time())}{_uninstaller_bn}')
             if os.path.isfile(_asset_uninstaller):
                 _tmp_file_lines += [
-                    f"{_log_prefix}Uninstalling '{_model}'... >>{LOG_PATH}\n",
+                    f"{_log_prefix}Uninstalling '{_model}'...>>{LOG_PATH}\n",
                     f"{_copy}{_asset_uninstaller} {_tmp_uninstaller}\n",
-                    f'{_start_cmd}{_tmp_uninstaller} {" ".join(_asset_params["uninstaller_args"] if "uninstaller_args" in _asset_params and _asset_params["uninstaller_args"] else [])}{f" /automatic {USER_PATH}" if USER_SYS=="win" else "" if USER_SYS=="lin" else ""}\n',
-                    f'{_rm}{_tmp_uninstaller} 2>NUL\n'
+                    f'{_start_cmd}{_tmp_uninstaller} {" ".join(_asset_sys_params["uninstaller_args"] if "uninstaller_args" in _asset_sys_params and _asset_sys_params["uninstaller_args"] else [])}{f" /automatic {USER_PATH}" if USER_SYS=="win" else " -a" if USER_SYS=="lin" else ""}\n',
+                    f'{_rm}{_tmp_uninstaller} {_noecho}\n'
                 ]
 
 
@@ -638,14 +636,14 @@ class Derunner():
                 _uncompress_cmd=f'tar -xzvf {_tmp_repo_dwnld_path} -C {_asset_project_dir} --strip-components 1\n'
             elif USER_SYS=="lin":
                 _mkdir="mkdir -p "
-                _download_cmd=f'wget {_asset_repo}/archive/{_asset_commit}.zip -O {_tmp_repo_dwnld_path}"\n'
+                _download_cmd=f'wget {_asset_repo}/archive/{_asset_commit}.zip -O {_tmp_repo_dwnld_path}\n'
                 _uncompress_cmd=f'apt install libarchive-tools -y && bsdtar -xzvf {_tmp_repo_dwnld_path} -C {_asset_project_dir} --strip-components=1\n'
             _tmp_file_lines += [
                 f"{_log_prefix}Downlading '{_model}'... >>{LOG_PATH}\n",
                 f"{_mkdir}{_asset_project_dir}\n", # Create Asset Folder
                 _download_cmd,
                 _uncompress_cmd,
-                f'{_rm}{_tmp_repo_dwnld_path} 2>NUL\n'
+                f'{_rm}{_tmp_repo_dwnld_path} {_noecho}\n'
             ]
 
 
@@ -679,13 +677,13 @@ class Derunner():
                 _model: _model_version
             }).replace(" ", "").replace('"', '\\"')
             _manager_set_user_confs = os.path.join(MANAGER_TOOLS_PATH, "Tools", "SetUserConfigs.py")
-            _tmp_file_lines.append(f'{_call}{_manager_python} {_manager_set_user_confs} --key models --value "{_new_model}"  > NUL 2>NUL\n')
+            _tmp_file_lines.append(f'{_call}{_manager_python} {_manager_set_user_confs} --key models --value "{_new_model}"{_noecho}\n')
         
     
         ## 5.1 - after asset instalation!!
         #   > Update Services Config with params from Latest Services Config
         _app_after_model_reinstall = os.path.join(APP_PATH, "Tools", "after_model_reinstall.py")
-        _tmp_file_lines.append(f'{_call}{_app_python} {_app_after_model_reinstall} > NUL 2>NUL\n')
+        _tmp_file_lines.append(f'{_call}{_app_python} {_app_after_model_reinstall}{_noecho}\n')
 
 
         # Force DeRunner Restart
@@ -707,7 +705,7 @@ class Derunner():
         # 6 - Create Installer Bat
         with open(target_path, "w") as fw:
             fw.writelines(_tmp_file_lines)
-                
+        user_chown(target_path)
         return target_path
 
     #   > Request Model(s) reinstalation
@@ -717,9 +715,8 @@ class Derunner():
             self.__init__()
 
         _reinstall_path = self.create_model_reinstalation(_reinstall_model)
-        _reinstall_cmd = [_reinstall_path] if USER_SYS == "win" else ['nohup', _reinstall_path] if USER_SYS == "lin" else None
-        print(f" [ WARNING ] -> Model Reinstalation required:\n\tmodel: {_reinstall_model}\n\treinstall cmd: {' '.join(_reinstall_cmd)}")
-        if not _reinstall_cmd:
+
+        if not _reinstall_path:
             return None
 
         # os.spawnl(os.P_OVERLAY, str(_reinstall_path), )
@@ -728,19 +725,25 @@ class Derunner():
         if USER_SYS == "win":
             CREATE_NEW_PROCESS_GROUP = 0x00000200
             DETACHED_PROCESS = 0x00000008
+            _reinstall_cmd = [_reinstall_path]
+            # TODO: https://stackoverflow.com/a/13256908
             Popen(
                 _reinstall_cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
-            ).poll()
+            )
         elif USER_SYS == "lin":
-            Popen(
+            _reinstall_cmd = ['/bin/bash', _reinstall_path]  
+            # inspired in https://stackoverflow.com/a/60280256
+            subprocess.Popen(
                 _reinstall_cmd,
                 stdout=None, 
                 stderr=None,
+                universal_newlines=True,
                 preexec_fn=os.setpgrp 
-            ).poll()
+            )
+        print(f" [ WARNING ] -> Model Reinstalation required:\n\tmodel: {_reinstall_model}\n\treinstall cmd: {' '.join(_reinstall_cmd)}")
         return 0
     
     #   > Check for upgrades
@@ -855,7 +858,7 @@ class Derunner():
                 req_serv_upg = self.req_service_upgrade()
                 if req_serv_upg == 0:
                     # STOP SERVICE
-                    exit(666)
+                    exit(66)
 
                 model_req = self.monitor_model_request(ignore_models=_ignore_models, debug=DEBUG)
 
@@ -925,7 +928,7 @@ class Derunner():
                 req_reinstall = self.request_model_reinstall(_reinstall_model, init=True)
                 if req_reinstall == 0:
                     # STOP SERVICE
-                    exit(666)
+                    exit(66)
 
 if __name__ == "__main__":
     args = parser.parse_args()
