@@ -164,15 +164,17 @@ class Derunner():
 
         # Create Services Config File if don't exist
         if not os.path.isfile(SERV_CONF_PATH):
+            with open(LAST_SERV_CONF_PATH) as fls:
+                _template_serv=yaml.load(fls, Loader=SafeLoader)
+            _template_serv["services_params"] = {}
             with open(SERV_CONF_PATH, "w") as fw:
-                fw.write(_req_res.text)
-        
+                yaml.dump(_template_serv,fw,sort_keys=False)        
+            user_chown(SERV_CONF_PATH)
         user_chown(LAST_SERV_CONF_PATH)
-        user_chown(SERV_CONF_PATH)
 
         with open( SERV_CONF_PATH ) as f_curr:
-                with open(LAST_SERV_CONF_PATH) as f_last:
-                    return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
+            with open(LAST_SERV_CONF_PATH) as f_last:
+                return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
 
 
     # DeSOTA API Monitor
