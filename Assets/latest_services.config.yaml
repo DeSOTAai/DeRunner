@@ -10,7 +10,7 @@ services_params: {
     desotaai/derunner: {
         win: {
             version: 1.0.0,
-            commit: ,
+            commit: e5cbf31e7db991de7ed6be95aea25dbcda71a801,
             project_dir: Desota\DeRunner,
             execs_path: executables\Windows,
             setup: derunner.setup.bat,
@@ -28,16 +28,16 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: ,
+            commit: e5cbf31e7db991de7ed6be95aea25dbcda71a801,
             project_dir: Desota/DeRunner,
             execs_path: executables/Linux,
-            setup: derunner.setup.bat,
+            setup: derunner.setup.bash,
             setup_args: [-m],
-            uninstaller: derunner.uninstall.bat,
+            uninstaller: derunner.uninstall.bash,
             uninstaller_args: [-q],
-            starter: ,
-            stoper: ,
-            status:
+            starter: derunner.start.bash,
+            stoper: derunner.stop.bash,
+            status: derunner.status.bash,
         },
         mac: {
             version: ,
@@ -63,7 +63,7 @@ services_params: {
     franciscomvargas/neuralqa/qa: {
         win: {
             version: 1.0.1,
-            commit: a5308ee661d40fc126c9a7f9f225a5ca9745aa45,
+            commit: 905edfc77f551ca6dad3327d1b74a46d9512a24f,
             install_dir: Desota\Desota_Models\NeuralQA, # OPTIONAL - `project_dir`as default 
             project_dir: Desota\Desota_Models\NeuralQA\neuralqa,
             execs_path: executables\Windows,
@@ -87,16 +87,16 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: a5308ee661d40fc126c9a7f9f225a5ca9745aa45,
+            commit: 905edfc77f551ca6dad3327d1b74a46d9512a24f,
             project_dir: Desota/Desota_Models/NeuraQA/neuralqa,
             execs_path: executables/Linux,
-            setup: neuralqa.setup.bat,
+            setup: neuralqa.setup.bash,
             setup_args: [-m],
-            uninstaller: neuralqa.uninstall.bat,
+            uninstaller: neuralqa.uninstall.bash,
             uninstaller_args: [-q],
-            starter: ,
-            stoper: ,
-            status: ,
+            starter: neuralqa.start.bash,
+            stoper: neuralqa.stop.bash,
+            status: neuralqa.status.bash,
 
             desota_runner: qa_runner.py,
             python_path: Desota/Desota_Models/NeuraQA/neuralqa/env/bin/python3
@@ -158,7 +158,7 @@ services_params: {
     franciscomvargas/descraper/url: {
         win: {
             version: 1.0.0,
-            commit: cb25cddae74e749134f7db61e3b7e48b73ef52e6,
+            commit: 5e88a0ab690b8c2bf7682f80883d11c9af9c9ace,
             project_dir: Desota\Desota_Models\DeScraper,
             execs_path: executables\Windows,
             setup: descraper.setup.bat,
@@ -171,7 +171,6 @@ services_params: {
             
             desota_runner: url_runner.py,
             python_path: Desota\Desota_Models\DeScraper\env\python.exe,
-
             
             service_path: Desota\Desota_Models\DeScraper\executables\Windows,
             installer: https://raw.githubusercontent.com/franciscomvargas/descraper/main/executables/Windows/descraper.install.bat,
@@ -181,16 +180,16 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: cb25cddae74e749134f7db61e3b7e48b73ef52e6,
+            commit: 5e88a0ab690b8c2bf7682f80883d11c9af9c9ace,
             project_dir: Desota/Desota_Models/DeScraper,
             execs_path: executables/Linux,
-            setup: descraper.setup.bat,
+            setup: descraper.setup.bash,
             setup_args: [-m],
-            uninstaller: descraper.uninstall.bat,
+            uninstaller: descraper.uninstall.bash,
             uninstaller_args: [-q],
-            starter: ,
-            stoper: ,
-            status: ,
+            starter: descraper.start.bash,
+            stoper: descraper.stop.bash,
+            status: descraper.status.bash,
             
             desota_runner: url_runner.py,
             python_path: Desota/Desota_Models/DeScraper/env/bin/python3
@@ -248,7 +247,7 @@ services_params: {
     franciscomvargas/deurlcruncher: {
         win: {
             version: 1.0.1,
-            commit: ff9da2e6f003bddd423b2dfdc0ee18d60bb1849b,
+            commit: 0d670e8f766b6c7e7b0ea3e7f56dc489d01a56ce,
             project_dir: Desota\Desota_Models\DeUrlCruncher,
             execs_path: executables\Windows,
             setup: deurlcruncher.setup.bat,
@@ -278,12 +277,12 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: ff9da2e6f003bddd423b2dfdc0ee18d60bb1849b,
+            commit: 0d670e8f766b6c7e7b0ea3e7f56dc489d01a56ce,
             project_dir: Desota/Desota_Models/DeUrlCruncher,
             execs_path: executables/Linux,
-            setup: deurlcruncher.setup.bat,
+            setup: deurlcruncher.setup.bash,
             setup_args: [-m],
-            uninstaller: deurlcruncher.uninstall.bat,
+            uninstaller: deurlcruncher.uninstall.bash,
             uninstaller_args: [-q],
             starter: ,
             stoper: ,
