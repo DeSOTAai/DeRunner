@@ -329,31 +329,25 @@ services_params: {
 ### TODO - Install > Setup Upgrade
 manager_params: {
     win: {
-        version: 1.0.0,
-        service_path: Desota\DeManagerTools\executables\Windows,
-        installer: https://raw.githubusercontent.com/DeSOTAai/DeManagerTools/main/executables/Windows/demanagertools.install.bat,
-        uninstaller: demanagertools.uninstall.bat,
-        installer_args: [],
-        uninstaller_args: [/Q]
+        version: 0.0.2,
+        project_dir: Desota\Desota_Models\DeManagerTools,
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.0.2/v0.0.2-win64.zip,
+        release_desc: Upgrade with DeRunner Logs in DeManagerTools Dashboard (DeSOTA Requests)
     },
     lin: {
-        version: ,
-        service_path: Desota/Desota_Models/DeScraper/executables/Linux,
-        installer: ,
-        uninstaller: ,
-        installer_args: ,
-        uninstaller_args:
+        version: 1.0.0,
+        project_dir: Desota/Desota_Models/DeManagerTools,
+        build_url: ,
+        release_desc: 
     },
     mac: {
-        version: ,
-        service_path: Desota/Desota_Models/DeScraper/executables/MacOS,
-        installer: ,
-        uninstaller: ,
-        installer_args: ,
-        uninstaller_args:
+        version: 1.0.0,
+        project_dir: Desota/Desota_Models/DeManagerTools,
+        build_url: ,
+        release_desc: 
     },
     source_code: https://github.com/desotaai/demanagertools,
     report_issue: https://github.com/desotaai/demanagertools/issues,
     description: https://github.com/desotaai/demanagertools/blob/main/README.md,
-    short_description: DeSOTA Manager and Tools for Clients Servers,
+    short_description: DeSOTA Manager and Tools for Client Servers,
 }
