@@ -36,7 +36,6 @@ USER_SYS=get_platform()
 # :: os.getcwd() = C:\users\[user]\Desota\DeRunner
 # WORKING_FOLDER = os.getcwd()
 WORKING_FOLDER = os.path.dirname(os.path.realpath(__file__))
-LOG_PATH = os.path.join(WORKING_FOLDER, "service.log")
 def user_chown(path):
     '''Remove root previleges for files and folders: Required for Linux'''
     if USER_SYS == "lin":
@@ -52,6 +51,9 @@ elif USER_SYS == "lin":
     USER_PATH = "/".join(WORKING_FOLDER.split("/")[:-2])
 DESOTA_ROOT_PATH = os.path.join(USER_PATH, "Desota")
 LOG_PATH = os.path.join(DESOTA_ROOT_PATH, "demanager.log")
+TMP_PATH=os.path.join(DESOTA_ROOT_PATH, "tmp")
+if not os.path.isdir(TMP_PATH):
+    os.mkdir(TMP_PATH)
 
 APP_PATH = os.path.join(DESOTA_ROOT_PATH, "DeRunner")
 CONFIG_PATH = os.path.join(DESOTA_ROOT_PATH, "Configs")
@@ -137,39 +139,48 @@ class Derunner():
     
     #   > Return latest_services.config.yaml(write if not ignore_update)
     def get_services_config(self, ignore_update=False) -> (dict, dict):
-        if ignore_update:
+        _req_res = None
+        if not ignore_update:
+            _req_res = requests.get(LATEST_SERV_CONF_RAW)
+        if ignore_update or ( isinstance(_req_res, requests.Response) and _req_res.status_code != 200 ):
             if not (os.path.isfile(SERV_CONF_PATH) or os.path.isfile(LAST_SERV_CONF_PATH)):
                 print(f" [SERV_CONF] Not found-> {SERV_CONF_PATH}")
                 print(f" [LAST_SERV_CONF] Not found-> {LAST_SERV_CONF_PATH}")
                 raise EnvironmentError()
-            with open( SERV_CONF_PATH ) as f_curr:
-                with open(LAST_SERV_CONF_PATH) as f_last:
-                    return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
-        
-        _req_res = requests.get(LATEST_SERV_CONF_RAW)
-        if _req_res.status_code != 200:
-            print(f" [SERV_CONF] Not found-> {SERV_CONF_PATH}")
-            print(f" [LAST_SERV_CONF] Not found-> {LAST_SERV_CONF_PATH}")
-            raise EnvironmentError()
-        
+            else:
+                with open( SERV_CONF_PATH ) as f_curr:
+                    with open(LAST_SERV_CONF_PATH) as f_last:
+                        return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
+                    
         # Create Latest Services Config File
         with open(LAST_SERV_CONF_PATH, "w") as fw:
             fw.write(_req_res.text)
+        user_chown(LAST_SERV_CONF_PATH)
 
         # Create Services Config File if don't exist
         if not os.path.isfile(SERV_CONF_PATH):
             with open(LAST_SERV_CONF_PATH) as fls:
                 _template_serv=yaml.load(fls, Loader=SafeLoader)
-            _template_serv["services_params"] = {}
+             
+            _user_models = self.get_user_config()["models"]
+            _user_serv_params = {}
+            if _user_models:
+                for _model in _user_models:
+                    _params = _template_serv["services_params"][_model]
+                    _user_serv_params[_model] = _params
+                    if "child_models" in _params and _params["child_models"]:
+                        for _child in  _params["child_models"]:
+                            if _child in _template_serv["services_params"]:
+                                _user_serv_params[_child] = _template_serv["services_params"][_child]
+
+            _template_serv["services_params"] = _user_serv_params
             with open(SERV_CONF_PATH, "w") as fw:
-                yaml.dump(_template_serv,fw,sort_keys=False)        
+                yaml.dump(_template_serv,fw,sort_keys=False)
             user_chown(SERV_CONF_PATH)
-        user_chown(LAST_SERV_CONF_PATH)
 
         with open( SERV_CONF_PATH ) as f_curr:
             with open(LAST_SERV_CONF_PATH) as f_last:
                 return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
-
 
     # DeSOTA API Monitor
     #   > Get child models and remove desota tools (IGNORE_MODELS)
@@ -551,7 +562,7 @@ class Derunner():
         if USER_SYS == "win":
             '''I'm a windows nerd!'''
             # Init
-            target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bat")
+            target_path = os.path.join(TMP_PATH, f"tmp_model_install{int(time.time())}.bat")
             _start_cmd="start /W "
             _call = "call "
             _copy = "copy "
@@ -572,7 +583,7 @@ class Derunner():
         elif USER_SYS=="lin":
             '''I know what i'm doing '''
             # Init
-            target_path = os.path.join(DESOTA_ROOT_PATH, f"tmp_model_install{int(time.time())}.bash")
+            target_path = os.path.join(TMP_PATH, f"tmp_model_install{int(time.time())}.bash")
             _start_cmd="bash "
             _call=""
             _copy = "cp "
@@ -605,7 +616,7 @@ class Derunner():
             _asset_sys_params=self.serv_conf["services_params"][_model][USER_SYS]
             _asset_uninstaller = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["uninstaller"])
             _uninstaller_bn = os.path.basename(_asset_uninstaller)
-            _tmp_uninstaller = os.path.join(USER_PATH, f'{int(time.time())}{_uninstaller_bn}')
+            _tmp_uninstaller = os.path.join(TMP_PATH, f'{int(time.time())}{_uninstaller_bn}')
             if os.path.isfile(_asset_uninstaller):
                 _tmp_file_lines += [
                     f"{_log_prefix}Uninstalling '{_model}'...>>{LOG_PATH}\n",
@@ -622,7 +633,7 @@ class Derunner():
             _asset_repo=_asset_params["source_code"]
             _asset_commit=_asset_sys_params["commit"]
             _asset_project_dir = os.path.join(USER_PATH, _asset_sys_params["install_dir"] if "install_dir" in _asset_sys_params else _asset_sys_params["project_dir"])
-            _tmp_repo_dwnld_path=os.path.join(USER_PATH, f"DeRunner_Dwnld_{_count}.zip")
+            _tmp_repo_dwnld_path=os.path.join(TMP_PATH, f"DeRunner_Dwnld_{_count}.zip")
             ## Download Commands
             if USER_SYS == "win":
                 _mkdir="mkdir "
@@ -645,11 +656,10 @@ class Derunner():
         for _model in model_ids:
             _asset_sys_params=self.last_serv_conf["services_params"][_model][USER_SYS]
             _asset_setup = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["setup"])
-            if os.path.isfile(_asset_setup):
-                _tmp_file_lines += [
-                    f"{_log_prefix}Installing '{_model}'... >>{LOG_PATH}\n",
-                    f'{_start_cmd}{_asset_setup} {" ".join(_asset_sys_params["setup_args"] if "setup_args" in _asset_sys_params and _asset_sys_params["setup_args"] else [])}\n'
-                ]
+            _tmp_file_lines += [
+                f"{_log_prefix}Installing '{_model}'... >>{LOG_PATH}\n",
+                f'{_start_cmd}{_asset_setup} {" ".join(_asset_sys_params["setup_args"] if "setup_args" in _asset_sys_params and _asset_sys_params["setup_args"] else [])}\n'
+            ]
 
 
         # 5 - Start `run_constantly` Models <- Required Models
