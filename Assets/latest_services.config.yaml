@@ -1,8 +1,6 @@
 #param: Get to know if all Services Status, inclusively if running in derunner
 #type: dict{ str(model): int(status) } -> status ( 0=STOPPED | 1=STARTED | 2=RUNNING )
-services_status: {
-    desotaai/derunner: 2
-}
+services_status: null
 
 ## DeSOTA Services Params
 services_params: {
@@ -270,10 +268,6 @@ services_params: {
             installer_args: [/reinstall],
             runner: Desota\Desota_Models\DeUrlCruncher\runner.py,
             runner_py: Desota\Desota_Models\DeUrlCruncher\env\python.exe,
-            cli: [
-                Desota\Desota_Models\DeUrlCruncher\env\python.exe,
-                Desota\Desota_Models\DeUrlCruncher\main.py
-            ]
         },
         lin: {
             version: 0.0.0,
@@ -289,9 +283,9 @@ services_params: {
             status: ,
 
             desota_runner: runner.py,
-            python_path: Desota/Desota_Models/DeUrlCruncher/env/binpython3,
+            python_path: Desota/Desota_Models/DeUrlCruncher/env/bin/python3,
             cli_cmd: [
-                Desota/Desota_Models/DeUrlCruncher/env/binpython3,
+                Desota/Desota_Models/DeUrlCruncher/env/bin/python3,
                 Desota/Desota_Models/DeUrlCruncher/main.py
             ]
         },
@@ -316,7 +310,7 @@ services_params: {
         description: https://github.com/franciscomvargas/DeUrlCruncher/blob/main/README.md,
         short_description: Get google URL results from string query,
         model_ui: ,
-        model_cli: cli,
+        model_cli: cli_cmd,
         handshake_req: ,
         handshake_res: ,
         run_constantly: false,
