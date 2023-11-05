@@ -329,10 +329,10 @@ manager_params: {
         release_desc: Upgrade with DeRunner Logs in DeManagerTools Dashboard (DeSOTA Requests)
     },
     lin: {
-        version: 1.0.0,
+        version: 0.0.3,
         project_dir: Desota/Desota_Models/DeManagerTools,
-        build_url: ,
-        release_desc: 
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.0.2/v0.0.3-lin64.zip,
+        release_desc: pre-release
     },
     mac: {
         version: 1.0.0,
