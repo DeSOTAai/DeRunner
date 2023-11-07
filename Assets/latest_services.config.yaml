@@ -8,7 +8,7 @@ services_params: {
     desotaai/derunner: {
         win: {
             version: 1.0.0,
-            commit: 9a3a6b97821e228c293b0d9f19c98cc30aa0f9e2,
+            commit: 8f457df110b97d7531b33328ad38a87b20f7cea1,
             project_dir: Desota\DeRunner,
             execs_path: executables\Windows,
             setup: derunner.setup.bat,
@@ -26,7 +26,7 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: 9a3a6b97821e228c293b0d9f19c98cc30aa0f9e2,
+            commit: 8f457df110b97d7531b33328ad38a87b20f7cea1,
             project_dir: Desota/DeRunner,
             execs_path: executables/Linux,
             setup: derunner.setup.bash,
@@ -310,7 +310,7 @@ services_params: {
         description: https://github.com/franciscomvargas/DeUrlCruncher/blob/main/README.md,
         short_description: Get google URL results from string query,
         model_ui: ,
-        model_cli: cli_cmd,
+        model_cli: cli,
         handshake_req: ,
         handshake_res: ,
         run_constantly: false,
@@ -323,10 +323,10 @@ services_params: {
 ### TODO - Install > Setup Upgrade
 manager_params: {
     win: {
-        version: 0.0.2,
+        version: 0.0.3,
         project_dir: Desota\Desota_Models\DeManagerTools,
-        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.0.2/v0.0.2-win64.zip,
-        release_desc: Upgrade with DeRunner Logs in DeManagerTools Dashboard (DeSOTA Requests)
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.0.2/v0.0.3-win64.zip,
+        release_desc: pre-release
     },
     lin: {
         version: 0.0.3,
