@@ -244,8 +244,8 @@ services_params: {
     },
     franciscomvargas/deurlcruncher: {
         win: {
-            version: 1.0.1,
-            commit: 0d670e8f766b6c7e7b0ea3e7f56dc489d01a56ce,
+            version: 0.0.0,
+            commit: a447362be44e7ac5bd23698dafc8fd6959de76e0,
             project_dir: Desota\Desota_Models\DeUrlCruncher,
             execs_path: executables\Windows,
             setup: deurlcruncher.setup.bat,
@@ -261,17 +261,11 @@ services_params: {
             cli_cmd: [
                 Desota\Desota_Models\DeUrlCruncher\env\python.exe,
                 Desota\Desota_Models\DeUrlCruncher\main.py
-            ],
-
-            service_path: Desota\Desota_Models\DeUrlCruncher\executables\Windows,
-            installer: https://raw.githubusercontent.com/franciscomvargas/DeUrlCruncher/main/executables/Windows/deurlcruncher.install.bat,
-            installer_args: [/reinstall],
-            runner: Desota\Desota_Models\DeUrlCruncher\runner.py,
-            runner_py: Desota\Desota_Models\DeUrlCruncher\env\python.exe,
+            ]
         },
         lin: {
             version: 0.0.0,
-            commit: 0d670e8f766b6c7e7b0ea3e7f56dc489d01a56ce,
+            commit: a447362be44e7ac5bd23698dafc8fd6959de76e0,
             project_dir: Desota/Desota_Models/DeUrlCruncher,
             execs_path: executables/Linux,
             setup: deurlcruncher.setup.bash,
