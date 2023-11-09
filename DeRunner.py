@@ -471,7 +471,7 @@ class Derunner():
         else:
             _model_serv = self.serv_conf["services_params"][ _model_params["parent_model"] ][USER_SYS]
 
-        _model_starter = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["starter"]) if _model_serv["starter"] else None
+        _model_starter = os.path.join(USER_PATH, _model_serv["project_dir"], _model_serv["execs_path"], _model_serv["starter"]) if _model_serv["starter"] else None
         if not _model_starter:
             return
         
@@ -510,7 +510,7 @@ class Derunner():
         
         _model_serv = _model_params[USER_SYS]
 
-        _model_stoper = os.path.join(USER_PATH, _model_serv["service_path"], _model_serv["stoper"]) if _model_serv["stoper"] else None
+        _model_stoper = os.path.join(USER_PATH, _model_serv["project_dir"], _model_serv["execs_path"], _model_serv["stoper"]) if _model_serv["stoper"] else None
         if not _model_stoper:
             return None
         
