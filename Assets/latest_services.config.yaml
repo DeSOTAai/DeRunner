@@ -8,7 +8,7 @@ services_params: {
     desotaai/derunner: {
         win: {
             version: 0.0.0,
-            commit: 8f457df110b97d7531b33328ad38a87b20f7cea1,
+            commit: b907773b211ec27bb7b0e828cf0fb93c0f79239f,
             project_dir: Desota\DeRunner,
             execs_path: executables\Windows,
             setup: derunner.setup.bat,
@@ -21,7 +21,7 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: 8f457df110b97d7531b33328ad38a87b20f7cea1,
+            commit: b907773b211ec27bb7b0e828cf0fb93c0f79239f,
             project_dir: Desota/DeRunner,
             execs_path: executables/Linux,
             setup: derunner.setup.bash,
@@ -227,7 +227,7 @@ services_params: {
     franciscomvargas/deurlcruncher: {
         win: {
             version: 0.0.0,
-            commit: a447362be44e7ac5bd23698dafc8fd6959de76e0,
+            commit: e531b7804eebccbb6908fd1c5dd0ae80390de828,
             project_dir: Desota\Desota_Models\DeUrlCruncher,
             execs_path: executables\Windows,
             setup: deurlcruncher.setup.bat,
@@ -247,7 +247,7 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: a447362be44e7ac5bd23698dafc8fd6959de76e0,
+            commit: e531b7804eebccbb6908fd1c5dd0ae80390de828,
             project_dir: Desota/Desota_Models/DeUrlCruncher,
             execs_path: executables/Linux,
             setup: deurlcruncher.setup.bash,
@@ -299,16 +299,16 @@ services_params: {
 ### TODO - Install > Setup Upgrade
 manager_params: {
     win: {
-        version: 0.0.3,
+        version: 0.1.0,
         project_dir: Desota\Desota_Models\DeManagerTools,
-        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.0.2/v0.0.3-win64.zip,
-        release_desc: pre-release
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.0/v0.1.0-win64.zip,
+        release_desc: First Release for Windows & Linux.
     },
     lin: {
-        version: 0.0.3,
+        version: 0.1.0,
         project_dir: Desota/Desota_Models/DeManagerTools,
-        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.0.2/v0.0.3-lin64.zip,
-        release_desc: pre-release
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.0/v0.1.0-lin64.zip,
+        release_desc: First Release for Windows & Linux.
     },
     mac: {
         version: ,
