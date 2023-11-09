@@ -210,19 +210,19 @@ sudo bash ~/Desota/DeRunner/executables/Linux/derunner.setup.bash
 
 ### Start Service
 ```cmd
-sudo bash ~/Desota/DeRunner/executables/Linux/derunner.start.bat
+sudo bash ~/Desota/DeRunner/executables/Linux/derunner.start.bash
 
 ```
     
 ### Stop Service
 ```cmd
-sudo bash ~/Desota/DeRunner/executables/Linux/derunner.stop.bat
+sudo bash ~/Desota/DeRunner/executables/Linux/derunner.stop.bash
 
 ```
 
 ### Status Service
 ```cmd
-bash ~/Desota/DeRunner/executables/Linux/derunner.status.bat
+bash ~/Desota/DeRunner/executables/Linux/derunner.status.bash
 
 ```
 
