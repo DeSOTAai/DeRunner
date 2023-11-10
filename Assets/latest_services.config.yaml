@@ -279,19 +279,20 @@ services_params: {
             status: ,
 
             desota_runner: ,
-            python_path:
+            python_path: ,
+            cli_cmd: 
         },
         source_code: https://github.com/franciscomvargas/DeUrlCruncher,
         report_issue: https://github.com/franciscomvargas/DeUrlCruncher/issues,
         description: https://github.com/franciscomvargas/DeUrlCruncher/blob/main/README.md,
         short_description: Get google URL results from string query,
-        model_ui: ,
-        model_cli: cli,
+        model_ui: null,
+        model_cli: cli_cmd,
         handshake_req: ,
-        handshake_res: ,
+        handshake_res: null,
         run_constantly: false,
         submodel: false,
-        child_models:
+        child_models: null
     },
 }
 
