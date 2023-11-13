@@ -361,10 +361,10 @@ services_params: {
 ## DeSOTA Manager Tools Params
 manager_params: {
     win: {
-        version: 0.1.0,
+        version: 0.1.1,
         project_dir: Desota\Desota_Models\DeManagerTools,
-        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.0/v0.1.0-win64.zip,
-        release_desc: First Release for Windows & Linux.
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.1/v0.1.1-win64.zip,
+        release_desc: Required Tool Services not hard coded.
     },
     lin: {
         version: 0.1.0,
