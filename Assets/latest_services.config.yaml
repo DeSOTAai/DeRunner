@@ -47,10 +47,11 @@ services_params: {
         },
         source_code: https://github.com/desotaai/derunner,
         report_issue: https://github.com/desotaai/derunner/issues,
-        description: https://github.com/desotaai/derunner/blob/main/README.md,
+        description: https://github.com/desotaai/derunner/tree/main#readme,
         short_description: Desota Client for API Requests,
         run_constantly: true,
-        submodel: false
+        submodel: false,
+        required: true
     },
     # Models
     franciscomvargas/neuralqa/qa: {
@@ -105,7 +106,7 @@ services_params: {
         },
         source_code: https://github.com/franciscomvargas/neuralqa,
         report_issue: https://github.com/franciscomvargas/neuralqa/issues,
-        description: https://github.com/franciscomvargas/neuralqa/blob/master/README_original.md,
+        description: https://github.com/franciscomvargas/neuralqa/tree/master#readme,
         short_description: Library for Question Answering on Large Datasets with BERT,
         model_ui: http://127.0.0.1:8888/,
         handshake_req: http://127.0.0.1:8888/api/handshake/,
@@ -116,7 +117,8 @@ services_params: {
         submodel: false,
         child_models: [
             franciscomvargas/neuralqa/expansion
-        ]
+        ],
+        required: false
     },
     franciscomvargas/neuralqa/expansion: {
         win: {
@@ -192,7 +194,7 @@ services_params: {
         },
         source_code: https://github.com/franciscomvargas/descraper,
         report_issue: https://github.com/franciscomvargas/descraper/issues,
-        description: https://github.com/franciscomvargas/descraper/blob/main/README.md,
+        description: https://github.com/franciscomvargas/descraper/tree/main#readme,
         short_description: WebScrape with assistance of AI Models,
         model_ui: http://127.0.0.1:8880/,
         handshake_req: http://127.0.0.1:8880/api/handshake/,
@@ -203,7 +205,8 @@ services_params: {
         submodel: false,
         child_models: [
             franciscomvargas/descraper/html
-        ]
+        ],
+        required: false
     },
     franciscomvargas/descraper/html: {
         win: {
@@ -224,6 +227,7 @@ services_params: {
         submodel: true,
         parent_model: franciscomvargas/descraper/url
     },
+    # Tools
     franciscomvargas/deurlcruncher: {
         win: {
             version: 0.0.0,
@@ -284,20 +288,68 @@ services_params: {
         },
         source_code: https://github.com/franciscomvargas/DeUrlCruncher,
         report_issue: https://github.com/franciscomvargas/DeUrlCruncher/issues,
-        description: https://github.com/franciscomvargas/DeUrlCruncher/blob/main/README.md,
+        description: https://github.com/franciscomvargas/DeUrlCruncher/tree/main#readme,
         short_description: Get google URL results from string query,
-        model_ui: null,
         model_cli: cli_cmd,
-        handshake_req: ,
-        handshake_res: null,
         run_constantly: false,
         submodel: false,
         child_models: null
     },
+    desotaai/tinypython: {
+        win: {
+            version: 0.0.0,
+            commit: 98f07c27590c221ca1815914e472cc088c73df84,
+            project_dir: Desota\Portables\TinyPython,
+            execs_path: executables\Windows,
+            setup: tinypython.setup.bat,
+            setup_args: null,
+            uninstaller: tinypython.uninstall.bat,
+            uninstaller_args: [/Q],
+            starter: ,
+            stoper: ,
+            status: ,
+            python_path: Desota\Portables\TinyPython\env\python.exe
+        },
+        lin: {
+            version: 0.0.0,
+            commit: 98f07c27590c221ca1815914e472cc088c73df84,
+            project_dir: Desota/Portables/TinyPython,
+            execs_path: executables/Linux,
+            setup: tinypython.setup.bash,
+            setup_args: [-m],
+            uninstaller: tinypython.uninstall.bash,
+            uninstaller_args: [-q],
+            starter: ,
+            stoper: ,
+            status: ,
+            python_path: Desota/Portables/TinyPython/env/bin/python3
+        },
+        mac: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Portables/TinyPython,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+            python_path:
+        },
+        source_code: https://github.com/DeSOTAai/TinyPython,
+        report_issue: https://github.com/DeSOTAai/TinyPython/issues,
+        description: https://github.com/DeSOTAai/TinyPython/tree/main#readme,
+        short_description: Portable Python as tool for Dedicated Model Runners,
+        run_constantly: false,
+        submodel: false,
+        child_models: ,
+        required: true
+    },
 }
 
 ## DeSOTA Manager Tools Params
-### TODO - Install > Setup Upgrade
 manager_params: {
     win: {
         version: 0.1.0,
@@ -319,6 +371,6 @@ manager_params: {
     },
     source_code: https://github.com/desotaai/demanagertools,
     report_issue: https://github.com/desotaai/demanagertools/issues,
-    description: https://github.com/desotaai/demanagertools/blob/main/README.md,
+    description: https://github.com/desotaai/demanagertools/tree/main#readme,
     short_description: DeSOTA Manager and Tools for Client Servers,
 }
