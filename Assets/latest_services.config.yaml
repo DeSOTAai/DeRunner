@@ -45,13 +45,14 @@ services_params: {
             stoper: ,
             status:
         },
+        service_type: tool,
+        required: true,
         source_code: https://github.com/desotaai/derunner,
         report_issue: https://github.com/desotaai/derunner/issues,
         description: https://github.com/desotaai/derunner/tree/main#readme,
         short_description: Desota Client for API Requests,
         run_constantly: true,
-        submodel: false,
-        required: true
+        submodel: false
     },
     # Models
     franciscomvargas/neuralqa/qa: {
@@ -104,6 +105,8 @@ services_params: {
             desota_runner: ,
             python_path:
         },
+        service_type: model,
+        required: false,
         source_code: https://github.com/franciscomvargas/neuralqa,
         report_issue: https://github.com/franciscomvargas/neuralqa/issues,
         description: https://github.com/franciscomvargas/neuralqa/tree/master#readme,
@@ -192,6 +195,8 @@ services_params: {
             desota_runner: ,
             python_path:
         },
+        service_type: model,
+        required: false,
         source_code: https://github.com/franciscomvargas/descraper,
         report_issue: https://github.com/franciscomvargas/descraper/issues,
         description: https://github.com/franciscomvargas/descraper/tree/main#readme,
@@ -286,6 +291,8 @@ services_params: {
             python_path: ,
             cli_cmd: 
         },
+        service_type: tool,
+        required: false,
         source_code: https://github.com/franciscomvargas/DeUrlCruncher,
         report_issue: https://github.com/franciscomvargas/DeUrlCruncher/issues,
         description: https://github.com/franciscomvargas/DeUrlCruncher/tree/main#readme,
@@ -338,6 +345,8 @@ services_params: {
             status: ,
             python_path:
         },
+        service_type: tool,
+        required: true,
         source_code: https://github.com/DeSOTAai/TinyPython,
         report_issue: https://github.com/DeSOTAai/TinyPython/issues,
         description: https://github.com/DeSOTAai/TinyPython/tree/main#readme,
