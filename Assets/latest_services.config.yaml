@@ -4,7 +4,7 @@ services_status: null
 
 ## DeSOTA Services Params
 services_params: {
-    # DeSOTA models runner
+    # DeSOTA Required Tools
     desotaai/derunner: {
         win: {
             version: 0.0.0,
@@ -53,6 +53,60 @@ services_params: {
         short_description: Desota Client for API Requests,
         run_constantly: true,
         submodel: false
+    },
+    desotaai/tinypython: {
+        win: {
+            version: 0.0.0,
+            commit: 98f07c27590c221ca1815914e472cc088c73df84,
+            project_dir: Desota\Portables\TinyPython,
+            execs_path: executables\Windows,
+            setup: tinypython.setup.bat,
+            setup_args: null,
+            uninstaller: tinypython.uninstall.bat,
+            uninstaller_args: [/Q],
+            starter: ,
+            stoper: ,
+            status: ,
+            python_path: Desota\Portables\TinyPython\env\python.exe
+        },
+        lin: {
+            version: 0.0.0,
+            commit: 98f07c27590c221ca1815914e472cc088c73df84,
+            project_dir: Desota/Portables/TinyPython,
+            execs_path: executables/Linux,
+            setup: tinypython.setup.bash,
+            setup_args: [-m],
+            uninstaller: tinypython.uninstall.bash,
+            uninstaller_args: [-q],
+            starter: ,
+            stoper: ,
+            status: ,
+            python_path: Desota/Portables/TinyPython/env/bin/python3
+        },
+        mac: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Portables/TinyPython,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+            python_path:
+        },
+        service_type: tool,
+        required: true,
+        source_code: https://github.com/DeSOTAai/TinyPython,
+        report_issue: https://github.com/DeSOTAai/TinyPython/issues,
+        description: https://github.com/DeSOTAai/TinyPython/tree/main#readme,
+        short_description: Portable Python as tool for Dedicated Model Runners,
+        run_constantly: false,
+        submodel: false,
+        child_models: ,
+        required: true
     },
     # Models
     franciscomvargas/neuralqa/qa: {
@@ -302,39 +356,50 @@ services_params: {
         submodel: false,
         child_models: null
     },
-    desotaai/tinypython: {
+    franciscomvargas/whisper.cpp: {
         win: {
-            version: 0.0.0,
-            commit: 98f07c27590c221ca1815914e472cc088c73df84,
-            project_dir: Desota\Portables\TinyPython,
+            version: ,
+            commit: ,
+            project_dir: Desota\Desota_Models\WhisperCpp,
             execs_path: executables\Windows,
-            setup: tinypython.setup.bat,
-            setup_args: null,
-            uninstaller: tinypython.uninstall.bat,
+            setup: whisper_cpp.setup.bat,
+            setup_args: [/manualstart],
+            uninstaller: whisper_cpp.uninstall.bat,
             uninstaller_args: [/Q],
             starter: ,
             stoper: ,
             status: ,
-            python_path: Desota\Portables\TinyPython\env\python.exe
+
+            desota_runner: runner.py,
+            python_path: Desota\Portables\TinyPython\env\python.exe,
+            cli_cmd: []
         },
         lin: {
             version: 0.0.0,
-            commit: 98f07c27590c221ca1815914e472cc088c73df84,
-            project_dir: Desota/Portables/TinyPython,
+            commit: 5775c6705942a0f059c0ae4a4886fc439cf55704,
+            project_dir: Desota/Desota_Models/WhisperCpp,
             execs_path: executables/Linux,
-            setup: tinypython.setup.bash,
+            setup: whisper_cpp.setup.bash,
             setup_args: [-m],
-            uninstaller: tinypython.uninstall.bash,
+            uninstaller: whisper_cpp.uninstall.bash,
             uninstaller_args: [-q],
             starter: ,
             stoper: ,
             status: ,
-            python_path: Desota/Portables/TinyPython/env/bin/python3
+
+            desota_runner: runner.py,
+            python_path: Desota/Portables/TinyPython/env/bin/python3,
+            cli_cmd: [
+                Desota/Desota_Models/WhisperCpp/stream, 
+                -m, Desota/Desota_Models/WhisperCpp/models/ggml-base.en.bin,
+                --step, 30000,
+                --length, 30000
+            ]
         },
         mac: {
             version: ,
             commit: ,
-            project_dir: Desota/Portables/TinyPython,
+            project_dir: Desota/Desota_Models/WhisperCpp,
             execs_path: executables/MacOS,
             setup: ,
             setup_args: ,
@@ -343,19 +408,22 @@ services_params: {
             starter: ,
             stoper: ,
             status: ,
-            python_path:
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
         },
         service_type: tool,
-        required: true,
-        source_code: https://github.com/DeSOTAai/TinyPython,
-        report_issue: https://github.com/DeSOTAai/TinyPython/issues,
-        description: https://github.com/DeSOTAai/TinyPython/tree/main#readme,
-        short_description: Portable Python as tool for Dedicated Model Runners,
+        required: false,
+        source_code: https://github.com/franciscomvargas/whisper.cpp,
+        report_issue: https://github.com/franciscomvargas/whisper.cpp/issues,
+        description: https://github.com/franciscomvargas/whisper.cpp/tree/master#readme,
+        short_description: Port of OpenAI's Whisper model in C/C++ ,
+        model_cli: cli_cmd,
         run_constantly: false,
         submodel: false,
-        child_models: ,
-        required: true
-    },
+        child_models: null
+    }
 }
 
 ## DeSOTA Manager Tools Params
