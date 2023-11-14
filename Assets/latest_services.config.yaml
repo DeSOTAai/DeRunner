@@ -25,7 +25,7 @@ services_params: {
             project_dir: Desota/DeRunner,
             execs_path: executables/Linux,
             setup: derunner.setup.bash,
-            setup_args: [-m],
+            setup_args: null,
             uninstaller: derunner.uninstall.bash,
             uninstaller_args: [-q],
             starter: derunner.start.bash,
