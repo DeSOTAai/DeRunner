@@ -418,7 +418,7 @@ services_params: {
         source_code: https://github.com/franciscomvargas/whisper.cpp,
         report_issue: https://github.com/franciscomvargas/whisper.cpp/issues,
         description: https://github.com/franciscomvargas/whisper.cpp/tree/master#readme,
-        short_description: Port of OpenAI's Whisper model in C/C++ ,
+        short_description: Port of OpenAI's Whisper model in C/C++,
         model_cli: cli_cmd,
         run_constantly: false,
         submodel: false,
@@ -432,13 +432,13 @@ manager_params: {
         version: 0.1.1,
         project_dir: Desota\Desota_Models\DeManagerTools,
         build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.1/v0.1.1-win64.zip,
-        release_desc: Required Tool Services not hard coded.
+        release_desc: Re-definition of required Tool Services & Ignore Models without commit.
     },
     lin: {
-        version: 0.1.0,
+        version: 0.1.1,
         project_dir: Desota/Desota_Models/DeManagerTools,
-        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.0/v0.1.0-lin64.zip,
-        release_desc: First Release for Windows & Linux.
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.1/v0.1.1-lin64.zip,
+        release_desc: e-definition of required Tool Services & Ignore Models without commit.
     },
     mac: {
         version: ,
