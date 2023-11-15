@@ -126,7 +126,7 @@ class Derunner():
     def get_user_config(self) -> dict:
         if not os.path.isfile(USER_CONF_PATH):
             _template_user_conf={
-                "user_api": None,
+                "api_key": None,
                 "models":None,
                 "system": USER_SYS
             }
