@@ -1,5 +1,6 @@
-import sys, os, io, shutil, time
+import sys, os, io, time
 import json, ast, re
+import shutil, traceback
 
 import subprocess, requests
 from subprocess import check_output
@@ -35,27 +36,29 @@ USER_SYS=get_platform()
     
 # :: os.getcwd() = C:\users\[user]\Desota\DeRunner
 # WORKING_FOLDER = os.getcwd()
-WORKING_FOLDER = os.path.dirname(os.path.realpath(__file__))
+APP_PATH = os.path.dirname(os.path.realpath(__file__))
+if USER_SYS == "win":
+    path_split = str(APP_PATH).split("\\")
+    USER=path_split[-3]
+    USER_PATH = "\\".join(path_split[:-2])
+elif USER_SYS == "lin":
+    path_split = str(APP_PATH).split("/")
+    USER=path_split[-3]
+    USER_PATH = "/".join(path_split[:-2])
 def user_chown(path):
     '''Remove root previleges for files and folders: Required for Linux'''
     if USER_SYS == "lin":
         #CURR_PATH=/home/[USER]/Desota/DeRunner
-        USER=str(WORKING_FOLDER).split("/")[-3]
         os.system(f"chown -R {USER} {path}")
     return
-
-
-if USER_SYS == "win":
-    USER_PATH = "\\".join(WORKING_FOLDER.split("\\")[:-2])
-elif USER_SYS == "lin":
-    USER_PATH = "/".join(WORKING_FOLDER.split("/")[:-2])
+    
 DESOTA_ROOT_PATH = os.path.join(USER_PATH, "Desota")
 LOG_PATH = os.path.join(DESOTA_ROOT_PATH, "demanager.log")
 TMP_PATH=os.path.join(DESOTA_ROOT_PATH, "tmp")
 if not os.path.isdir(TMP_PATH):
     os.mkdir(TMP_PATH)
+    user_chown(TMP_PATH)
 
-APP_PATH = os.path.join(DESOTA_ROOT_PATH, "DeRunner")
 CONFIG_PATH = os.path.join(DESOTA_ROOT_PATH, "Configs")
 if not os.path.isdir(CONFIG_PATH):
     os.mkdir(CONFIG_PATH)
@@ -97,7 +100,7 @@ def cprint(query, condition=DEBUG):
     '''Conditional print'''
     if condition:
         print(query)
-#   > Log to service.log
+#   > Log to demanager.log
 def delogger(query):
     if not os.path.isfile(LOG_PATH):
         with open(LOG_PATH, "w") as fw:
@@ -112,6 +115,70 @@ def delogger(query):
             fa.write(json.dumps(query, indent=2))
             fa.write("\n")
     user_chown(LOG_PATH)
+# Decifer Desota Files
+def fix_file_name(file_name):
+    # TEMPORARY FIX
+    # retrieved from https://stackoverflow.com/a/3642850 & https://stackoverflow.com/a/32680048
+    _file_pattern = re.compile(r'file\(((.)*)\)')
+    _file_res = _file_pattern.search(file_name)
+    if _file_res:
+        file_name = _file_res.group(1)
+    _text_pattern = re.compile(r'text\(((.)*)\)')
+    _text_res = _text_pattern.search(file_name)
+    if _text_res:
+        file_name = _text_res.group(1)
+    _audio_pattern = re.compile(r'audio\(((.)*)\)')
+    _audio_res = _text_pattern.search(file_name)
+    if _audio_res:
+        file_name = _audio_res.group(1)
+    return file_name
+# Downld Desota Files
+def get_url_from_str(string):
+    # retrieved from https://www.geeksforgeeks.org/python-check-url-string/
+    # findall() has been used
+    # with valid conditions for urls in string
+    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+    url = re.findall(regex, string)
+    return [x[0] for x in url]
+#
+def retrieve_file_content(file_idx):
+    if os.path.isfile(file_idx):
+            with open(file_idx, 'r') as fr:
+                return fr.read()
+    file_url = get_url_from_str(file_idx)
+    file_ext = os.path.splitext(file_url)[1] if file_url else None
+    if not file_url or not file_ext:
+        return file_idx
+    file_content = ""
+    with  requests.get(file_idx, stream=True) as req_file:
+        if req_file.status_code != 200:
+            return file_idx
+        
+        if req_file.encoding is None:
+            req_file.encoding = 'utf-8'
+
+        for line in req_file.iter_lines(decode_unicode=True):
+            if line:
+                file_content += line
+    return file_content
+#
+def download_file(file_idx, get_file_content=False) -> str:
+    if get_file_content:
+        return retrieve_file_content(file_idx)
+    out_path = os.path.join(TMP_PATH, os.path.basename(file_idx))
+    if os.path.isfile(file_idx):
+        return file_idx
+    file_url = get_url_from_str(file_idx)[0]
+    file_ext = os.path.splitext(file_url)[1] if file_url else None
+    if not file_url or not file_ext:
+        return file_idx
+    with requests.get(file_idx, stream=True) as r:
+        if r.status_code != 200:
+            return file_idx
+        with open(out_path, 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+    return out_path
+
 
 # DeRunner Class
 class Derunner():
@@ -151,11 +218,11 @@ class Derunner():
                 with open( SERV_CONF_PATH ) as f_curr:
                     with open(LAST_SERV_CONF_PATH) as f_last:
                         return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
-                    
-        # Create Latest Services Config File
-        with open(LAST_SERV_CONF_PATH, "w") as fw:
-            fw.write(_req_res.text)
-        user_chown(LAST_SERV_CONF_PATH)
+        if _req_res.status_code == 200:
+            # Create Latest Services Config File
+            with open(LAST_SERV_CONF_PATH, "w") as fw:
+                fw.write(_req_res.text)
+            user_chown(LAST_SERV_CONF_PATH)
 
         # Create Services Config File if don't exist
         if not os.path.isfile(SERV_CONF_PATH):
@@ -372,16 +439,17 @@ class Derunner():
                 if isinstance(task_dic, dict) and task_dic:
                     model_request_dict['input_args'] = {}
                     for file_type, file_value in task_dic.items():
+                        file_value_fixed = fix_file_name(file_value)
                         #print(file_type)
                         if file_type == "text":
                             # cprint(f'text select on 0', debug)   
-                            model_request_dict['input_args']['text_prompt'] = str(file_value)
+                            model_request_dict['input_args']['text_prompt'] = download_file(file_value_fixed, get_file_content=True)
                         elif file_type in ['image', 'video', 'audio', 'file']:
                             model_request_dict['input_args'][file_type] = {}
-                            model_request_dict['input_args'][file_type]['file_name'] = str(file_value)
-                            model_request_dict['input_args'][file_type]['file_url'] = f"{API_UP}/{file_value}"
+                            model_request_dict['input_args'][file_type]['file_name'] = str(file_value_fixed)
+                            model_request_dict['input_args'][file_type]['file_url'] = f"{API_UP}/{file_value_fixed}"
                         else:
-                            model_request_dict['input_args'][file_type] = str(file_value)
+                            model_request_dict['input_args'][file_type] = download_file(file_value_fixed)
                             
                     cprint(f"Request INPUT Files: {json.dumps(model_request_dict['input_args'], indent=2)}", debug)
                         
@@ -412,16 +480,17 @@ class Derunner():
                             if dep_dic:
                                 model_request_dict['dep_args'][dep_id] = {}
                                 for file_type, file_value in dep_dic.items():
+                                    file_value_fixed = fix_file_name(file_value)
                                     #print(file_type)
                                     if file_type == "text":
                                         # cprint(f'text select on 0', debug)   
-                                        model_request_dict['dep_args'][dep_id]['text_prompt'] = str(file_value)
+                                        model_request_dict['dep_args'][dep_id]['text_prompt'] = download_file(file_file_value_fixed, get_file_content=True)
                                     elif file_type in ['image', 'video', 'audio', 'file']:
                                         model_request_dict['dep_args'][dep_id][file_type] = {}
-                                        model_request_dict['dep_args'][dep_id][file_type]['file_name'] = str(file_value)
-                                        model_request_dict['dep_args'][dep_id][file_type]['file_url'] = f"{API_UP}/{file_value}"
+                                        model_request_dict['dep_args'][dep_id][file_type]['file_name'] = str(file_value_fixed)
+                                        model_request_dict['dep_args'][dep_id][file_type]['file_url'] = f"{API_UP}/{file_value_fixed}"
                                     else:
-                                        model_request_dict['dep_args'][dep_id][file_type] = str(file_value)
+                                        model_request_dict['dep_args'][dep_id][file_type] = download_file(file_file_value_fixed)
                                             
                         cprint(f"Request DEP Files: {json.dumps(model_request_dict['dep_args'], indent=2)}", debug)
                         
@@ -863,6 +932,7 @@ class Derunner():
 
                 if not model_req:
                     continue
+                print("*"*80)
                 delogger("*"*80)
                 print(f"[ INFO ] -> Incoming Model Request:\n{json.dumps(model_req, indent=2)}")
                 delogger(f"[ INFO ] -> Incoming Model Request:\n{json.dumps(model_req, indent=2)}")
@@ -908,8 +978,15 @@ class Derunner():
                 #TODO: implement
                 pass
             except Exception as e:
-                print(f"[ CRITICAL FAIL ] -> Re-Install DeRunner: {e}")
-                delogger(f"[ CRITICAL FAIL ] -> Re-Install DeRunner: {e}")
+
+                print(f'''[ CRITICAL FAIL ] -> DeRunner Fail INFO:
+  Exception: {e}
+  {traceback.format_exc()}''')
+                delogger([
+                    f"[ CRITICAL FAIL ] -> Re-Install DeRunner: \n",
+                    f"  Exception: {e}\n",
+                    f"  {traceback.format_exc()}\n"
+                ])
                 error_level = 8
                 error_msg = f"DeRunner CRITICAL FAIL: {e}"
                 _reinstall_model = "desotaai/derunner"
