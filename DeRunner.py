@@ -990,7 +990,7 @@ class Derunner():
                     f"  {traceback.format_exc()}\n"
                 ])
                 error_level = 8
-                error_msg = f"DeRunner CRITICAL FAIL: {e}"
+                error_msg = f"DeRunner CRITICAL FAIL"
                 _reinstall_model = "desotaai/derunner"
                 pass
             
