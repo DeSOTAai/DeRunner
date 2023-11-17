@@ -50,7 +50,10 @@ def retrieve_file_content(file_idx) -> str:
     if os.path.isfile(file_idx):
             with open(file_idx, 'r') as fr:
                 return fr.read()
-    file_url = get_url_from_str(file_idx)[0]
+    file_url = get_url_from_str(file_idx)
+    if len(file_url)==0:
+        return file_idx
+    file_url = file_url[0]
     file_ext = os.path.splitext(file_url)[1] if file_url else None
     if not file_url or not file_ext:
         return file_idx

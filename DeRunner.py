@@ -545,9 +545,10 @@ class Derunner():
             return
         
         if DEBUG or USER_SYS=="lin":
-            cprint(f'Model start cmd:\n\t{_model_starter}', DEBUG)
+            start_cmd = ["bash", _model_starter] if USER_SYS=="lin" else [_model_starter]
+            cprint(f'Model start cmd:\n\t{" ".join(start_cmd)}', DEBUG)
             _sproc = Popen(
-                [_model_starter]
+                start_cmd
             )
         else:
             _sproc = Popen(
@@ -584,9 +585,10 @@ class Derunner():
             return None
         
         if DEBUG or USER_SYS=="lin":
-            cprint(f'Model stop cmd:\n\t{_model_stoper}', DEBUG)
+            stop_cmd = ["bash", _model_starter] if USER_SYS=="lin" else [_model_starter]
+            cprint(f'Model stop cmd:\n\t{" ".join(stop_cmd)}', DEBUG)
             _sproc = Popen(
-                [_model_stoper]
+                stop_cmd
             )
         else:
             _sproc = Popen(
