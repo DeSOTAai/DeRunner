@@ -303,7 +303,7 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: 3e21bb4b5b32dc0b73f95e506f2018eea244beff,
+            commit: 046ea0ee1086a5e5e22cb64a1b9215a5dce0e604,
             project_dir: Desota/Desota_Models/WhisperCpp,
             execs_path: executables/Linux,
             setup: whisper_cpp.setup.bash,
