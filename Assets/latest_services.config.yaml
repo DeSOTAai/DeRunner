@@ -45,7 +45,7 @@ services_params: {
             stoper: ,
             status:
         },
-        service_type: tool,
+        service_type: asset,
         required: true,
         source_code: https://github.com/desotaai/derunner,
         report_issue: https://github.com/desotaai/derunner/issues,
@@ -97,7 +97,7 @@ services_params: {
             status: ,
             python_path:
         },
-        service_type: tool,
+        service_type: asset,
         required: true,
         source_code: https://github.com/DeSOTAai/TinyPython,
         report_issue: https://github.com/DeSOTAai/TinyPython/issues,
