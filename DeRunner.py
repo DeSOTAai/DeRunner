@@ -146,16 +146,42 @@ def retrieve_file_content(file_idx):
     if not file_url or not file_ext:
         return file_idx
     file_content = ""
-    with  requests.get(file_idx, stream=True) as req_file:
-        if req_file.status_code != 200:
-            return file_idx
-        
-        if req_file.encoding is None:
-            req_file.encoding = 'utf-8'
 
-        for line in req_file.iter_lines(decode_unicode=True):
-            if line:
-                file_content += line
+    _http_connect = True
+    while True:
+        try:
+            with  requests.get(file_idx, stream=True) as req_file:
+                if req_file.status_code != 200:
+                    return file_idx
+                
+                if req_file.encoding is None:
+                    req_file.encoding = 'utf-8'
+
+                for line in req_file.iter_lines(decode_unicode=True):
+                    if line:
+                        file_content += line
+            break
+        except requests.exceptions.ConnectionError as cerr:
+            if _http_connect:
+                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
+                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
+            _http_connect = False
+            pass
+        except requests.exceptions.ConnectTimeout as cto:
+            if _http_connect:
+                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
+                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
+            _http_connect = False
+            pass
+        except requests.exceptions.ReadTimeout as rto:
+            if _http_connect:
+                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
+                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
+            _http_connect = False
+            pass
+    if not _http_connect:
+        print(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
+        delogger(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
     return file_content
 #
 def download_file(file_idx, get_file_content=False) -> str:
@@ -168,12 +194,67 @@ def download_file(file_idx, get_file_content=False) -> str:
     file_ext = os.path.splitext(file_url)[1] if file_url else None
     if not file_url or not file_ext:
         return file_idx
-    with requests.get(file_idx, stream=True) as r:
-        if r.status_code != 200:
-            return file_idx
-        with open(out_path, 'wb') as f:
-            shutil.copyfileobj(r.raw, f)
+
+    _http_connect = True
+    while True:
+        try:
+            with requests.get(file_idx, stream=True) as r:
+                if r.status_code != 200:
+                    return file_idx
+                with open(out_path, 'wb') as f:
+                    shutil.copyfileobj(r.raw, f)
+                break
+        except requests.exceptions.ConnectionError as cerr:
+            if _http_connect:
+                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
+                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
+            _http_connect = False
+            pass
+        except requests.exceptions.ConnectTimeout as cto:
+            if _http_connect:
+                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
+                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
+            _http_connect = False
+            pass
+        except requests.exceptions.ReadTimeout as rto:
+            if _http_connect:
+                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
+                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
+            _http_connect = False
+            pass
+    if not _http_connect:
+        print(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
+        delogger(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
+
     return out_path
+# Simple Post Request
+def simple_post(url, data, timeout=None):
+    _http_connect = True
+    while True:
+        try:
+            response = requests.post(url, data=data, timeout=timeout)
+            if not _http_connect:
+                print(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
+                delogger(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
+            return response
+        except requests.exceptions.ConnectionError as cerr:
+            if _http_connect:
+                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
+                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
+            _http_connect = False
+            pass
+        except requests.exceptions.ConnectTimeout as cto:
+            if _http_connect:
+                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
+                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
+            _http_connect = False
+            pass
+        except requests.exceptions.ReadTimeout as rto:
+            if _http_connect:
+                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
+                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
+            _http_connect = False
+            pass
 def check_status():
     if USER_SYS != "lin":
         return
@@ -223,7 +304,20 @@ class Derunner():
     def get_services_config(self, ignore_update=False) -> (dict, dict):
         _req_res = None
         if not ignore_update:
-            _req_res = requests.get(LATEST_SERV_CONF_RAW)
+            try:
+                _req_res = requests.get(LATEST_SERV_CONF_RAW)
+            except requests.exceptions.ConnectionError as cerr:
+                cprint(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}", DEBUG)
+                ignore_update = True
+                pass
+            except requests.exceptions.ConnectTimeout as cto:
+                cprint(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}", DEBUG)
+                ignore_update = True
+                pass
+            except requests.exceptions.ReadTimeout as rto:
+                cprint(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}", DEBUG)
+                ignore_update = True
+                pass
         if ignore_update or ( isinstance(_req_res, requests.Response) and _req_res.status_code != 200 ):
             if not (os.path.isfile(SERV_CONF_PATH) or os.path.isfile(LAST_SERV_CONF_PATH)):
                 print(f" [SERV_CONF] Not found-> {SERV_CONF_PATH}")
@@ -392,7 +486,9 @@ class Derunner():
                 "api_key":self.user_api_key,
                 "model":model
             }
-            task = requests.post(API_URL, data=data, timeout=30)
+            
+            task = simple_post(API_URL, data=data, timeout=30)
+
             cprint(f"\nSignal DeSOTA that Model is wake up:\n{json.dumps(data, indent=2)}\nResponse Status = {task.status_code}", debug)
             if task.status_code != 200:
                 continue
@@ -406,7 +502,9 @@ class Derunner():
                 "model":model,
                 "select_task":I
             }
-            select_task = requests.post(API_URL, data=data, timeout=30)
+            
+            select_task = simple_post(API_URL, data=data, timeout=30)
+
             cprint(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {select_task.status_code}", debug)
             if select_task.status_code != 200:
                 continue
@@ -529,11 +627,11 @@ class Derunner():
         model_request_dict["task_args"] = task_dic
         model_request_dict['task_id'] = selected_task['id']
 
-        #send_task_data = {
+        # send_task_data = {
         #    "api_key":self.user_api_key,
         #    "model":model
-        #}
-        #sendTask = requests.post(API_URL, data=data)
+        # }
+        # sendTask = simple_post(API_URL, data=send_task_data)
 
         # TODO: Sorry Kris :')
         # if model_request_dict["task_type"] in ["image-to-image", "seg-image-to-image", "canny-image-to-image", "softedge-image-to-image", "lines-image-to-image", "normals-image-to-image", "pose-image-to-image"]:
@@ -995,17 +1093,8 @@ class Derunner():
                 error_msg = f"Model CRITICAL ERROR: {cpe}"
                 _reinstall_model = str(cpe)
                 pass
-            except ConnectionError as ce:
-                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {ce}")
-                error_level = 8
-                error_msg = "ConnectionError"
-                #TODO: implement
-                pass
             except Exception as e:
-
-                print(f'''[ CRITICAL FAIL ] -> DeRunner Fail INFO:
-  Exception: {e}
-  {traceback.format_exc()}''')
+                print(f'[ CRITICAL FAIL ] -> DeRunner Fail INFO:\n  Exception: {e}\n  {traceback.format_exc()}')
                 delogger([
                     f"[ CRITICAL FAIL ] -> Re-Install DeRunner: \n",
                     f"  Exception: {e}\n",
@@ -1016,14 +1105,26 @@ class Derunner():
                 if not DEVELOPMENT:
                     _reinstall_model = DERRUNER_ID
                 pass
-            
-            if error_level:
-                error_url = f"{API_URL}?api_key={self.user_api_key}&model={model_req['task_model']}&send_task={model_req['task_id']}&error={error_level}&error_msg={error_msg}" 
-                error_res = requests.post(url = error_url)
-                print(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {error_url}\n\tRES: {json.dumps(error_res.json(), indent=2)}")
-                delogger(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {error_url}\n\tRES: {json.dumps(error_res.json(), indent=2)}")
-                time.sleep(.8)
 
+            if error_level:
+                _handled_error = True
+                try: # If error_level without some payload parameter 
+                    error_payload = {
+                        "api_key": self.user_api_key,
+                        "model": model_req['task_model'],
+                        "send_task": model_req['task_id'],
+                        "error": error_level,
+                        "error_msg": error_msg
+                    }
+                except:
+                    _handled_error = False
+                    delogger(f"[ WARNING ] -> DeSOTA Unhandled Error")
+
+                if _handled_error:
+                    _rem_service_res = simple_post(url=API_URL, data=error_payload)
+                    print(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {API_URL}\n\tRES: {json.dumps(error_payload.json(), indent=2)}")
+                    delogger(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {API_URL}\n\tRES: {json.dumps(error_payload.json(), indent=2)}")
+                    time.sleep(.8)
             
             if _reinstall_model:
                 req_reinstall = self.request_model_reinstall(_reinstall_model, init=True)
