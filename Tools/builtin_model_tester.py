@@ -1,5 +1,5 @@
 import sys, os, time, json
-import yaml
+import yaml, validators
 
 import subprocess, requests, traceback
 from subprocess import check_output
@@ -175,11 +175,10 @@ def get_expert_query(expert):
             return f"Behave as a {expert} model"
 
 #   > Construct model_request_dict
-def get_model_request_dict(model, expert, input_query, input_type, input_url, input_dict): 
+def get_model_request_dict(model, expert, input_query, input_type, input_idx, input_dict): 
     if not input_query:
         input_query = get_expert_query(expert)
 
-    file_basename = os.path.basename(input_url)
     model_request_dict = {
         "task_type": "not_defined",      # TASK VARS
         "task_model": model,
@@ -192,16 +191,27 @@ def get_model_request_dict(model, expert, input_query, input_type, input_url, in
         input_dict["text_prompt"] = input_query
         model_request_dict["input_args"] = input_dict
     else:
+        if validators.url(input_idx):
+            print("IM URL")
+            input_file = input_idx
+        else:
+            if not os.path.isfile(input_idx):
+                input_file = os.path.join(USER_PATH, input_idx)
+                if not os.path.isfile(input_file):
+                    print("IM RAW")
+                    input_file = input_idx
+        
         if input_type in ["text"]:
             model_request_dict["input_args"] = {          
-                input_type: input_url,
+                input_type: input_file,
                 "text_prompt": input_query
             }
         else:
+            file_basename = os.path.basename(input_idx)
             model_request_dict["input_args"] = {          
                 input_type: {
                     "file_name": file_basename,
-                    "file_url": input_url
+                    "file_url": input_file
                 },
                 "text_prompt": input_query
             }

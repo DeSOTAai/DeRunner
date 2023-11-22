@@ -17,6 +17,12 @@ from yaml.loader import SafeLoader
 
 I=0
 DEBUG = False
+DEVELOPMENT = False
+if len(sys.argv)>1:
+    if sys.argv[1] in ["-dev"]:
+        DEVELOPMENT = True
+    elif sys.argv[1] in ["-deb"]:
+        DEBUG = True
 
 # inspired inhttps://stackoverflow.com/a/13874620
 def get_platform():
@@ -282,6 +288,10 @@ class Derunner():
         self.user_conf = self.get_user_config()
         self.user_models = self.user_conf['models']
         self.user_api_key = self.user_conf['api_key']
+        if USER_SYS == "win":
+            self.pypath = os.path.join(APP_PATH, "env", "python")
+        elif USER_SYS == "lin":
+            self.pypath = os.path.join(APP_PATH, "env", "bin", "python3")
 
     #   > Grab User Configurations
     def get_user_config(self) -> dict:
@@ -365,30 +375,29 @@ class Derunner():
             yaml.dump(configs,f_serv,sort_keys=False)
 
     # DeSOTA API Monitor
-    #   > Get child models and remove desota tools (IGNORE_MODELS)
-    def grab_all_user_models(self, ignore_models=IGNORE_MODELS) -> list:
-        all_user_models = []
-        if not self.user_models:
-            return all_user_models
-        self.__init__(ignore_update=True)
-        for model in list(self.user_models.keys()):
-            if model in ignore_models:
-                continue
-            
-            all_user_models.append(model)
-            _model_params = self.serv_conf["services_params"][model]
-            # print(f" [ DEBUG ALL USER MODELS ] - {model} params = {json.dumps(_model_params, indent=2)}")
-
-            _child_models = None if "child_models" not in _model_params and not _model_params["child_models"] else _model_params["child_models"]
-            # print(f" [ DEBUG ALL USER MODELS ] - {model} child models = {_child_models}")
-            if _child_models:
-                if isinstance(_child_models, str):
-                    _child_models = [_child_models]
-                if isinstance(_child_models, list):
-                    for _child_model in _child_models:
-                        if _child_model in self.serv_conf["services_params"] and _child_model not in all_user_models:
-                            all_user_models.append(_child_model)
-        return all_user_models
+    def grab_runner_models(self, update=True) -> list:
+        if update:
+            user_conf = self.get_user_config()
+        else:
+            user_conf = self.user_conf
+        try:
+            user_models = user_conf["models"]
+        except:
+            while True:
+                try:
+                    user_conf = self.get_user_config()
+                    user_models = user_conf["models"]
+                    break
+                except:
+                    pass
+        runner_models = []
+        if not user_models:
+            return runner_models
+        for model in user_models:
+            model_params = self.serv_conf["services_params"][model]
+            if model_params["service_type"] != "asset":
+                runner_models.append(model)
+        return runner_models
     
     #   > Check for model request
     def monitor_model_request(self, user_models, debug=False) -> dict:
@@ -1031,6 +1040,209 @@ class Derunner():
             return 2
         return 1
     
+    #   > Create Model(s) uninstall script for uninstalation
+    def create_model_uninstalation(self, model_ids, rm_models) -> str:
+        # 1 - INIT + Scripts HEADER
+        if USER_SYS == "win":
+            '''I'm a windows nerd!'''
+            # Init
+            target_path = os.path.join(TMP_PATH, f"tmp_model_uninstall{int(time.time())}.bat")
+            _start_cmd="start /W "
+            _call = "call "
+            _copy = "copy "
+            _rm = "del "
+            _noecho=" >NUL 2>NUL"
+            _log_prefix = "ECHO DeRunner.Uninstall - "
+            _app_python = os.path.join(APP_PATH, "env", "python")
+            # 1 - BAT HEADER
+            _tmp_file_lines = ["@ECHO OFF\n"]
+            
+            # 1.1 - Wait DeRunner Service STOP
+            if DERRUNER_ID in model_ids:
+                derunner_status_path = os.path.join(APP_PATH, "executables", "Windows", "derunner.status.bat")
+                _tmp_file_lines += [
+                    ":wait_derunner_stop\n",
+                    f'FOR /F "tokens=*" %%g IN (\'{derunner_status_path} /nopause\') do (SET derunner_status=%%g)\n',
+                    "IF %derunner_status% EQU SERVICE_RUNNING GOTO wait_derunner_stop\n"
+                ]
+        elif USER_SYS=="lin":
+            '''I know what i'm doing '''
+            # Init
+            target_path = os.path.join(TMP_PATH, f"tmp_model_uninstall{int(time.time())}.bash")
+            _start_cmd="bash "
+            _call=""
+            _copy = "cp "
+            _rm = "rm -rf "
+            _noecho=" &>/dev/nul"
+            _log_prefix = "echo DeRunner.Uninstall - "
+            _app_python = os.path.join(APP_PATH, "env", "bin", "python3")
+
+             # 1 - BASH HEADER
+            _tmp_file_lines = ["#!/bin/bash\n"]
+            
+            # 1.1 - Wait DeRunner Service STOP
+            if DERRUNER_ID in model_ids:
+                derunner_status_path = os.path.join(APP_PATH, "executables", "Linux", "derunner.status.bash")
+                _tmp_file_lines += [
+                    f"_serv_status=$(bash {derunner_status_path})\n",
+                    'while [ "$_serv_status" = "SERVICE_RUNNING" ]\n',
+                    "do\n",
+                    f"\t_serv_status=$(bash {derunner_status_path})\n",
+                    "done\n",
+                ]
+
+        if isinstance(model_ids, str):
+            model_ids = [model_ids]
+        if not isinstance(model_ids, list):
+            return None
+        
+        # 2 - Uninstall <- Required Models
+        if not DEVELOPMENT:
+            for _model in model_ids:
+                _asset_sys_params=self.serv_conf["services_params"][_model][USER_SYS]
+                _asset_uninstaller = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["uninstaller"])
+                _uninstaller_bn = os.path.basename(_asset_uninstaller)
+                _tmp_uninstaller = os.path.join(TMP_PATH, f'{int(time.time())}{_uninstaller_bn}')
+                if os.path.isfile(_asset_uninstaller):
+                    _tmp_file_lines += [
+                        f"{_log_prefix}Uninstalling '{_model}'...>>{LOG_PATH}\n",
+                        f"{_copy}{_asset_uninstaller} {_tmp_uninstaller}\n",
+                        f'{_start_cmd}{_tmp_uninstaller} {" ".join(_asset_sys_params["uninstaller_args"] if "uninstaller_args" in _asset_sys_params and _asset_sys_params["uninstaller_args"] else [])}{f" /automatic {USER_PATH}" if USER_SYS=="win" else " -a" if USER_SYS=="lin" else ""}\n',
+                        f'{_rm}{_tmp_uninstaller} {_noecho}\n'
+                    ]
+
+        # Remove Model from Service Configs
+        _res_sconf, _ = self.get_services_config(ignore_update=True)
+        cprint(f"[ UPGRADE ] -> pre services_configs: {json.dumps(_res_sconf, indent = 2)}", DEBUG)
+        delogger(f"[ UPGRADE ] -> pre services_configs: {json.dumps(_res_sconf)}")
+        _compare_conf = _res_sconf.copy()
+        for _model in rm_models:
+            if _model in _compare_conf["services_params"]:
+                _res_sconf["services_params"].pop(_model)
+        cprint(f"[ UPGRADE ] -> pos services_configs: {json.dumps(_res_sconf, indent = 2)}", DEBUG)
+        delogger(f"[ UPGRADE ] -> pos services_configs: {json.dumps(_res_sconf)}")
+        self.set_services_config(_res_sconf)
+        if DEVELOPMENT:
+            return "devop"
+        
+        # Force DeRunner Restart
+        if DERRUNER_ID not in model_ids:
+            _asset_sys_params=self.last_serv_conf["services_params"][DERRUNER_ID][USER_SYS]
+            _derunner_start = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["starter"])
+            _tmp_file_lines += [
+                f"{_log_prefix}Force Start DeRunner >>{LOG_PATH}\n",
+                f'{_start_cmd}{_derunner_start}\n'
+            ]
+
+
+        ## END OF FILE - Delete Bat at end of instalation 
+        ### WINDOWS - retrieved from https://stackoverflow.com/a/20333152
+        ### LINUX   - ...
+        _tmp_file_lines.append('(goto) 2>nul & del "%~f0"\n'if USER_SYS == "win" else f'rm -rf {target_path}\n' if USER_SYS == "lin" else "")
+
+
+        # 6 - Create Uninstaller File
+        with open(target_path, "w") as fw:
+            fw.writelines(_tmp_file_lines)
+        user_chown(target_path)
+        return target_path
+
+    #   > Request Model(s) uninstalation
+    def request_model_uninstall(self, uninstall_models) -> bool:
+        '''
+        Exit Codes:
+        1 - Reinstall Started W/O DeRunner (Not Required to Stop Services)
+        2 - Reinstall Started W DeRunner
+        8 - Development Mode (Update Configs only)
+        9 - Reinstall Fail
+        '''
+
+        if isinstance(uninstall_models, str):
+            uninstall_models = [uninstall_models]
+        if not isinstance(uninstall_models, list):
+            return 9
+            
+        # Remove Model from User Configs
+        #   - Prevent models being called by DeRunner
+        _res_uconf = self.get_user_config()
+        _compare_conf = _res_uconf.copy()
+        _total_rm_serv = []
+        for _model in uninstall_models:
+            try:
+                model_params = self.serv_conf['services_params'][_model]
+            except:
+                model_params = self.last_serv_conf['services_params'][_model]
+            try: # Rem from models
+                _total_rm_serv.append(_model)
+                # edit user config models
+                if model_params["submodel"]:
+                    if model_params["parent_model"] in uninstall_models:
+                        continue
+                    else:
+                        # I believe this will only happen in Critical Fail
+                        _model = model_params["parent_model"]
+                if _model in _compare_conf["models"]:
+                    _res_uconf["models"].pop(_model)
+            except:
+                pass
+            try: # Search Childs
+                _childs = _compare_conf["child_models"] if _compare_conf["child_models"] else []
+                for c in _childs:
+                    if c in _compare_conf["models"]:
+                        _res_uconf["models"].pop(c)
+                        _total_rm_serv.append(c)
+            except:
+                pass
+            try: # Rem from admissions
+                print("[ UNINSTALL ] Model Group:", json.dumps(_total_rm_serv, indent = 2))
+                # edit user config admissions
+                if "admissions" in _compare_conf and _compare_conf["admissions"]:
+                    for un_mo_ch in _total_rm_serv:
+                        for admn_key, admissions in _compare_conf["admissions"].items():
+                            if un_mo_ch in admissions:
+                                _res_uconf["admissions"][admn_key].pop(un_mo_ch)
+            except:
+                pass
+        cprint(f"[ UNINSTALL ] -> pre user_configs: {json.dumps(_res_uconf, indent = 2)}", DEBUG)
+        self.set_user_config(_res_uconf)
+
+        # Generate Reinstall Script
+        self.__init__(ignore_update=True)
+        _uninstall_path = self.create_model_uninstalation(uninstall_models, _total_rm_serv)
+        if _uninstall_path == "devop":
+            return 8
+        elif not _uninstall_path:
+            return 9
+
+        # os.spawnl(os.P_OVERLAY, str(_uninstall_path), )
+
+        # retrieved from https://stackoverflow.com/a/14797454
+        if USER_SYS == "win":
+            CREATE_NEW_PROCESS_GROUP = 0x00000200
+            DETACHED_PROCESS = 0x00000008
+            _uninstall_cmd = [_uninstall_path]
+            # TODO: https://stackoverflow.com/a/13256908
+            Popen(
+                _uninstall_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                creationflags=DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP
+            )
+        elif USER_SYS == "lin":
+            _uninstall_cmd = ['/bin/bash', _uninstall_path]  
+            # inspired in https://stackoverflow.com/a/60280256
+            subprocess.Popen(
+                _uninstall_cmd,
+                stdout=None, 
+                stderr=None,
+                universal_newlines=True,
+                preexec_fn=os.setpgrp 
+            )
+        print(f" [ WARNING ] -> Model(s) Uninstalation Requested:\n\tmodel: {uninstall_models}\n\tuninstall cmd: {' '.join(_uninstall_cmd)}")
+        if DERRUNER_ID in uninstall_models:
+            return 2
+        return 1
+    
     #   > Check for upgrades
     def req_service_upgrade(self):
         '''
@@ -1074,6 +1286,225 @@ class Derunner():
         if req_reinstall != 9:
             self.handle_upgrade_timer(create=True)
         return req_reinstall
+
+    #   > Test Models Funks
+    def quiet_subprocess(self, cmd_list, timeout=None):
+        start_time = time.time()
+        # retrieved from https://stackoverflow.com/a/62226026
+        if DEBUG or USER_SYS == "lin":
+            cprint(f'Quiet Subprocess Requested:\n\t{" ".join(cmd_list)}', DEBUG)
+            _sproc = Popen(
+                cmd_list
+            )
+        elif USER_SYS == "win":
+            _sproc = Popen(
+                cmd_list,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.STDOUT,
+                creationflags=subprocess.CREATE_NO_WINDOW
+            )
+        else:
+            return 1
+        while True:
+            if timeout and time.time() - start_time > timeout:
+                return 1
+            ret_code = _sproc.poll()
+            if ret_code != None:
+                break
+            continue
+        return ret_code
+    
+    def grab_model_info(self, model, version):
+        # TODO: Implement DeSota Model Info Req
+        #   perhaps is only required test "res url upload" and "model timeout"                                 
+        match model:
+            case "franciscomvargas/deurlcruncher":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Search',        # Can go to service_config
+                        '--input-type', 'text',             # Can go to service_config
+                        '--input-file', '"Search Engine"',  # Can go to service_config
+                        # report-file > URL OF DESOTA IN THE FUTURE
+                        '--report-file', '/home/vargas/Desota/duc_report.json' 
+                    ],
+                    "timeout": 180  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "franciscomvargas/whisper.cpp":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Transcribe',  # Can go to service_config
+                        '--input-type', 'audio',        # Can go to service_config
+                        '--input-file', 'Desota/Desota_Models/WhisperCpp/samples/jfk.wav',  # Can go to service_config
+                        # report-file > URL OF DESOTA IN THE FUTURE
+                        '--report-file', '/home/vargas/Desota/whisper_report.json' 
+                    ],
+                    "timeout": 240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "franciscomvargas/descraper/url":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', '"Search"',        # Can go to service_config
+                        '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
+                        # report-file > URL OF DESOTA IN THE FUTURE
+                        '--report-file', '/home/vargas/Desota/descraper_url_report.json' 
+                    ],
+                    "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "franciscomvargas/descraper/html":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', '"Search"',        # Can go to service_config
+                        '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
+                        # report-file > URL OF DESOTA IN THE FUTURE
+                        '--report-file', '/home/vargas/Desota/descraper_html_report.json' 
+                    ],
+                    "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case _:
+                print(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
+                delogger(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
+                return None
+    def grab_models2test(self):
+        # Grab Function required Configs
+        user_config = self.get_user_config()
+        mem_user_config = self.get_user_config()
+        user_models = self.grab_runner_models()
+        user_key = user_config["api_key"]
+        user_update = False
+        if not user_models or not user_key:
+            return {}, {}
+
+        # Confirm if user_config has admissions key
+        if "admissions" not in user_config:
+            user_config["admissions"] = {}
+            self.set_user_config(user_config)
+        if user_key not in user_config["admissions"]:
+            user_config["admissions"][user_key] = {}
+            self.set_user_config(user_config)
+
+        models2test = {}
+        models_tested = []
+        for model in user_models:
+            try:
+                version = user_config["models"][model]
+            except:
+                continue
+            if model in user_config["admissions"][user_key] and user_config["admissions"][user_key][model] == version:
+                models_tested.append(model)
+                continue
+
+            # Confirm if model have been allready tested
+            if user_config["admissions"]:
+                for ak, tm in user_config["admissions"].items():
+                    if isinstance(tm, dict) and model in tm:
+                        if tm[model] != version:
+                            user_config["admissions"][ak].pop(model)
+                        else:
+                            # Model have been tested with other api_key
+                            user_config["admissions"][user_key][model] = version
+                            # TODO: DeSOTA API ADD MODEL to this API
+                        self.set_user_config(user_config)
+            # Final Own API Admission Confirmation
+            if model in user_config["admissions"][user_key] and user_config["admissions"][user_key][model] == version:
+                models_tested.append(model)
+                continue
+            else:
+                models2test[model] = version
+        return models2test, models_tested
+    
+    def test_models(self):
+        # Monitor newby models to test
+        models2test, models_tested = self.grab_models2test()
+        # If no Model Found
+        if not models2test:
+            return models_tested
+
+        # Test Models Logic Bellow
+        test_script_path = os.path.join(APP_PATH, "Tools", "builtin_model_tester.py")
+        for model, version in models2test.items():
+            # INFO
+            print(f"[ INFO ] -> Model Tester start:\n  Model ID: {model}")
+            delogger(f"[ INFO ] -> Model Tester start:\n  Model ID: {model}")
+            
+            # Get Model Test CMD
+            # TODO: expert info will be provided by desota
+            model_test_info = self.grab_model_info(model, version)
+            # Confirm Info
+            if not model_test_info:
+                continue
+            else:
+                for key in ["cmd", "timeout"]:
+                    if key not in model_test_info or not model_test_info[key]:
+                        continue
+            model_test_cmd = model_test_info["cmd"]
+            model_test_timeout = model_test_info["timeout"]
+            model_test_cmd = [self.pypath, test_script_path] + model_test_cmd
+            print("TEST CMD:", " ".join(model_test_cmd))
+            test_res = self.quiet_subprocess(model_test_cmd, model_test_timeout)
+            if test_res == 0:
+                self.__init__(ignore_update=True)
+                user_conf = self.user_conf
+                user_conf["admissions"][self.user_api_key].update({model:version})
+                self.set_user_config(user_conf)
+                models_tested.append(model)
+                print(f"[ INFO ] -> Model Tester end:\n  Model ID: {model}\n  Result: SUCESS")
+                delogger(f"[ INFO ] -> Model Tester end:\n  Model ID: {model}\n  Result: SUCESS")
+                # print("TEST: ", API_URL + f"?api_key={self.user_api_key}&models_list={uninstalled_model}&remove_model=1")
+                _add_model_payload = {
+                    "api_key": self.user_api_key,
+                    "models_list": model,
+                    "add_model": "1"
+                }
+                delogger([
+                    f"[ API Append Model ]\n",
+                    f"       model: {model}:\n", 
+                    f"        url: {API_URL}:\n", 
+                    f"    payload: {json.dumps(_add_model_payload, indent=2)}\n",
+                ])
+
+                _add_service_res = simple_post(url = API_URL, data = _add_model_payload)
+                
+                delogger([
+                    f"    response: {_add_service_res.text}\n",
+                    f"      result: {_add_service_res}\n"
+                ])
+            else:
+                # REQUEST MODEL UNINSTALL
+                req_uninstall = self.request_model_uninstall(model)
+                # DeRunner Uninstall Requested
+                if req_uninstall == 2:
+                    # STOP SERVICE
+                    exit(66)
+                
+                # DeSOTA API REMOVE MODEL
+                # print("TEST: ", DESOTA_API_URL + f"?api_key={self.user_api_key}&models_list={model}&remove_model=1")
+                _rem_service_payload = {
+                    "api_key": self.user_api_key,
+                    "models_list": model,
+                    "remove_model": "1"
+                }
+                delogger([
+                    f"[ API Append Model ]\n",
+                    f"       model: {model}:\n", 
+                    f"        url: {API_URL}:\n", 
+                    f"    payload: {json.dumps(_rem_service_payload, indent=2)}\n",
+                ])
+                
+                _rem_service_res = simple_post(url = API_URL, data = _rem_service_payload)
+
+                delogger([
+                    f"    response: {_rem_service_res.text}\n",
+                    f"      result: {_rem_service_res}\n"
+                ])
+                
+                print(f"[ INFO ] -> Model Tester end:\n  Model ID: {model}\n  Result: FAIL")
+                delogger(f"[ INFO ] -> Model Tester end:\n  Model ID: {model}\n  Result: FAIL")
+        
+        return models_tested
 
 
     # Call Model Runner
@@ -1153,6 +1584,9 @@ class Derunner():
                     # STOP SERVICE
                     exit(66)
 
+                # Check for untested models
+                admmit_models = self.test_models()
+                
                 model_req = self.monitor_model_request(admmit_models, debug=DEBUG)
 
                 if not model_req:
