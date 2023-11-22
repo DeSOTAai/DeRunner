@@ -14,11 +14,6 @@ except:
 # import pyyaml module
 import yaml
 from yaml.loader import SafeLoader
-import argparse
-parser = argparse.ArgumentParser()
-parser.add_argument('-hs', '--handshake',
-                    help='Service Status Request',
-                    action='store_true')
 
 I=0
 DEBUG = False
@@ -77,9 +72,6 @@ LATEST_SERV_CONF_RAW = "https://raw.githubusercontent.com/DeSOTAai/DeRunner/main
 
 API_URL = "https://desota.net/assistant/api.php"
 API_UP =  "https://desota.net/assistant/api_uploads"
-
-# DeSOTA Services that don't run with DeRunner
-IGNORE_MODELS = ["desotaai/derunner"] 
 
 # MODEL_TO_METHOD = configs['model_to_method']
 
@@ -1032,5 +1024,4 @@ class Derunner():
 if __name__ == "__main__":
     check_status()
     derunner_class = Derunner()
-    # derunner_class.debug(args)
-    derunner_class.mainloop(args)
+    derunner_class.mainloop()
