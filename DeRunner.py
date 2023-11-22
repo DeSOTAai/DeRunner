@@ -178,6 +178,25 @@ def download_file(file_idx, get_file_content=False) -> str:
         with open(out_path, 'wb') as f:
             shutil.copyfileobj(r.raw, f)
     return out_path
+def check_status():
+    if USER_SYS != "lin":
+        return
+    _status = None
+    if not os.path.isfile(STATUS_PATH):
+        print("STATUS FILE NOT FOUND!")
+        with open(STATUS_PATH, "w") as fw:
+            fw.write("0")
+            _status =  0
+    with open(STATUS_PATH, "r") as fr:
+        _status  = int(fr.read().strip())
+    if _status == 1:
+        print("[ INFO ] -> DeRunner Service Stop Requested!")
+        print("Start CMD:\tsudo systemctl start derunner.service")
+        delogger([
+            "[ INFO ] -> DeRunner Service Stop Requested!\n",
+            "  Start CMD: sudo systemctl start derunner.service\n"
+        ])
+        exit(0)
 
 
 # DeRunner Class
@@ -920,6 +939,8 @@ class Derunner():
         _ignore_models = IGNORE_MODELS.copy()
         _reinstall_model = None
         while True:
+            # Check Service Stop Request
+            check_status()
             try:
                 # clear()
                 # TODO : Test new installed models here...
@@ -1009,7 +1030,7 @@ class Derunner():
                     exit(66)
 
 if __name__ == "__main__":
-    args = parser.parse_args()
+    check_status()
     derunner_class = Derunner()
     # derunner_class.debug(args)
     derunner_class.mainloop(args)

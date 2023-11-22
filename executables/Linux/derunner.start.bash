@@ -4,6 +4,7 @@
 get_user=$(who)
 USER=${get_user%% *}
 USER_HOME="/home/$USER"
+STATUS_FLAG_PATH="$USER_HOME/Desota/DeRunner/status.txt"
 
 
 # -- Edit bellow vvvv DeSOTA DEVELOPER EXAMPLe: miniconda + pip pckgs + systemctl service
@@ -24,15 +25,32 @@ SHAKE_RES=""
     exit 1;
 }
 
+# IPUT ARGS - -s="Start Model Service"; -d="Print stuff and Pause at end"
+systemctl_flag=0
+while getopts fn: flag
+do
+    case $flag in
+        f) systemctl_flag=1;;
+    esac
+done
+
+echo "Inform Main"
+echo "0">$STATUS_FLAG_PATH
+chown $USER $STATUS_FLAG_PATH
+
+if [ "$systemctl_flag" -eq "1" ]; then
+    exit 0
+fi
+
 echo "Starting Service..."
 echo "    service name: $SERV_NAME"
 
 systemctl start $SERV_NAME
-
+start_res=$? 
 if test "$SERV_WAITER" = ""
 then
     echo "    $SERV_NAME started"
-    exit
+    exit $start_res
 fi
 
 _curr_stat=$($SERV_WAITER 2>/dev/nul)
@@ -47,4 +65,4 @@ do
 done
 echo
 echo "    $SERV_NAME started"
-exit
+exit 0

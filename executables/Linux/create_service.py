@@ -21,6 +21,8 @@ if not USER_PATH:
 CURR_PATH = os.path.dirname(os.path.realpath(__file__))
 
 TARGET_RUN_FILE = os.path.join(CURR_PATH, "derunner.service.bash")
+TARGET_START_FILE = os.path.join(CURR_PATH, "derunner.start.bash")
+TARGET_STOP_FILE = os.path.join(CURR_PATH, "derunner.stop.bash")
 TARGET_SERV_FILE = os.path.join(CURR_PATH, "derunner.service")
 
 MODEL_PATH=os.path.join(USER_PATH, "Desota", "DeRunner")
@@ -29,6 +31,8 @@ MODEL_EXECS=os.path.join(MODEL_PATH, "executables", "Linux")
 SERV_DESC="Desota/DeRunner - Main Runner of Desota Services"
 SERV_PORT=8880
 SERV_RUN_CMD=f"/bin/bash {TARGET_RUN_FILE}"
+SERV_START_CMD=f"/bin/bash {TARGET_START_FILE} -f"
+SERV_STOP_CMD=f"/bin/bash {TARGET_STOP_FILE}"
 PYTHON_MAIN_CMD=f"{MODEL_ENV}/bin/python3 {MODEL_PATH}/DeRunner.py"
 STOP_DERUNNER=f"bash {MODEL_EXECS}/derunner.stop.bash"
 
@@ -68,7 +72,9 @@ StartLimitAction=reboot.
 Type=simple
 Restart=always
 RestartSec=2
+ExecStartPre={SERV_START_CMD}
 ExecStart={SERV_RUN_CMD}
+ExecStopPost={SERV_STOP_CMD}
 KillMode=process
 
 [Install]
