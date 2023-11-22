@@ -298,6 +298,10 @@ class Derunner():
         with open( USER_CONF_PATH ) as f_user:
             return yaml.load(f_user, Loader=SafeLoader)
     
+    def set_user_config(self, configs):
+        with open( USER_CONF_PATH, "w" ) as f_user:
+            yaml.dump(configs,f_user,sort_keys=False)
+    
     #   > Return latest_services.config.yaml(write if not ignore_update)
     def get_services_config(self, ignore_update=False) -> (dict, dict):
         _req_res = None
@@ -355,6 +359,10 @@ class Derunner():
         with open( SERV_CONF_PATH ) as f_curr:
             with open(LAST_SERV_CONF_PATH) as f_last:
                 return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
+
+    def set_services_config(self, configs):
+        with open( SERV_CONF_PATH, "w" ) as f_serv:
+            yaml.dump(configs,f_serv,sort_keys=False)
 
     # DeSOTA API Monitor
     #   > Get child models and remove desota tools (IGNORE_MODELS)
@@ -733,8 +741,8 @@ class Derunner():
             return "go for it"
         return None
 
-    #   > Create Model(s) installer for reinstalation
-    def create_model_reinstalation(self, model_ids) -> str:
+    #   > Create Model(s) install script for reinstalation
+    def create_model_reinstalation(self, model_ids, rm_models, submodel_critical_fail) -> str:
         # 1 - INIT + Scripts HEADER
         if USER_SYS == "win":
             '''I'm a windows nerd!'''
@@ -791,19 +799,32 @@ class Derunner():
             return None
         
         # 2 - Uninstall <- Required Models
-        for _model in model_ids:
-            _asset_sys_params=self.serv_conf["services_params"][_model][USER_SYS]
-            _asset_uninstaller = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["uninstaller"])
-            _uninstaller_bn = os.path.basename(_asset_uninstaller)
-            _tmp_uninstaller = os.path.join(TMP_PATH, f'{int(time.time())}{_uninstaller_bn}')
-            if os.path.isfile(_asset_uninstaller):
-                _tmp_file_lines += [
-                    f"{_log_prefix}Uninstalling '{_model}'...>>{LOG_PATH}\n",
-                    f"{_copy}{_asset_uninstaller} {_tmp_uninstaller}\n",
-                    f'{_start_cmd}{_tmp_uninstaller} {" ".join(_asset_sys_params["uninstaller_args"] if "uninstaller_args" in _asset_sys_params and _asset_sys_params["uninstaller_args"] else [])}{f" /automatic {USER_PATH}" if USER_SYS=="win" else " -a" if USER_SYS=="lin" else ""}\n',
-                    f'{_rm}{_tmp_uninstaller} {_noecho}\n'
-                ]
+        if not submodel_critical_fail:
+            for _model in model_ids:
+                _asset_sys_params=self.serv_conf["services_params"][_model][USER_SYS]
+                _asset_uninstaller = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["uninstaller"])
+                _uninstaller_bn = os.path.basename(_asset_uninstaller)
+                _tmp_uninstaller = os.path.join(TMP_PATH, f'{int(time.time())}{_uninstaller_bn}')
+                if os.path.isfile(_asset_uninstaller):
+                    _tmp_file_lines += [
+                        f"{_log_prefix}Uninstalling '{_model}'...>>{LOG_PATH}\n",
+                        f"{_copy}{_asset_uninstaller} {_tmp_uninstaller}\n",
+                        f'{_start_cmd}{_tmp_uninstaller} {" ".join(_asset_sys_params["uninstaller_args"] if "uninstaller_args" in _asset_sys_params and _asset_sys_params["uninstaller_args"] else [])}{f" /automatic {USER_PATH}" if USER_SYS=="win" else " -a" if USER_SYS=="lin" else ""}\n',
+                        f'{_rm}{_tmp_uninstaller} {_noecho}\n'
+                    ]
 
+        # Remove Model from Service Configs
+        _res_sconf, _ = self.get_services_config(ignore_update=True)
+        cprint(f"[ UPGRADE ] -> pre services_configs: {json.dumps(_res_sconf, indent = 2)}", DEBUG)
+        _compare_conf = _res_sconf.copy()
+        for _model in rm_models:
+            if _model in _compare_conf["services_params"]:
+                _res_sconf["services_params"].pop(_model)
+        cprint(f"[ UPGRADE ] -> pos services_configs: {json.dumps(_res_sconf, indent = 2)}", DEBUG)
+        self.set_services_config(_res_sconf)
+
+        if submodel_critical_fail:
+            return None
 
         # 3 - Download + Uncompress to target folder <- Required Models
         for _count, _model in enumerate(model_ids):
@@ -886,22 +907,100 @@ class Derunner():
         _tmp_file_lines.append('(goto) 2>nul & del "%~f0"\n'if USER_SYS == "win" else f'rm -rf {target_path}\n' if USER_SYS == "lin" else "")
 
 
-        # 6 - Create Installer Bat
+        # 6 - Create Installer File
         with open(target_path, "w") as fw:
             fw.writelines(_tmp_file_lines)
         user_chown(target_path)
         return target_path
 
     #   > Request Model(s) reinstalation
-    def request_model_reinstall(self, _reinstall_model, init=False):
+    def request_model_reinstall(self, reinstall_models, init=False) -> bool:
+        '''
+        Exit Codes:
+         1 - Reinstall Started W/O DeRunner (Not Required to Stop Services)
+         2 - Reinstall Started W DeRunner
+         9 - Reinstall Fail
+        10 - Submodel Critical Fail
+        '''
         if init:
             # UPGRADE CONFIGURATIONS (Target: self.last_serv_conf)
             self.__init__()
 
-        _reinstall_path = self.create_model_reinstalation(_reinstall_model)
+        if isinstance(reinstall_models, str):
+            reinstall_models = [reinstall_models]
+        if not isinstance(reinstall_models, list):
+            return 9
+        
+        # Remove Model from User Configs && Get to know Current pass come from submodel critical_fail
+        #   - Prevent models being called by DeRunner
+        #   - Garantee Models are tested after reinstall
+        _res_uconf = self.get_user_config()
+        _compare_conf = _res_uconf.copy()
+        _total_rm_serv = []
+        submodel_critical_fail = False
+        for _model in reinstall_models:
+            try:
+                model_params = self.serv_conf['services_params'][_model]
+            except:
+                model_params = self.last_serv_conf['services_params'][_model]
+            try: # Rem from models
+                _total_rm_serv.append(_model)
+                # edit user config models
+                if model_params["submodel"]:
+                    if model_params["parent_model"] in reinstall_models:
+                        continue
+                    else:
+                        # I believe this will only happen in Critical Fail
+                        submodel_critical_fail = True
+                        _model = model_params["parent_model"]
+                else:
+                    submodel_critical_fail = False
+                if _model in _compare_conf["models"]:
+                    _res_uconf["models"].pop(_model)
+            except:
+                pass
+            try: # Search Childs
+                _childs = _compare_conf["child_models"] if _compare_conf["child_models"] else []
+                for c in _childs:
+                    if c in _compare_conf["models"]:
+                        _res_uconf["models"].pop(c)
+                        _total_rm_serv.append(c)
+            except:
+                pass
+            try: # Rem from admissions
+                print("[ UPGRADE ] Model Group:", json.dumps(_total_rm_serv, indent = 2))
+                # edit user config admissions
+                if "admissions" in _compare_conf and _compare_conf["admissions"]:
+                    for un_mo_ch in _total_rm_serv:
+                        for admn_key, admissions in _compare_conf["admissions"].items():
+                            if un_mo_ch in admissions:
+                                _res_uconf["admissions"][admn_key].pop(un_mo_ch)
+            except:
+                pass
+        
+        if submodel_critical_fail:
+            _res_uconf = _compare_conf.copy()
+            try:
+                # edit user config admissions
+                if "admissions" in _compare_conf and _compare_conf["admissions"]:
+                    for _model in reinstall_models:
+                        for admn_key, admissions in _compare_conf["admissions"].items():
+                            if _model in admissions:
+                                _res_uconf["admissions"][admn_key].pop(_model)
+            except:
+                pass
+            cprint(f"[ UPGRADE ] -> pre user_configs: {json.dumps(_res_uconf, indent = 2)}", DEBUG)
+            self.set_user_config(_res_uconf)
+            return 10
 
+        cprint(f"[ UPGRADE ] -> pre user_configs: {json.dumps(_res_uconf, indent = 2)}", DEBUG)
+        self.set_user_config(_res_uconf)
+
+        # Generate Reinstall Script
+        self.__init__(ignore_update=True)
+        _reinstall_path = self.create_model_reinstalation(reinstall_models, _total_rm_serv, submodel_critical_fail)
         if not _reinstall_path:
-            return None
+            return 9
 
         # os.spawnl(os.P_OVERLAY, str(_reinstall_path), )
 
@@ -1035,7 +1134,8 @@ class Derunner():
             try:
                 # Check for model upgrades
                 req_serv_upg = self.req_service_upgrade()
-                if req_serv_upg == 0:
+                # DeRunner Upgrade Requested
+                if req_serv_upg == 2:
                     # STOP SERVICE
                     exit(66)
 
@@ -1117,7 +1217,8 @@ class Derunner():
             
             if _reinstall_model:
                 req_reinstall = self.request_model_reinstall(_reinstall_model, init=True)
-                if req_reinstall == 0:
+                # DeRunner Upgrade Requested
+                if req_reinstall == 2:
                     # STOP SERVICE
                     exit(66)
 
