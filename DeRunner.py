@@ -1033,33 +1033,47 @@ class Derunner():
     
     #   > Check for upgrades
     def req_service_upgrade(self):
+        '''
+        Exit Codes:
+        0 - No Model to Upgrade
+        1 - Upgrade Started W/O DeRunner (Not Required to Stop Services)
+        2 - Upgrade Started W DeRunner
+        9 - Upgrade Fail
+        '''
         # Timer check
         upgrade_timer = self.handle_upgrade_timer()
         if upgrade_timer != "go for it":
-            return None
+            return 0
         
 
         delogger(f"[ INFO:{int(time.time())} ] - Searching for models upgrade.")
+        print(f"[ INFO:{int(time.time())} ] - Searching for models upgrade.")
         # UPGRADE CONFIGURATIONS (Target: self.last_serv_conf)
         self.__init__()
-        if not self.user_models:
-            delogger(f"[ INFO ] - Models upgrade completed. Next upgrade in {int(UPG_FREQ/3600)}h")
-            return None
+        user_models = self.user_conf["models"]
+        if not user_models:
+            delogger(f"[ UPGRADE ] - No model found. Next upgrade in {int(UPG_FREQ/3600)}h")
+            print(f"[ UPGRADE ] - No model found. Next upgrade in {int(UPG_FREQ/3600)}h")
+            return 0
         _upg_models = []
-        for _model in list(self.user_models.keys()):
+        for _model in list(user_models.keys()):
+            if self.serv_conf["services_params"][_model]["submodel"]:
+                continue
             curr_version = self.serv_conf["services_params"][_model][USER_SYS]["version"]
             last_version = self.last_serv_conf["services_params"][_model][USER_SYS]["version"]
             if curr_version != last_version:
                 _upg_models.append(_model)
+        self.handle_upgrade_timer(create=True)
         if not _upg_models:
-            self.handle_upgrade_timer(create=True)
-            return None
-        
-        delogger(f"[ INFO:{int(time.time())} ] - Founded the following models to upgrade: {_upg_models}")
-        req_reinstall = self.request_model_reinstall(_upg_models)
-        if req_reinstall == 0:
-            self.handle_upgrade_timer(create=True)
+            delogger(f"[ UPGRADE ] - Up to date. Next upgrade in {int(UPG_FREQ/3600)}h")
+            print(f"[ UPGRADE ] - Up to date. Next upgrade in {int(UPG_FREQ/3600)}h")
             return 0
+        delogger(f"[ INFO:{int(time.time())} ] - Founded the following models to upgrade: {_upg_models}")
+        print(f"[ INFO:{int(time.time())} ] - Founded the following models to upgrade: {_upg_models}")
+        req_reinstall = self.request_model_reinstall(_upg_models)
+        if req_reinstall != 9:
+            self.handle_upgrade_timer(create=True)
+        return req_reinstall
 
 
     # Call Model Runner
