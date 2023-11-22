@@ -40,6 +40,7 @@ elif USER_SYS == "lin":
     path_split = str(APP_PATH).split("/")
     USER=path_split[-3]
     USER_PATH = "/".join(path_split[:-2])
+STATUS_PATH = os.path.join(APP_PATH, "status.txt")
 def user_chown(path):
     '''Remove root previleges for files and folders: Required for Linux'''
     if USER_SYS == "lin":
@@ -67,7 +68,10 @@ LAST_UP_EPOCH = os.path.join(CONFIG_PATH, "last_upgrade_epoch.txt")
 UPG_FREQ = 86400    # 24h
 # UPG_FREQ = 10     # DEBUG
 
-# Services Configurations - Latest version URL
+# Services Configurations
+#   - DeRunner service name
+DERRUNER_ID = "desotaai/derunner"
+#   - Latest version URL
 LATEST_SERV_CONF_RAW = "https://raw.githubusercontent.com/DeSOTAai/DeRunner/main/Assets/latest_services.config.yaml"
 
 API_URL = "https://desota.net/assistant/api.php"
@@ -656,12 +660,13 @@ class Derunner():
             _tmp_file_lines = ["@ECHO OFF\n"]
             
             # 1.1 - Wait DeRunner Service STOP
-            derunner_status_path = os.path.join(APP_PATH, "executables", "Windows", "derunner.status.bat")
-            _tmp_file_lines += [
-                ":wait_derunner_stop\n",
-                f'FOR /F "tokens=*" %%g IN (\'{derunner_status_path} /nopause\') do (SET derunner_status=%%g)\n',
-                "IF %derunner_status% EQU SERVICE_RUNNING GOTO wait_derunner_stop\n"
-            ]
+            if DERRUNER_ID in model_ids:
+                derunner_status_path = os.path.join(APP_PATH, "executables", "Windows", "derunner.status.bat")
+                _tmp_file_lines += [
+                    ":wait_derunner_stop\n",
+                    f'FOR /F "tokens=*" %%g IN (\'{derunner_status_path} /nopause\') do (SET derunner_status=%%g)\n',
+                    "IF %derunner_status% EQU SERVICE_RUNNING GOTO wait_derunner_stop\n"
+                ]
         elif USER_SYS=="lin":
             '''I know what i'm doing '''
             # Init
@@ -678,14 +683,15 @@ class Derunner():
             _tmp_file_lines = ["#!/bin/bash\n"]
             
             # 1.1 - Wait DeRunner Service STOP
-            derunner_status_path = os.path.join(APP_PATH, "executables", "Linux", "derunner.status.bash")
-            _tmp_file_lines += [
-                f"_serv_status=$(bash {derunner_status_path})\n",
-                'while [ "$_serv_status" = "SERVICE_RUNNING" ]\n',
-                "do\n",
-                f"\t_serv_status=$(bash {derunner_status_path})\n",
-                "done\n",
-            ]
+            if DERRUNER_ID in model_ids:
+                derunner_status_path = os.path.join(APP_PATH, "executables", "Linux", "derunner.status.bash")
+                _tmp_file_lines += [
+                    f"_serv_status=$(bash {derunner_status_path})\n",
+                    'while [ "$_serv_status" = "SERVICE_RUNNING" ]\n',
+                    "do\n",
+                    f"\t_serv_status=$(bash {derunner_status_path})\n",
+                    "done\n",
+                ]
 
         if isinstance(model_ids, str):
             model_ids = [model_ids]
@@ -746,11 +752,9 @@ class Derunner():
 
         # 5 - Start `run_constantly` Models <- Required Models
         for _model in model_ids:
-            if _model == "desotaai/derunner":
-                continue
             _asset_params=self.last_serv_conf["services_params"][_model]
             _asset_sys_params=_asset_params[USER_SYS]
-            if _asset_params["run_constantly"]:
+            if _model != DERRUNER_ID and _asset_params["run_constantly"]:
                 _asset_start = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["starter"])
                 _tmp_file_lines += [
                     f"{_log_prefix}Starting '{_model}'... >>{LOG_PATH}\n",
@@ -764,20 +768,23 @@ class Derunner():
             }).replace(" ", "").replace('"', '\\"')
             _manager_set_user_confs = os.path.join(APP_PATH, "Tools", "SetUserConfigs.py")
             _tmp_file_lines.append(f'{_call}{_app_python} {_manager_set_user_confs} --key models --value "{_new_model}"{_noecho}\n')
+            # print(f'{_call}{_app_python} {_manager_set_user_confs} --key models --value "{_new_model}"{_noecho}\n')
         
     
         ## 5.1 - after asset instalation!!
         #   > Update Services Config with params from Latest Services Config
         _app_after_model_reinstall = os.path.join(APP_PATH, "Tools", "after_model_reinstall.py")
         _tmp_file_lines.append(f'{_call}{_app_python} {_app_after_model_reinstall}{_noecho}\n')
+        cprint(f'{_call}{_app_python} {_app_after_model_reinstall}{_noecho}\n', DEBUG)
+        # delogger(f'{_call}{_app_python} {_app_after_model_reinstall}{_noecho}\n')
 
 
         # Force DeRunner Restart
-        if "desotaai/derunner" not in model_ids:
-            _asset_sys_params=self.last_serv_conf["services_params"]["desotaai/derunner"][USER_SYS]
+        if DERRUNER_ID not in model_ids:
+            _asset_sys_params=self.last_serv_conf["services_params"][DERRUNER_ID][USER_SYS]
             _derunner_start = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["starter"])
             _tmp_file_lines += [
-                f"{_log_prefix}Restarting DeRunner... >>{LOG_PATH}\n",
+                f"{_log_prefix}Force Start DeRunner >>{LOG_PATH}\n",
                 f'{_start_cmd}{_derunner_start}\n'
             ]
 
@@ -829,8 +836,10 @@ class Derunner():
                 universal_newlines=True,
                 preexec_fn=os.setpgrp 
             )
-        print(f" [ WARNING ] -> Model Reinstalation required:\n\tmodel: {_reinstall_model}\n\treinstall cmd: {' '.join(_reinstall_cmd)}")
-        return 0
+        print(f" [ WARNING ] -> Model(s) Reinstalation Requested:\n\tmodel: {reinstall_models}\n\treinstall cmd: {' '.join(_reinstall_cmd)}")
+        if DERRUNER_ID in reinstall_models:
+            return 2
+        return 1
     
     #   > Check for upgrades
     def req_service_upgrade(self):
@@ -1004,7 +1013,8 @@ class Derunner():
                 ])
                 error_level = 8
                 error_msg = f"DeRunner CRITICAL FAIL"
-                _reinstall_model = "desotaai/derunner"
+                if not DEVELOPMENT:
+                    _reinstall_model = DERRUNER_ID
                 pass
             
             if error_level:
