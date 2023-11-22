@@ -77,8 +77,6 @@ LATEST_SERV_CONF_RAW = "https://raw.githubusercontent.com/DeSOTAai/DeRunner/main
 API_URL = "https://desota.net/assistant/api.php"
 API_UP =  "https://desota.net/assistant/api_uploads"
 
-# MODEL_TO_METHOD = configs['model_to_method']
-
 # models=['audio-classification-efficientat', 'whisper-small-en', 'coqui-tts-male', 'lllyasviel/sd-controlnet-seg-text-to-image','lllyasviel/sd-controlnet-openpose-text-to-image','lllyasviel/sd-controlnet-normal-text-to-image','lllyasviel/sd-controlnet-mlsd-text-to-image','lllyasviel/sd-controlnet-hed-text-to-image','lllyasviel/sd-controlnet-depth-text-to-image','lllyasviel/sd-controlnet-canny-text-to-image','lllyasviel/sd-controlnet-openpose-control','lllyasviel/sd-controlnet-normal-control','lllyasviel/sd-controlnet-mlsd-control','lllyasviel/sd-controlnet-hed-control','lllyasviel/sd-controlnet-canny-control','lllyasviel/sd-controlnet-text','clip','basic-vid2vid','basic-txt2vid','watch-video','talking-heads','clip-2','clip-2']
 
 
@@ -385,14 +383,11 @@ class Derunner():
         return all_user_models
     
     #   > Check for model request
-    def monitor_model_request(self, ignore_models=IGNORE_MODELS, debug=False) -> dict:
+    def monitor_model_request(self, user_models, debug=False) -> dict:
         global I
         I += 1
-        
         cprint(f"Running...{I}", debug) 
-
         selected_task = False
-        
         model_request_dict = {
             "task_type": None,      # TASK VARS
             "task_model": None,
@@ -468,15 +463,13 @@ class Derunner():
             }
         }
         '''
-        
-        # Grab Models + Child Models (services.config.yaml)
-        _all_user_models = self.grab_all_user_models(ignore_models)
-        cprint(f"[ INFO ] -> All User Models: {json.dumps(_all_user_models, indent=4)}", debug)
+        # User Models
+        cprint(f"[ INFO ] -> All User Models: {json.dumps(user_models, indent=4)}", debug)
 
-        if not _all_user_models:
+        if not user_models:
             return None
         
-        for model in _all_user_models:
+        for model in user_models:
             '''
             Send a POST request to API to get a task
                 Return: `task`
@@ -597,13 +590,13 @@ class Derunner():
                                     #print(file_type)
                                     if file_type == "text":
                                         # cprint(f'text select on 0', debug)   
-                                        model_request_dict['dep_args'][dep_id]['text_prompt'] = download_file(file_file_value_fixed, get_file_content=True)
+                                        model_request_dict['dep_args'][dep_id]['text_prompt'] = download_file(file_value_fixed, get_file_content=True)
                                     elif file_type in ['image', 'video', 'audio', 'file']:
                                         model_request_dict['dep_args'][dep_id][file_type] = {}
                                         model_request_dict['dep_args'][dep_id][file_type]['file_name'] = str(file_value_fixed)
                                         model_request_dict['dep_args'][dep_id][file_type]['file_url'] = f"{API_UP}/{file_value_fixed}"
                                     else:
-                                        model_request_dict['dep_args'][dep_id][file_type] = download_file(file_file_value_fixed)
+                                        model_request_dict['dep_args'][dep_id][file_type] = download_file(file_value_fixed)
                                             
                         cprint(f"Request DEP Files: {json.dumps(model_request_dict['dep_args'], indent=2)}", debug)
                         
@@ -698,7 +691,7 @@ class Derunner():
             return None
         
         if DEBUG or USER_SYS=="lin":
-            stop_cmd = ["bash", _model_starter] if USER_SYS=="lin" else [_model_starter]
+            stop_cmd = ["bash", _model_stoper] if USER_SYS=="lin" else [_model_stoper]
             cprint(f'Model stop cmd:\n\t{" ".join(stop_cmd)}', DEBUG)
             _sproc = Popen(
                 stop_cmd
@@ -1027,30 +1020,26 @@ class Derunner():
 
 
     # Main DeRunner Loop
-    def mainloop(self, args) -> None:
+    def mainloop(self) -> None:
         # Print Configurations
         print("Runner Up!")
         delogger("Runner Up!")
         
         print(f"[ INFO ] -> Configurations:\n{json.dumps(self.user_conf, indent=2)}")
         delogger(f"[ INFO ] -> Configurations:\n{json.dumps(self.user_conf, indent=2)}")
-
-        _ignore_models = IGNORE_MODELS.copy()
+        
         _reinstall_model = None
         while True:
             # Check Service Stop Request
             check_status()
             try:
-                # clear()
-                # TODO : Test new installed models here...
-
                 # Check for model upgrades
                 req_serv_upg = self.req_service_upgrade()
                 if req_serv_upg == 0:
                     # STOP SERVICE
                     exit(66)
 
-                model_req = self.monitor_model_request(ignore_models=_ignore_models, debug=DEBUG)
+                model_req = self.monitor_model_request(admmit_models, debug=DEBUG)
 
                 if not model_req:
                     continue
