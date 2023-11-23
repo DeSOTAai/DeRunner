@@ -394,9 +394,12 @@ class Derunner():
         if not user_models:
             return runner_models
         for model in user_models:
-            model_params = self.serv_conf["services_params"][model]
-            if model_params["service_type"] != "asset":
-                runner_models.append(model)
+            try:
+                model_params = self.serv_conf["services_params"][model]
+                if model_params["service_type"] != "asset":
+                    runner_models.append(model)
+            except:
+                continue
         return runner_models
     
     #   > Check for model request
