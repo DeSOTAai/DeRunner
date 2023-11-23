@@ -810,8 +810,12 @@ class Derunner():
         # 2 - Uninstall <- Required Models
         if not submodel_critical_fail:
             for _model in model_ids:
-                _asset_sys_params=self.serv_conf["services_params"][_model][USER_SYS]
-                _asset_uninstaller = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["uninstaller"])
+                try:
+                    _asset_sys_params=self.serv_conf["services_params"][_model][USER_SYS]
+                    _asset_uninstaller = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["uninstaller"])
+                except:
+                    _asset_sys_params=self.last_serv_conf["services_params"][_model][USER_SYS]
+                    _asset_uninstaller = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["uninstaller"])
                 _uninstaller_bn = os.path.basename(_asset_uninstaller)
                 _tmp_uninstaller = os.path.join(TMP_PATH, f'{int(time.time())}{_uninstaller_bn}')
                 if os.path.isfile(_asset_uninstaller):
@@ -1316,58 +1320,104 @@ class Derunner():
     
     def grab_model_info(self, model, version):
         # TODO: Implement DeSota Model Info Req
-        #   perhaps is only required test "res url upload" and "model timeout"                                 
-        match model:
-            case "franciscomvargas/deurlcruncher":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', 'Search',        # Can go to service_config
-                        '--input-type', 'text',             # Can go to service_config
-                        '--input-file', '"Search Engine"',  # Can go to service_config
-                        # report-file > URL OF DESOTA IN THE FUTURE
-                        '--report-file', '/home/vargas/Desota/duc_report.json' 
-                    ],
-                    "timeout": 180  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "franciscomvargas/whisper.cpp":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', 'Transcribe',  # Can go to service_config
-                        '--input-type', 'audio',        # Can go to service_config
-                        '--input-file', 'Desota/Desota_Models/WhisperCpp/samples/jfk.wav',  # Can go to service_config
-                        # report-file > URL OF DESOTA IN THE FUTURE
-                        '--report-file', '/home/vargas/Desota/whisper_report.json' 
-                    ],
-                    "timeout": 240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "franciscomvargas/descraper/url":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Search"',        # Can go to service_config
-                        '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
-                        # report-file > URL OF DESOTA IN THE FUTURE
-                        '--report-file', '/home/vargas/Desota/descraper_url_report.json' 
-                    ],
-                    "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "franciscomvargas/descraper/html":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Search"',        # Can go to service_config
-                        '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
-                        # report-file > URL OF DESOTA IN THE FUTURE
-                        '--report-file', '/home/vargas/Desota/descraper_html_report.json' 
-                    ],
-                    "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case _:
-                print(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
-                delogger(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
-                return None
+        #   perhaps is only required test "res url upload" and "model timeout"
+        if USER_SYS == "lin":
+            match model:
+                case "franciscomvargas/deurlcruncher":
+                    return {
+                        "cmd": [
+                            '--model', model,
+                            '--input-query', 'Search',        # Can go to service_config
+                            '--input-type', 'text',             # Can go to service_config
+                            '--input-file', '"Search Engine"',  # Can go to service_config
+                            # report-file > URL OF DESOTA IN THE FUTURE
+                            '--report-file', f'{USER_PATH}/Desota/duc_report.json' 
+                        ],
+                        "timeout": 180  # Can go to service_config ( NOT EDITABLE AFTER)
+                    }
+                case "franciscomvargas/whisper.cpp":
+                    return {
+                        "cmd": [
+                            '--model', model,
+                            '--input-query', 'Transcribe',  # Can go to service_config
+                            '--input-type', 'audio',        # Can go to service_config
+                            '--input-file', 'Desota/Desota_Models/WhisperCpp/samples/jfk.wav',  # Can go to service_config
+                            # report-file > URL OF DESOTA IN THE FUTURE
+                            '--report-file', f'{USER_PATH}/Desota/whisper_report.json' 
+                        ],
+                        "timeout": 240  # Can go to service_config ( NOT EDITABLE AFTER)
+                    }
+                case "franciscomvargas/descraper/url":
+                    return {
+                        "cmd": [
+                            '--model', model,
+                            '--input-query', '"Search"',        # Can go to service_config
+                            '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
+                            # report-file > URL OF DESOTA IN THE FUTURE
+                            '--report-file', f'{USER_PATH}/Desota/descraper_url_report.json' 
+                        ],
+                        "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
+                    }
+                case "franciscomvargas/descraper/html":
+                    return {
+                        "cmd": [
+                            '--model', model,
+                            '--input-query', '"Search"',        # Can go to service_config
+                            '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
+                            # report-file > URL OF DESOTA IN THE FUTURE
+                            '--report-file', f'{USER_PATH}/Desota/descraper_html_report.json' 
+                        ],
+                        "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
+                    }
+                case _:
+                    print(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
+                    delogger(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
+                    return None
+        if USER_SYS == "win":
+            match model:
+                case "franciscomvargas/deurlcruncher":
+                    return {
+                        "cmd": [
+                            '--model', model,
+                            '--input-query', 'Search',        # Can go to service_config
+                            '--input-type', 'text',             # Can go to service_config
+                            '--input-file', '"Search Engine"',  # Can go to service_config
+                            # report-file > URL OF DESOTA IN THE FUTURE
+                            '--report-file', f'{USER_PATH}\Desota\duc_report.json' 
+                        ],
+                        "timeout": 180  # Can go to service_config ( NOT EDITABLE AFTER)
+                    }
+                case "franciscomvargas/descraper/url":
+                    return {
+                        "cmd": [
+                            '--model', model,
+                            '--input-query', '"Search"',        # Can go to service_config
+                            '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
+                            # report-file > URL OF DESOTA IN THE FUTURE
+                            '--report-file', f'{USER_PATH}\Desota\descraper_url_report.json' 
+                        ],
+                        "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
+                    }
+                case "franciscomvargas/descraper/html":
+                    return {
+                        "cmd": [
+                            '--model', model,
+                            '--input-query', '"Search"',        # Can go to service_config
+                            '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
+                            # report-file > URL OF DESOTA IN THE FUTURE
+                            '--report-file', f'{USER_PATH}\Desota\descraper_html_report.json' 
+                        ],
+                        "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
+                    }
+                case _:
+                    print(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
+                    delogger(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
+                    return None
+        else:
+            print(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
+            delogger(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
+            return None
+        
     def grab_models2test(self):
         # Grab Function required Configs
         user_config = self.get_user_config()
