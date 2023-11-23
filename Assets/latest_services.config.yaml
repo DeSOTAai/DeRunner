@@ -57,7 +57,7 @@ services_params: {
     desotaai/tinypython: {
         win: {
             version: 0.0.0,
-            commit: 22a3ffeb2d9c2c211847b18e1788abfe21aff58d,
+            commit: a7d531b3431e6bc143a9b95d1019049354a9da9a,
             project_dir: Desota\Portables\TinyPython,
             execs_path: executables\Windows,
             setup: tinypython.setup.bat,
@@ -71,7 +71,7 @@ services_params: {
         },
         lin: {
             version: 0.0.0,
-            commit: 22a3ffeb2d9c2c211847b18e1788abfe21aff58d,
+            commit: a7d531b3431e6bc143a9b95d1019049354a9da9a,
             project_dir: Desota/Portables/TinyPython,
             execs_path: executables/Linux,
             setup: tinypython.setup.bash,
