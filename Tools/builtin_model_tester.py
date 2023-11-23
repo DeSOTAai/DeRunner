@@ -272,7 +272,7 @@ def stop_model_serv(model_id) -> None:
         return None
     
     if DEBUG or USER_SYS=="lin":
-        stop_cmd = ["bash", _model_starter] if USER_SYS=="lin" else [_model_starter]
+        stop_cmd = ["bash", _model_stoper] if USER_SYS=="lin" else [_model_stoper]
         print(f'Model stop cmd:\n\t{" ".join(stop_cmd)}')
         _sproc = Popen(
             stop_cmd
