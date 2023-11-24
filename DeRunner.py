@@ -397,7 +397,10 @@ class Derunner():
             return runner_models
         for model in user_models:
             try:
-                model_params = self.serv_conf["services_params"][model]
+                try:
+                    model_params = self.serv_conf["services_params"][model]
+                except:
+                    model_params = self.last_serv_conf["services_params"][model]
                 if model_params["service_type"] != "asset":
                     runner_models.append(model)
             except:
@@ -1160,10 +1163,10 @@ class Derunner():
     def request_model_uninstall(self, uninstall_models) -> bool:
         '''
         Exit Codes:
-        1 - Reinstall Started W/O DeRunner (Not Required to Stop Services)
-        2 - Reinstall Started W DeRunner
+        1 - Uninstall Started W/O DeRunner (Not Required to Stop Services)
+        2 - Uninstall Started W DeRunner
         8 - Development Mode (Update Configs only)
-        9 - Reinstall Fail
+        9 - Uninstall Fail
         '''
 
         if isinstance(uninstall_models, str):
@@ -1176,30 +1179,32 @@ class Derunner():
         _res_uconf = self.get_user_config()
         _compare_conf = _res_uconf.copy()
         _total_rm_serv = []
+        submodel_list=[]
         for _model in uninstall_models:
+            is_submodel = False
             try:
                 model_params = self.serv_conf['services_params'][_model]
             except:
                 model_params = self.last_serv_conf['services_params'][_model]
             try: # Rem from models
                 _total_rm_serv.append(_model)
-                # edit user config models
                 if model_params["submodel"]:
-                    if model_params["parent_model"] in uninstall_models:
-                        continue
-                    else:
-                        # I believe this will only happen in Critical Fail
-                        _model = model_params["parent_model"]
+                    is_submodel = True
+                    submodel_list.append(True)
+                else:
+                    submodel_list.append(False)
+                # edit user config models
                 if _model in _compare_conf["models"]:
                     _res_uconf["models"].pop(_model)
             except:
                 pass
             try: # Search Childs
-                _childs = _compare_conf["child_models"] if _compare_conf["child_models"] else []
-                for c in _childs:
-                    if c in _compare_conf["models"]:
-                        _res_uconf["models"].pop(c)
-                        _total_rm_serv.append(c)
+                if not is_submodel:
+                    _childs = _compare_conf["child_models"] if _compare_conf["child_models"] else []
+                    for c in _childs:
+                        if c in _compare_conf["models"]:
+                            _res_uconf["models"].pop(c)
+                            _total_rm_serv.append(c)
             except:
                 pass
             try: # Rem from admissions
@@ -1214,6 +1219,11 @@ class Derunner():
                 pass
         cprint(f"[ UNINSTALL ] -> pre user_configs: {json.dumps(_res_uconf, indent = 2)}", DEBUG)
         self.set_user_config(_res_uconf)
+
+        if len(submodel_list) < 1:
+            return 9
+        if not False in submodel_list:
+            return 1
 
         # Generate Reinstall Script
         self.__init__(ignore_update=True)

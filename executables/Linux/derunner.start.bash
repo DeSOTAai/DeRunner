@@ -45,7 +45,7 @@ fi
 echo "Starting Service..."
 echo "    service name: $SERV_NAME"
 
-systemctl start $SERV_NAME
+systemctl --no-block start $SERV_NAME
 start_res=$? 
 if test "$SERV_WAITER" = ""
 then
