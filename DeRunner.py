@@ -83,6 +83,7 @@ LATEST_SERV_CONF_RAW = "https://raw.githubusercontent.com/DeSOTAai/DeRunner/main
 API_URL = "https://desota.net/assistant/api.php"
 API_UP =  "https://desota.net/assistant/api_uploads"
 
+DEFAULT_MODEL_TIMEOUT = 3600
 # models=['audio-classification-efficientat', 'whisper-small-en', 'coqui-tts-male', 'lllyasviel/sd-controlnet-seg-text-to-image','lllyasviel/sd-controlnet-openpose-text-to-image','lllyasviel/sd-controlnet-normal-text-to-image','lllyasviel/sd-controlnet-mlsd-text-to-image','lllyasviel/sd-controlnet-hed-text-to-image','lllyasviel/sd-controlnet-depth-text-to-image','lllyasviel/sd-controlnet-canny-text-to-image','lllyasviel/sd-controlnet-openpose-control','lllyasviel/sd-controlnet-normal-control','lllyasviel/sd-controlnet-mlsd-control','lllyasviel/sd-controlnet-hed-control','lllyasviel/sd-controlnet-canny-control','lllyasviel/sd-controlnet-text','clip','basic-vid2vid','basic-txt2vid','watch-video','talking-heads','clip-2','clip-2']
 
 
@@ -259,6 +260,7 @@ def simple_post(url, data, timeout=None):
                 delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
             _http_connect = False
             pass
+    return response
 def check_status():
     if USER_SYS != "lin":
         return
@@ -1517,16 +1519,28 @@ class Derunner():
 
     # Call Model Runner
     def call_model(self, model_req):
+        '''
+        return codes:
+        - 0 (sucess)
+        - 1 (input error)
+        - 2 (output error / timeout)
+        - 3 (desota comunication error)
+        - _ (critical fail) # causes model automatic reinstall
+        '''
+        signal_api_freq = 60 # seconds
+        start_time = time.time()
+        last_signal_time = start_time
         # Create tmp model_req.yaml with request params for model runner
-        _tmp_req_path = os.path.join(APP_PATH, f"tmp_model_req{int(time.time())}.yaml")
+        _tmp_req_path = os.path.join(TMP_PATH, f"tmp_model_req{int(time.time())}.yaml")
         with open(_tmp_req_path, 'w',) as fw:
             yaml.dump(model_req,fw,sort_keys=False)
 
         # Model Vars
         _model_id = model_req['task_model']                                             # Model Name
-        _model_runner_param = self.serv_conf["services_params"][_model_id][USER_SYS]      # Model params from services.config.yaml
-        _model_runner = os.path.join(USER_PATH, _model_runner_param["project_dir"], _model_runner_param["desota_runner"])          # Model runner path
-        _model_runner_py = os.path.join(USER_PATH, _model_runner_param["python_path"])    # Python with model runner packages
+        _model_runner_param = self.serv_conf["services_params"][_model_id]  # Model params from services.config.yaml
+        _model_runner_sys_param = _model_runner_param[USER_SYS] 
+        _model_runner = os.path.join(USER_PATH, _model_runner_sys_param["project_dir"], _model_runner_sys_param["desota_runner"])          # Model runner path
+        _model_runner_py = os.path.join(USER_PATH, _model_runner_sys_param["python_path"])    # Python with model runner packages
 
         # API Response URL
         _model_res_url = f"{API_URL}?api_key={self.user_api_key}&model={model_req['task_model']}&send_task=" + model_req['task_id']
@@ -1555,13 +1569,42 @@ class Derunner():
             )
         else:
             return
-        # TODO: implement model timeout
+        # Model timeout
+        try:
+            _model_runner_timeout = _model_runner_param["timeout"]
+        except:
+            _model_runner_timeout = DEFAULT_MODEL_TIMEOUT
+        print(" [ DEBUG ] -> Model Timeout:", _model_runner_timeout)
+        # Signal User Configs
+        edit_user_conf = self.get_user_config()
+        try:
+            edit_user_conf["running"][self.user_api_key] = _model_id
+        except:
+            edit_user_conf.update({"running":{self.user_api_key:_model_id}})
+        self.set_user_config(edit_user_conf)
         while True:
+            # Check Timeout
+            if time.time() - start_time > _model_runner_timeout:
+                _ret_code = 2
+                break
             _ret_code = _sproc.poll()
             if _ret_code != None:
                 break
+            # Signal DeSOTA API
+            if time.time() - last_signal_time > signal_api_freq:
+                last_signal_time = time.time()
+                model_running_payload = {
+                    "api_key": self.user_api_key,
+                    "models_list": _model_id,
+                    "handshake":"1"
+                }
+                model_running_res = simple_post(url=API_URL, data=model_running_payload)
             continue
 
+        # Remove Signal from User Configs
+        edit_user_conf["running"][self.user_api_key] = None
+        self.set_user_config(edit_user_conf)
+        
         if os.path.isfile(_tmp_req_path):
             os.remove(_tmp_req_path)
 
@@ -1667,8 +1710,8 @@ class Derunner():
 
                 if _handled_error:
                     _rem_service_res = simple_post(url=API_URL, data=error_payload)
-                    print(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {API_URL}\n\tRES: {json.dumps(error_payload.json(), indent=2)}")
-                    delogger(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {API_URL}\n\tRES: {json.dumps(error_payload.json(), indent=2)}")
+                    print(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {API_URL}\n\tRES: {json.dumps(_rem_service_res.json(), indent=2)}")
+                    delogger(f"[ INFO ] -> DeSOTA ERROR Upload:\n\tURL: {API_URL}\n\tRES: {json.dumps(_rem_service_res.json(), indent=2)}")
                     time.sleep(.8)
             
             if _reinstall_model:
