@@ -430,16 +430,16 @@ services_params: {
 ## DeSOTA Manager Tools Params
 manager_params: {
     win: {
-        version: 0.1.1,
+        version: 0.2.0,
         project_dir: Desota\Desota_Models\DeManagerTools,
         build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.1/v0.1.1-win64.zip,
-        release_desc: Re-definition of required Tool Services & Ignore Models without commit.
+        release_desc: α Release > DeSOTA API Comunication
     },
     lin: {
-        version: 0.1.1,
+        version: 0.2.0,
         project_dir: Desota/Desota_Models/DeManagerTools,
         build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.1/v0.1.1-lin64.zip,
-        release_desc: e-definition of required Tool Services & Ignore Models without commit.
+        release_desc: α Release > DeSOTA API Comunication
     },
     mac: {
         version: ,
