@@ -385,13 +385,7 @@ class Derunner():
         try:
             user_models = user_conf["models"]
         except:
-            while True:
-                try:
-                    user_conf = self.get_user_config()
-                    user_models = user_conf["models"]
-                    break
-                except:
-                    pass
+            return []
         runner_models = []
         if not user_models:
             return runner_models
@@ -1393,7 +1387,10 @@ class Derunner():
         user_config = self.get_user_config()
         mem_user_config = self.get_user_config()
         user_models = self.grab_runner_models()
-        user_key = user_config["api_key"]
+        try:
+            user_key = user_config["api_key"]
+        except:
+            return {}, {}
         user_update = False
         if not user_models or not user_key:
             return {}, {}
@@ -1471,8 +1468,8 @@ class Derunner():
                 user_conf["admissions"][self.user_api_key].update({model:version})
                 self.set_user_config(user_conf)
                 models_tested.append(model)
-                print(f"[ INFO ] -> Model Tester end:\n  Model ID: {model}\n  Result: SUCESS")
-                delogger(f"[ INFO ] -> Model Tester end:\n  Model ID: {model}\n  Result: SUCESS")
+                print(f"[ INFO ] -> Model Tester end:\n  Model ID: {model}\n  Result: SUCCESS")
+                delogger(f"[ INFO ] -> Model Tester end:\n  Model ID: {model}\n  Result: SUCCESS")
                 # print("TEST: ", API_URL + f"?api_key={self.user_api_key}&models_list={uninstalled_model}&remove_model=1")
                 _add_model_payload = {
                     "api_key": self.user_api_key,
