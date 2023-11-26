@@ -432,13 +432,13 @@ manager_params: {
     win: {
         version: 0.2.0,
         project_dir: Desota\Desota_Models\DeManagerTools,
-        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.1/v0.1.1-win64.zip,
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.2.0/v0.2.0-win64.zip,
         release_desc: Alpha Release > DeSOTA API Comunication
     },
     lin: {
         version: 0.2.0,
         project_dir: Desota/Desota_Models/DeManagerTools,
-        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.1.1/v0.1.1-lin64.zip,
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.2.0/v0.2.0-win64.zip,
         release_desc: Alpha Release > DeSOTA API Comunication
     },
     mac: {
