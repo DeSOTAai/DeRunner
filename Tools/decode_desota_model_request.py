@@ -76,10 +76,10 @@ def download_file(file_idx, get_file_content=False) -> str:
     out_path = os.path.join(TMP_PATH, os.path.basename(file_idx))
     if os.path.isfile(file_idx):
         return file_idx
-    file_urls = get_url_from_str(file_idx)
-    if not file_urls:
+    file_url = get_url_from_str(file_idx)
+    if not file_url:
         return file_idx
-    file_ext = os.path.splitext(file_urls[0])[1] if file_url else None
+    file_ext = os.path.splitext(file_url[0])[1] if file_url else None
     if not file_url or not file_ext:
         return file_idx
     with requests.get(file_idx, stream=True) as r:
