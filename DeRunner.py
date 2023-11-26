@@ -1536,12 +1536,16 @@ class Derunner():
         '''
         signal_api_freq = 60 # seconds
         start_time = time.time()
-        last_signal_time = start_time
+        request_creation_timeout = 60
         # Create tmp model_req.yaml with request params for model runner
         _tmp_req_path = os.path.join(TMP_PATH, f"tmp_model_req{int(time.time())}.yaml")
         with open(_tmp_req_path, 'w',) as fw:
             yaml.dump(model_req,fw,sort_keys=False)
-
+        while not os.path.exists(_tmp_req_path):
+            if time.time() - start_time > request_creation_timeout:
+                return 1
+            time.sleep(1)
+        last_signal_time = start_time
         # Model Vars
         _model_id = model_req['task_model']                                             # Model Name
         _model_runner_param = self.serv_conf["services_params"][_model_id]  # Model params from services.config.yaml
