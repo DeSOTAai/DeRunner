@@ -279,7 +279,7 @@ def check_status():
             "[ INFO ] -> DeRunner Service Stop Requested!\n",
             "  Start CMD: sudo systemctl start derunner.service\n"
         ])
-        exit(0)
+        exit(66)
 
 
 # DeRunner Class
@@ -317,6 +317,7 @@ class Derunner():
     #   > Return latest_services.config.yaml(write if not ignore_update)
     def get_services_config(self, ignore_update=False) -> (dict, dict):
         _req_res = None
+        check_status()
         if not ignore_update:
             try:
                 _req_res = requests.get(LATEST_SERV_CONF_RAW)
@@ -332,6 +333,7 @@ class Derunner():
                 cprint(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}", DEBUG)
                 ignore_update = True
                 pass
+        check_status()
         if ignore_update or ( isinstance(_req_res, requests.Response) and _req_res.status_code != 200 ):
             if not (os.path.isfile(SERV_CONF_PATH) or os.path.isfile(LAST_SERV_CONF_PATH)):
                 print(f" [SERV_CONF] Not found-> {SERV_CONF_PATH}")
@@ -341,12 +343,14 @@ class Derunner():
                 with open( SERV_CONF_PATH ) as f_curr:
                     with open(LAST_SERV_CONF_PATH) as f_last:
                         return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
+        check_status()
         if _req_res.status_code == 200:
             # Create Latest Services Config File
             with open(LAST_SERV_CONF_PATH, "w") as fw:
                 fw.write(_req_res.text)
             user_chown(LAST_SERV_CONF_PATH)
 
+        check_status()
         # Create Services Config File if don't exist
         if not os.path.isfile(SERV_CONF_PATH):
             with open(LAST_SERV_CONF_PATH) as fls:
@@ -368,6 +372,7 @@ class Derunner():
                 yaml.dump(_template_serv,fw,sort_keys=False)
             user_chown(SERV_CONF_PATH)
 
+        check_status()
         with open( SERV_CONF_PATH ) as f_curr:
             with open(LAST_SERV_CONF_PATH) as f_last:
                 return yaml.load(f_curr, Loader=SafeLoader), yaml.load(f_last, Loader=SafeLoader)
@@ -1645,12 +1650,14 @@ class Derunner():
                 if req_serv_upg == 2:
                     # STOP SERVICE
                     exit(66)
+                check_status()
 
                 # Check for untested models
                 admmit_models = self.test_models()
-                
-                model_req = self.monitor_model_request(admmit_models, debug=DEBUG)
+                check_status()
 
+                model_req = self.monitor_model_request(admmit_models, debug=DEBUG)
+                check_status()
                 if not model_req:
                     continue
                 print("*"*80)
@@ -1733,6 +1740,9 @@ class Derunner():
                     exit(66)
 
 if __name__ == "__main__":
+    # Check Service Stop Request
     check_status()
-    derunner_class = Derunner()
+    
+    # Start DeRunner
+    derunner_class = Derunner() # init
     derunner_class.mainloop()

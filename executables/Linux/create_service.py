@@ -19,11 +19,11 @@ if not USER_PATH:
 # -- Edit bellow vvvv DeSOTA DEVELOPER EXAMPLe: miniconda + pip pckgs + systemctl service
 
 CURR_PATH = os.path.dirname(os.path.realpath(__file__))
-
+SERV_NAME = "derunner.service"
 TARGET_RUN_FILE = os.path.join(CURR_PATH, "derunner.service.bash")
 TARGET_START_FILE = os.path.join(CURR_PATH, "derunner.start.bash")
-TARGET_STOP_FILE = os.path.join(CURR_PATH, "derunner.stop.bash")
-TARGET_SERV_FILE = os.path.join(CURR_PATH, "derunner.service")
+TARGET_STOP_FILE = os.path.join(CURR_PATH, "derunner.stop_flag.bash")
+TARGET_SERV_FILE = os.path.join(CURR_PATH, SERV_NAME)
 
 MODEL_PATH=os.path.join(USER_PATH, "Desota", "DeRunner")
 MODEL_ENV=os.path.join(MODEL_PATH, "env")
@@ -42,15 +42,13 @@ STOP_DERUNNER=f"bash {MODEL_EXECS}/derunner.stop.bash"
 
 # SERVICE RUNNER
 TEMPLATE_SERVICE_RUNNER=f'''#!/bin/bash
-# GET USER PATH
-STATE=0
-while [ "$STATE" -eq "0" ]
-do
-    {PYTHON_MAIN_CMD}
-    derunner_res=$?
-    if [ "$derunner_res" -eq "66" ]; then
-        echo "DeRunner Requested EXIT !"
-        STATE=66
+{PYTHON_MAIN_CMD} &
+derunner_pid=$!
+while : ; do
+    ps -p $derunner_pid >/dev/null
+    if [ $? -ne 0 ]; then
+        echo "DeRunner Servive EXIT Request !"
+        break
     fi
 done
 {STOP_DERUNNER}
@@ -66,13 +64,13 @@ Description={SERV_DESC}
 After=network.target
 StartLimitIntervalSec=0
 StartLimitBurst=5
-StartLimitAction=reboot.
+StartLimitAction=reboot
 
 [Service]
 Type=simple
 Restart=always
 RestartSec=2
-ExecStartPre={SERV_START_CMD}
+ExecStartPre=/bin/bash -c 'sleep 2 && systemctl enable {SERV_NAME} && {SERV_START_CMD}'
 ExecStart={SERV_RUN_CMD}
 ExecStopPost={SERV_STOP_CMD}
 KillMode=process
