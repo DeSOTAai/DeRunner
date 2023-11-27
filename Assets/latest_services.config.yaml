@@ -4,7 +4,7 @@ services_params: {
     desotaai/derunner: {
         win: {
             version: 0.1.0,
-            commit: b0f5e488d095b9cbd4b9412f6bef244554e2a7f4,
+            commit: fe4643a499ce48ba2a7626d6e211aac4178698a2,
             project_dir: Desota\DeRunner,
             execs_path: executables\Windows,
             setup: derunner.setup.bat,
@@ -17,7 +17,7 @@ services_params: {
         },
         lin: {
             version: 0.1.0,
-            commit: b0f5e488d095b9cbd4b9412f6bef244554e2a7f4,
+            commit: fe4643a499ce48ba2a7626d6e211aac4178698a2,
             project_dir: Desota/DeRunner,
             execs_path: executables/Linux,
             setup: derunner.setup.bash,
