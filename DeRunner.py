@@ -912,13 +912,12 @@ class Derunner():
 
 
         # Force DeRunner Restart
-        if DERRUNER_ID not in model_ids:
-            _asset_sys_params=self.last_serv_conf["services_params"][DERRUNER_ID][USER_SYS]
-            _derunner_start = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["starter"])
-            _tmp_file_lines += [
-                f"{_log_prefix}Force Start DeRunner >>{LOG_PATH}\n",
-                f'{_start_cmd}{_derunner_start}\n'
-            ]
+        _asset_sys_params=self.last_serv_conf["services_params"][DERRUNER_ID][USER_SYS]
+        _derunner_start = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["starter"])
+        _tmp_file_lines += [
+            f"{_log_prefix}Force Start DeRunner >>{LOG_PATH}\n",
+            f'{_start_cmd}{_derunner_start}\n'
+        ]
 
 
         ## END OF FILE - Delete Bat at end of instalation 
@@ -1137,13 +1136,12 @@ class Derunner():
             return "devop"
         
         # Force DeRunner Restart
-        if DERRUNER_ID not in model_ids:
-            _asset_sys_params=self.last_serv_conf["services_params"][DERRUNER_ID][USER_SYS]
-            _derunner_start = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["starter"])
-            _tmp_file_lines += [
-                f"{_log_prefix}Force Start DeRunner >>{LOG_PATH}\n",
-                f'{_start_cmd}{_derunner_start}\n'
-            ]
+        _asset_sys_params=self.last_serv_conf["services_params"][DERRUNER_ID][USER_SYS]
+        _derunner_start = os.path.join(USER_PATH, _asset_sys_params["project_dir"], _asset_sys_params["execs_path"], _asset_sys_params["starter"])
+        _tmp_file_lines += [
+            f"{_log_prefix}Force Start DeRunner >>{LOG_PATH}\n",
+            f'{_start_cmd}{_derunner_start}\n'
+        ]
 
 
         ## END OF FILE - Delete Bat at end of instalation 
