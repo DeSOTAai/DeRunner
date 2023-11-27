@@ -1426,7 +1426,25 @@ class Derunner():
                         else:
                             # Model have been tested with other api_key
                             user_config["admissions"][user_key][model] = version
-                            # TODO: DeSOTA API ADD MODEL to this API
+                            # DeSOTA API ADD MODEL to this API
+                            _add_model_payload = {
+                                "api_key": user_key,
+                                "models_list": model,
+                                "add_model": "1"
+                            }
+                            delogger([
+                                f"[ API Append Model ]\n",
+                                f"       model: {model}:\n", 
+                                f"        url: {API_URL}:\n", 
+                                f"    payload: {json.dumps(_add_model_payload, indent=2)}\n",
+                            ])
+
+                            _add_service_res = simple_post(url = API_URL, data = _add_model_payload)
+                            
+                            delogger([
+                                f"    response: {_add_service_res.text}\n",
+                                f"      result: {_add_service_res}\n"
+                            ])
                         self.set_user_config(user_config)
             # Final Own API Admission Confirmation
             if model in user_config["admissions"][user_key] and user_config["admissions"][user_key][model] == version:
@@ -1666,19 +1684,18 @@ class Derunner():
                 self.start_model_serv(model_req['task_model'])
                 
                 model_res = self.call_model(model_req)
-
-                # TODO : Handle process return code
+                
                 error_level = None
                 if model_res == 1:
-                    print(f"[ TODO ] -> Model INPUT ERROR (Write exec_state = 9)")
+                    print(f"[ ERROR ] -> Model INPUT ERROR (Write exec_state = 9)")
                     error_level = 9
                     error_msg = "Model INPUT ERROR"
                 elif model_res == 2:
-                    print(f"[ TODO ] -> Model OUTPUT ERROR (Retry in another server)")
+                    print(f"[ ERROR ] -> Model OUTPUT ERROR (Retry in another server)")
                     error_level = 8
                     error_msg = "Model OUTPUT ERROR"
                 elif model_res == 3:
-                    print(f"[ TODO ] -> Write Result to DeSOTA ERROR (Retry in another server)")
+                    print(f"[ ERROR ] -> Write Result to DeSOTA ERROR (Retry in another server)")
                     error_level = 8
                     error_msg = "Write Result to DeSOTA ERROR"
                 elif model_res != 0:
