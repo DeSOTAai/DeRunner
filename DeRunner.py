@@ -423,64 +423,101 @@ class Derunner():
         Additional model_request_dict keys:
         {
             "input_args":{          # INPUT VARS
-                "file": {
-                    "file_name": ,
-                    "file_url":
-                },
-                "image": {
-                    "file_name": ,
-                    "file_url":
-                },
-                "audio": {
-                    "file_name": ,
-                    "file_url":
-                },
-                "video": {
-                    "file_name": ,
-                    "file_url":
-                },
-                "text_prompt": "What is the content of this file? "
+                "file": [
+                    {
+                        "file_name": ,
+                        "file_url":
+                    },
+                    ...
+                ],
+                "image": [
+                    {
+                        "file_name": ,
+                        "file_url":
+                    },
+                    ...
+                ]
+                "audio": [
+                    {
+                        "file_name": ,
+                        "file_url":
+                    },
+                    ...
+                ]
+                "video": [
+                    {
+                        "file_name": ,
+                        "file_url":
+                    },
+                    ...
+                ]
+                "text_prompt": ["What is the content of this file?", ...]
                 **aditional iputs .. test and see
             },       
             "dep_args":{            # DEPENDENCIES VARS
                 [dep_id_0]:{
-                    "file": {
-                        "file_name": ,
-                        "file_url":
-                    },
-                    "image": {
-                        "file_name": ,
-                        "file_url":
-                    },
-                    "audio": {
-                        "file_name": ,
-                        "file_url":
-                    },
-                    "video": {
-                        "file_name": ,
-                        "file_url":
-                    },
-                    "text_prompt": "What is the content of this file? "
+                    "file": [
+                        {
+                            "file_name": ,
+                            "file_url":
+                        },
+                        ...
+                    ],
+                    "image": [
+                        {
+                            "file_name": ,
+                            "file_url":
+                        },
+                        ...
+                    ]
+                    "audio": [
+                        {
+                            "file_name": ,
+                            "file_url":
+                        },
+                        ...
+                    ]
+                    "video": [
+                        {
+                            "file_name": ,
+                            "file_url":
+                        },
+                        ...
+                    ]
+                    "text_prompt": ["What is the content of this file?", ...]
                     **aditional iputs .. test and see
+                },       
                 }
                 [dep_id_1]:{
-                    "file": {
-                        "file_name": ,
-                        "file_url":
-                    },
-                    "image": {
-                        "file_name": ,
-                        "file_url":
-                    },
-                    "audio": {
-                        "file_name": ,
-                        "file_url":
-                    },
-                    "video": {
-                        "file_name": ,
-                        "file_url":
-                    },
-                    "text_prompt": "What is the content of this file? "
+                    "file": [
+                        {
+                            "file_name": ,
+                            "file_url":
+                        },
+                        ...
+                    ],
+                    "image": [
+                        {
+                            "file_name": ,
+                            "file_url":
+                        },
+                        ...
+                    ]
+                    "audio": [
+                        {
+                            "file_name": ,
+                            "file_url":
+                        },
+                        ...
+                    ]
+                    "video": [
+                        {
+                            "file_name": ,
+                            "file_url":
+                        },
+                        ...
+                    ]
+                    "text_prompt": ["What is the content of this file?", ...]
                     **aditional iputs .. test and see
                 }
                 (...)
@@ -567,20 +604,35 @@ class Derunner():
                     task_dic = None
 
                 if isinstance(task_dic, dict) and task_dic:
+                    #print(json.dumps(task_dic, indent=2))
                     model_request_dict['input_args'] = {}
-                    for file_type, file_value in task_dic.items():
-                        file_value_fixed = fix_file_name(file_value)
-                        #print(file_type)
-                        if file_type == "text":
-                            # cprint(f'text select on 0', debug)   
-                            model_request_dict['input_args']['text_prompt'] = download_file(file_value_fixed, get_file_content=True)
-                        elif file_type in ['image', 'video', 'audio', 'file']:
-                            model_request_dict['input_args'][file_type] = {}
-                            model_request_dict['input_args'][file_type]['file_name'] = str(file_value_fixed)
-                            model_request_dict['input_args'][file_type]['file_url'] = f"{API_UP}/{file_value_fixed}"
-                        else:
-                            model_request_dict['input_args'][file_type] = download_file(file_value_fixed)
-                            
+                    for file_type, file_values in task_dic.items():
+                        for duck_file in file_values:
+                            file_value_fixed = fix_file_name(duck_file)
+                            #print(file_type)
+                            if file_type == "text":
+                                # cprint(f'text select on 0', debug)
+                                try:
+                                    assert model_request_dict['input_args']['text_prompt']
+                                except:
+                                    model_request_dict['input_args']['text_prompt'] = []
+                                model_request_dict['input_args']['text_prompt'].append(download_file(file_value_fixed, get_file_content=True))
+                            elif file_type in ['image', 'video', 'audio', 'file']:
+                                try:
+                                    assert model_request_dict['input_args'][file_type]
+                                except:
+                                    model_request_dict['input_args'][file_type] = []
+                                model_request_dict['input_args'][file_type].append({
+                                    "file_name": str(file_value_fixed),
+                                    "file_url": f"{API_UP}/{file_value_fixed}"
+                                })
+                            else:
+                                try:
+                                    assert model_request_dict['input_args'][file_type]
+                                except:
+                                    model_request_dict['input_args'][file_type] = []
+                                model_request_dict['input_args'][file_type].append(download_file(file_value_fixed))
+                                
                     cprint(f"Request INPUT Files: {json.dumps(model_request_dict['input_args'], indent=2)}", debug)
                         
                     model_request_dict["task_type"] = selected_task['type']
@@ -596,31 +648,46 @@ class Derunner():
                         #deps = json.loads(str(task_dep.decode('UTF-8')))
                         model_request_dict['dep_args'] = {}
                         for dep_key, dep_args in task_dep.items():
-                            try:
-                                dep_id = int(dep_key)
-                                dep_dic = json.loads(str(dep_args))
-                            except:
+                            for duck_file in dep_args:
+                                file_value_fixed = fix_file_name(duck_file)
                                 try:
-                                    dep_dic = find_json(str(dep_args))
-                                    dep_dic = json.loads(dep_dic)   
+                                    dep_id = int(dep_key)
+                                    dep_dic = json.loads(str(dep_args))
                                 except:
-                                    dep_dic = None
-                                    if not model_request_dict['dep_args'] and debug:
-                                        cprint("no filename found" , debug)
-                            if dep_dic:
-                                model_request_dict['dep_args'][dep_id] = {}
-                                for file_type, file_value in dep_dic.items():
-                                    file_value_fixed = fix_file_name(file_value)
-                                    #print(file_type)
-                                    if file_type == "text":
-                                        # cprint(f'text select on 0', debug)   
-                                        model_request_dict['dep_args'][dep_id]['text_prompt'] = download_file(file_value_fixed, get_file_content=True)
-                                    elif file_type in ['image', 'video', 'audio', 'file']:
-                                        model_request_dict['dep_args'][dep_id][file_type] = {}
-                                        model_request_dict['dep_args'][dep_id][file_type]['file_name'] = str(file_value_fixed)
-                                        model_request_dict['dep_args'][dep_id][file_type]['file_url'] = f"{API_UP}/{file_value_fixed}"
-                                    else:
-                                        model_request_dict['dep_args'][dep_id][file_type] = download_file(file_value_fixed)
+                                    try:
+                                        dep_dic = find_json(str(dep_args))
+                                        dep_dic = json.loads(dep_dic)   
+                                    except:
+                                        dep_dic = None
+                                        if not model_request_dict['dep_args'] and debug:
+                                            cprint("no filename found" , debug)
+                                if dep_dic:
+                                    model_request_dict['dep_args'][dep_id] = {}
+                                    for file_type, file_value in dep_dic.items():
+                                        file_value_fixed = fix_file_name(file_value)
+                                        #print(file_type)
+                                        if file_type == "text":
+                                            # cprint(f'text select on 0', debug)
+                                            try:
+                                                assert model_request_dict['dep_args'][dep_id]['text_prompt']
+                                            except:
+                                                model_request_dict['dep_args'][dep_id]['text_prompt'] = []
+                                            model_request_dict['dep_args'][dep_id]['text_prompt'].append(download_file(file_value_fixed, get_file_content=True))
+                                        elif file_type in ['image', 'video', 'audio', 'file']:
+                                            try:
+                                                assert model_request_dict['dep_args'][dep_id][file_type]
+                                            except:
+                                                model_request_dict['dep_args'][dep_id][file_type] = []
+                                            model_request_dict['dep_args'][dep_id][file_type].append({
+                                                "file_name": str(file_value_fixed),
+                                                "file_url": f"{API_UP}/{file_value_fixed}"
+                                            })
+                                        else:
+                                            try:
+                                                assert model_request_dict['dep_args'][dep_id][file_type]
+                                            except:
+                                                model_request_dict['dep_args'][dep_id][file_type] = []
+                                            model_request_dict['dep_args'][dep_id][file_type].append(download_file(file_value_fixed))
                                             
                         cprint(f"Request DEP Files: {json.dumps(model_request_dict['dep_args'], indent=2)}", debug)
                         
