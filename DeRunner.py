@@ -607,6 +607,10 @@ class Derunner():
                     #print(json.dumps(task_dic, indent=2))
                     model_request_dict['input_args'] = {}
                     for file_type, file_values in task_dic.items():
+                        if isinstance(file_values, str):
+                            file_values = [file_values]
+                        if not isinstance(file_values, list):
+                            continue
                         for duck_file in file_values:
                             file_value_fixed = fix_file_name(duck_file)
                             #print(file_type)
@@ -648,6 +652,10 @@ class Derunner():
                         #deps = json.loads(str(task_dep.decode('UTF-8')))
                         model_request_dict['dep_args'] = {}
                         for dep_key, dep_args in task_dep.items():
+                            if isinstance(dep_args, str):
+                                dep_args = [dep_args]
+                            if not isinstance(dep_args, list):
+                                continue
                             for duck_file in dep_args:
                                 file_value_fixed = fix_file_name(duck_file)
                                 try:
