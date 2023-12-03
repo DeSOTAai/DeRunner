@@ -144,10 +144,13 @@ def get_url_from_str(string):
 #
 def retrieve_file_content(file_idx):
     if os.path.isfile(file_idx):
-            with open(file_idx, 'r') as fr:
-                return fr.read()
-    file_url = get_url_from_str(file_idx)
-    file_ext = os.path.splitext(file_url)[1] if file_url else None
+        with open(file_idx, 'r') as fr:
+            return fr.read()
+    try:
+        file_url = get_url_from_str(file_idx)
+        file_ext = os.path.splitext(file_url)[1] if file_url else None
+    except:
+        return file_idx
     if not file_url or not file_ext:
         return file_idx
     file_content = ""
@@ -1198,14 +1201,10 @@ class Derunner():
 
         # Remove Model from Service Configs
         _res_sconf, _ = self.get_services_config(ignore_update=True)
-        cprint(f"[ UPGRADE ] -> pre services_configs: {json.dumps(_res_sconf, indent = 2)}", DEBUG)
-        delogger(f"[ UPGRADE ] -> pre services_configs: {json.dumps(_res_sconf)}")
         _compare_conf = _res_sconf.copy()
         for _model in rm_models:
             if _model in _compare_conf["services_params"]:
                 _res_sconf["services_params"].pop(_model)
-        cprint(f"[ UPGRADE ] -> pos services_configs: {json.dumps(_res_sconf, indent = 2)}", DEBUG)
-        delogger(f"[ UPGRADE ] -> pos services_configs: {json.dumps(_res_sconf)}")
         self.set_services_config(_res_sconf)
         if DEVELOPMENT:
             return "devop"
