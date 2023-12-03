@@ -1438,7 +1438,7 @@ class Derunner():
                     "cmd": [
                         '--model', model,
                         '--input-query', '"Search"',        # Can go to service_config
-                        '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
+                        '--input-dict', '{"url":["https://pt.wikipedia.org/wiki/Os_Simpsons"]}',   # Can go to service_config
                         # report-file > URL OF DESOTA IN THE FUTURE
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "descraper_url_report.json")
                     ],
@@ -1449,7 +1449,7 @@ class Derunner():
                     "cmd": [
                         '--model', model,
                         '--input-query', '"Search"',        # Can go to service_config
-                        '--input-dict', '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}',   # Can go to service_config
+                        '--input-dict', '{"url":["https://pt.wikipedia.org/wiki/Os_Simpsons"]}',   # Can go to service_config
                         # report-file > URL OF DESOTA IN THE FUTURE
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "descraper_html_report.json")
                     ],

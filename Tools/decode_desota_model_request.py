@@ -176,11 +176,13 @@ def get_request_url(model_request_dict) -> list:
     if 'url' in model_request_dict["input_args"]:
         if isinstance(model_request_dict["input_args"]['url'], list):
             _req_url = []
-            for text_prompt in model_request_dict["input_args"]['url']:
-                inst_url = get_url_from_str(text_prompt)
-                if not _req_url:
-                    inst_url = get_url_from_file(text_prompt)
-                _req_url.append(download_file(inst_url))
+            for curr_url in model_request_dict["input_args"]['url']:
+                inst_url = get_url_from_str(curr_url)
+                print("UTILS:", inst_url)
+                if not inst_url:
+                    inst_url = get_url_from_file(curr_url)
+                if inst_url:
+                    _req_url += inst_url
             
     if not _req_url and 'file' in model_request_dict["input_args"]:
         if isinstance(model_request_dict["input_args"]['file'], list):
@@ -215,11 +217,15 @@ def get_html_from_str(string):
 
 def get_html_from_file(file_idx) -> (str, str):
     _search_in_file_idx, _encoding = get_html_from_str(file_idx)
-    if _search_in_file_idx != file_idx:
+    if _search_in_file_idx:
         return _search_in_file_idx, _encoding
         
     base_filename = os.path.basename(file_idx)
     file_path = os.path.join(TMP_PATH, base_filename)
+    file_tmp_path = os.path.join(TMP_PATH, "tmp_"+base_filename)
+    if not file_path.endswith(".html"):
+        file_path += ".html"
+        file_tmp_path += ".html"
     with  requests.get(file_idx, stream=True) as req_file:
         if req_file.status_code != 200:
             return None, None
@@ -227,9 +233,9 @@ def get_html_from_file(file_idx) -> (str, str):
         if req_file.encoding is None:
             req_file.encoding = 'utf-8'
 
-        with open("tmp_"+str(file_path), 'w') as fw:
+        with open(file_tmp_path, 'w') as fw:
             fw.write("")
-        with open("tmp_"+str(file_path), 'a', encoding=req_file.encoding) as fa:
+        with open(file_tmp_path, 'a', encoding=req_file.encoding) as fa:
             for line in req_file.iter_lines(decode_unicode=True):
                 if line:
                     fa.write(f"{line}\n")
@@ -239,21 +245,16 @@ def get_html_from_file(file_idx) -> (str, str):
             # inspired in https://stackoverflow.com/a/191455
             # alternative: https://superuser.com/a/1688176
             try:
-                with open("tmp_"+str(file_path), 'rb') as source:
+                with open(file_tmp_path, 'rb') as source:
                     with open(file_path, "w") as recode:
                         recode.write(str(source.read().decode(req_file.encoding).encode("utf-8").decode("utf-8")))
                 req_file.encoding = 'utf-8'
             except:
-                file_path = "tmp_"+str(file_path)
+                file_path = file_tmp_path
     return file_path, req_file.encoding
 
 def get_request_html(model_request_dict, from_url=False) -> list((str, str)):
     _req_html = None
-    if from_url and 'url' in model_request_dict["input_args"]:
-        if isinstance(model_request_dict["input_args"]['url'], list):
-            _req_html = []
-            for url in model_request_dict["input_args"]['url']:
-                _req_html.append(get_html_from_file(url))
 
     if not _req_html and 'html' in model_request_dict["input_args"]:
         if isinstance(model_request_dict["input_args"]['html'], list):
@@ -268,11 +269,16 @@ def get_request_html(model_request_dict, from_url=False) -> list((str, str)):
             for file_idx in model_request_dict["input_args"]['file']:
                 if "file_url" in file_idx:
                     _req_html.append(get_html_from_file(file_idx["file_url"]))
-                
+
+    if not _req_html and 'url' in model_request_dict["input_args"]:
+        if isinstance(model_request_dict["input_args"]['url'], list):
+            _req_html = []
+            for url in model_request_dict["input_args"]['url']:
+                _req_html.append(get_html_from_file(url))
+
     if not _req_html and 'text_prompt' in model_request_dict["input_args"]:
         if isinstance(model_request_dict["input_args"]['text_prompt'], list):
             _req_html = []
             for text_prompt in model_request_dict["input_args"]['text_prompt']:
                 _req_html.append(get_html_from_file(text_prompt))
-        
     return _req_html

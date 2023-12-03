@@ -101,7 +101,7 @@ parser.add_argument("-id", "--input-dict",
                     nargs='?',
                     const={}, default={},
                     help='[OPTION 2] Pass model parameters {"input_type1":"input_content1", "input_type2":"input_content2", ...}. Only works for selected experts. By calling this argument will be ignored `--input-type` and `--input-file` arguments',
-                    type=json.loads)
+                    type=ast.literal_eval)
 # TARGET PATH OS TEST REPORT
 parser.add_argument("-rf", "--report-file", 
                     help='Test report path | url as json file',
@@ -187,7 +187,7 @@ def get_model_request_dict(model, expert, input_query, input_type, input_idx, in
     }
     # INPUT VARS
     if input_dict:
-        input_dict["text_prompt"] = input_query
+        input_dict["text_prompt"] = [input_query]
         model_request_dict["input_args"] = input_dict
     else:
         try:
