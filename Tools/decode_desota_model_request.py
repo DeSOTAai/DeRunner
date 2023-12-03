@@ -171,7 +171,7 @@ def get_url_from_file(file_idx):
     file_content = download_file(file_idx, get_file_content=True)
     return get_url_from_str(file_content)
 
-def get_request_url(model_request_dict) -> str:
+def get_request_url(model_request_dict) -> list:
     _req_url = None
     if 'url' in model_request_dict["input_args"]:
         if isinstance(model_request_dict["input_args"]['url'], list):
@@ -180,14 +180,14 @@ def get_request_url(model_request_dict) -> str:
                 inst_url = get_url_from_str(text_prompt)
                 if not _req_url:
                     inst_url = get_url_from_file(text_prompt)
-                _req_url.append(download_file(inst_url)
+                _req_url.append(download_file(inst_url))
             
     if not _req_url and 'file' in model_request_dict["input_args"]:
         if isinstance(model_request_dict["input_args"]['file'], list):
             _req_url = []
             for file_idx in model_request_dict["input_args"]['file']:
                 if "file_url" in file_idx:
-                    _req_url.append(download_file(file_idx["file_url"])
+                    _req_url.append(download_file(file_idx["file_url"]))
 
     if not _req_url and 'text_prompt' in model_request_dict["input_args"]:
         if isinstance(model_request_dict["input_args"]['text_prompt'], list):
