@@ -357,8 +357,8 @@ services_params: {
     # Tools
     franciscomvargas/deurlcruncher: {
         win: {
-            version: 0.0.0,
-            commit: 9b6f7e525ce40b7262e48bc7eaaa3b96d0d0832f,
+            version: 0.0.1,
+            commit: e04f6afb2d98adb65a05e6a59659786c15b9f863,
             project_dir: Desota\Desota_Models\DeUrlCruncher,
             execs_path: executables\Windows,
             setup: deurlcruncher.setup.bat,
@@ -377,8 +377,8 @@ services_params: {
             ]
         },
         lin: {
-            version: 0.0.0,
-            commit: 9b6f7e525ce40b7262e48bc7eaaa3b96d0d0832f,
+            version: 0.0.1,
+            commit: e04f6afb2d98adb65a05e6a59659786c15b9f863,
             project_dir: Desota/Desota_Models/DeUrlCruncher,
             execs_path: executables/Linux,
             setup: deurlcruncher.setup.bash,
