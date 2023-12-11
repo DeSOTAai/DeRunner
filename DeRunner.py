@@ -15,6 +15,7 @@ except:
 import yaml
 from yaml.loader import SafeLoader
 
+from desota import detools
 I=0
 DEBUG = False
 DEVELOPMENT = False
@@ -23,17 +24,8 @@ if len(sys.argv)>1:
         DEVELOPMENT = True
     elif sys.argv[1] in ["-deb"]:
         DEBUG = True
-
-# inspired inhttps://stackoverflow.com/a/13874620
-def get_platform():
-    _platform = sys.platform
-    _win_res=["win32", "cygwin", "msys"]
-    _lin_res=["linux", "linux2"]
-    _user_sys = "win" if _platform in _win_res else "lin" if _platform in _lin_res else None
-    if not _user_sys:
-        raise EnvironmentError(f"Plataform `{_platform}` can not be parsed to DeSOTA Options: Windows={_win_res}; Linux={_lin_res}")
-    return _user_sys
-USER_SYS=get_platform()
+        
+USER_SYS = detools.get_platform()
     
 # :: os.getcwd() = C:\users\[user]\Desota\DeRunner
 # WORKING_FOLDER = os.getcwd()
@@ -47,24 +39,18 @@ elif USER_SYS == "lin":
     USER=path_split[-3]
     USER_PATH = "/".join(path_split[:-2])
 STATUS_PATH = os.path.join(APP_PATH, "status.txt")
-def user_chown(path):
-    '''Remove root previleges for files and folders: Required for Linux'''
-    if USER_SYS == "lin":
-        #CURR_PATH=/home/[USER]/Desota/DeRunner
-        os.system(f"chown -R {USER} {path}")
-    return
     
 DESOTA_ROOT_PATH = os.path.join(USER_PATH, "Desota")
 LOG_PATH = os.path.join(DESOTA_ROOT_PATH, "demanager.log")
 TMP_PATH=os.path.join(DESOTA_ROOT_PATH, "tmp")
 if not os.path.isdir(TMP_PATH):
     os.mkdir(TMP_PATH)
-    user_chown(TMP_PATH)
+    detools.user_chown(TMP_PATH)
 
 CONFIG_PATH = os.path.join(DESOTA_ROOT_PATH, "Configs")
 if not os.path.isdir(CONFIG_PATH):
     os.mkdir(CONFIG_PATH)
-    user_chown(CONFIG_PATH)
+    detools.user_chown(CONFIG_PATH)
 USER_CONF_PATH = os.path.join(CONFIG_PATH, "user.config.yaml")
 SERV_CONF_PATH = os.path.join(CONFIG_PATH, "services.config.yaml")
 LAST_SERV_CONF_PATH = os.path.join(CONFIG_PATH, "latest_services.config.yaml")
@@ -133,108 +119,6 @@ def fix_file_name(file_name):
     if _audio_res:
         file_name = _audio_res.group(1)
     return file_name
-# Downld Desota Files
-def get_url_from_str(string):
-    # retrieved from https://www.geeksforgeeks.org/python-check-url-string/
-    # findall() has been used
-    # with valid conditions for urls in string
-    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-    url = re.findall(regex, string)
-    return [x[0] for x in url]
-#
-def retrieve_file_content(file_idx):
-    if os.path.isfile(file_idx):
-        with open(file_idx, 'r') as fr:
-            return fr.read()
-    try:
-        file_url = get_url_from_str(file_idx)
-        file_ext = os.path.splitext(file_url)[1] if file_url else None
-    except:
-        return file_idx
-    if not file_url or not file_ext:
-        return file_idx
-    file_content = ""
-
-    _http_connect = True
-    while True:
-        try:
-            with  requests.get(file_idx, stream=True) as req_file:
-                if req_file.status_code != 200:
-                    return file_idx
-                
-                if req_file.encoding is None:
-                    req_file.encoding = 'utf-8'
-
-                for line in req_file.iter_lines(decode_unicode=True):
-                    if line:
-                        file_content += line
-            break
-        except requests.exceptions.ConnectionError as cerr:
-            if _http_connect:
-                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
-                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
-            _http_connect = False
-            pass
-        except requests.exceptions.ConnectTimeout as cto:
-            if _http_connect:
-                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
-                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
-            _http_connect = False
-            pass
-        except requests.exceptions.ReadTimeout as rto:
-            if _http_connect:
-                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
-                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
-            _http_connect = False
-            pass
-    if not _http_connect:
-        print(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
-        delogger(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
-    return file_content
-#
-def download_file(file_idx, get_file_content=False) -> str:
-    if get_file_content:
-        return retrieve_file_content(file_idx)
-    out_path = os.path.join(TMP_PATH, os.path.basename(file_idx))
-    if os.path.isfile(file_idx):
-        return file_idx
-    file_url = get_url_from_str(file_idx)[0]
-    file_ext = os.path.splitext(file_url)[1] if file_url else None
-    if not file_url or not file_ext:
-        return file_idx
-
-    _http_connect = True
-    while True:
-        try:
-            with requests.get(file_idx, stream=True) as r:
-                if r.status_code != 200:
-                    return file_idx
-                with open(out_path, 'wb') as f:
-                    shutil.copyfileobj(r.raw, f)
-                break
-        except requests.exceptions.ConnectionError as cerr:
-            if _http_connect:
-                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
-                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cerr}")
-            _http_connect = False
-            pass
-        except requests.exceptions.ConnectTimeout as cto:
-            if _http_connect:
-                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
-                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {cto}")
-            _http_connect = False
-            pass
-        except requests.exceptions.ReadTimeout as rto:
-            if _http_connect:
-                print(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
-                delogger(f"[ WARNING ] -> DeRunner Lost Internet Acess: {rto}")
-            _http_connect = False
-            pass
-    if not _http_connect:
-        print(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
-        delogger(f"[ INFO ] -> DeRunner Internet Acess Re-Established")
-
-    return out_path
 # Simple Post Request
 def simple_post(url, data, timeout=None):
     _http_connect = True
@@ -308,7 +192,7 @@ class Derunner():
             }
             with open(USER_CONF_PATH, 'w',) as fw:
                 yaml.dump(_template_user_conf,fw,sort_keys=False)
-            user_chown(USER_CONF_PATH)
+            detools.user_chown(USER_CONF_PATH)
             return _template_user_conf
         with open( USER_CONF_PATH ) as f_user:
             return yaml.load(f_user, Loader=SafeLoader)
@@ -351,7 +235,7 @@ class Derunner():
             # Create Latest Services Config File
             with open(LAST_SERV_CONF_PATH, "w") as fw:
                 fw.write(_req_res.text)
-            user_chown(LAST_SERV_CONF_PATH)
+            detools.user_chown(LAST_SERV_CONF_PATH)
 
         check_status()
         # Create Services Config File if don't exist
@@ -373,7 +257,7 @@ class Derunner():
             _template_serv["services_params"] = _user_serv_params
             with open(SERV_CONF_PATH, "w") as fw:
                 yaml.dump(_template_serv,fw,sort_keys=False)
-            user_chown(SERV_CONF_PATH)
+            detools.user_chown(SERV_CONF_PATH)
 
         check_status()
         with open( SERV_CONF_PATH ) as f_curr:
@@ -623,7 +507,7 @@ class Derunner():
                                     assert model_request_dict['input_args']['text_prompt']
                                 except:
                                     model_request_dict['input_args']['text_prompt'] = []
-                                model_request_dict['input_args']['text_prompt'].append(download_file(file_value_fixed, get_file_content=True))
+                                model_request_dict['input_args']['text_prompt'].append(detools.download_file(file_value_fixed, get_file_content=True))
                             elif file_type in ['image', 'video', 'audio', 'file']:
                                 try:
                                     assert model_request_dict['input_args'][file_type]
@@ -638,7 +522,7 @@ class Derunner():
                                     assert model_request_dict['input_args'][file_type]
                                 except:
                                     model_request_dict['input_args'][file_type] = []
-                                model_request_dict['input_args'][file_type].append(download_file(file_value_fixed))
+                                model_request_dict['input_args'][file_type].append(detools.download_file(file_value_fixed))
                                 
                     cprint(f"Request INPUT Files: {json.dumps(model_request_dict['input_args'], indent=2)}", debug)
                         
@@ -683,7 +567,7 @@ class Derunner():
                                                 assert model_request_dict['dep_args'][dep_id]['text_prompt']
                                             except:
                                                 model_request_dict['dep_args'][dep_id]['text_prompt'] = []
-                                            model_request_dict['dep_args'][dep_id]['text_prompt'].append(download_file(file_value_fixed, get_file_content=True))
+                                            model_request_dict['dep_args'][dep_id]['text_prompt'].append(detools.download_file(file_value_fixed, get_file_content=True))
                                         elif file_type in ['image', 'video', 'audio', 'file']:
                                             try:
                                                 assert model_request_dict['dep_args'][dep_id][file_type]
@@ -698,7 +582,7 @@ class Derunner():
                                                 assert model_request_dict['dep_args'][dep_id][file_type]
                                             except:
                                                 model_request_dict['dep_args'][dep_id][file_type] = []
-                                            model_request_dict['dep_args'][dep_id][file_type].append(download_file(file_value_fixed))
+                                            model_request_dict['dep_args'][dep_id][file_type].append(detools.download_file(file_value_fixed))
                                             
                         cprint(f"Request DEP Files: {json.dumps(model_request_dict['dep_args'], indent=2)}", debug)
                         
@@ -822,14 +706,14 @@ class Derunner():
             cprint(f"[ TIMER DEBUG ] - MEMORY DOESN'T EXIST", False)
             with open(LAST_UP_EPOCH, "w") as fw:
                 fw.write(str(time.time()))
-            user_chown(LAST_UP_EPOCH)
+            detools.user_chown(LAST_UP_EPOCH)
             return "go for it"
         
         cprint(f"[ TIMER DEBUG ] - MEMORY EXIST", DEBUG)
         with open(LAST_UP_EPOCH, "r") as fr:
             _last_up_ep = fr.read()
         _last_up_ep = float(_last_up_ep)
-        user_chown(LAST_UP_EPOCH)
+        detools.user_chown(LAST_UP_EPOCH)
         if time.time() - _last_up_ep >= UPG_FREQ:
             cprint(f"[ TIMER DEBUG ] - SECS PASSED SINCE LAST UPG = {int(time.time() - _last_up_ep)}", DEBUG)
             return "go for it"
@@ -1007,7 +891,7 @@ class Derunner():
         # 6 - Create Installer File
         with open(target_path, "w") as fw:
             fw.writelines(_tmp_file_lines)
-        user_chown(target_path)
+        detools.user_chown(target_path)
         return target_path
 
     #   > Request Model(s) reinstalation
@@ -1227,7 +1111,7 @@ class Derunner():
         # 6 - Create Uninstaller File
         with open(target_path, "w") as fw:
             fw.writelines(_tmp_file_lines)
-        user_chown(target_path)
+        detools.user_chown(target_path)
         return target_path
 
     #   > Request Model(s) uninstalation

@@ -1,4 +1,4 @@
-import sys, os, time, json, ast
+import sys, os, time, json
 import yaml, validators
 
 import subprocess, requests, traceback
@@ -11,19 +11,10 @@ except:
     pass
 
 from yaml.loader import SafeLoader
-
+from desota import detools
 DEBUG = True
 
-# inspired inhttps://stackoverflow.com/a/13874620
-def get_platform():
-    _platform = sys.platform
-    _win_res=["win32", "cygwin", "msys"]
-    _lin_res=["linux", "linux2"]
-    _user_sys = "win" if _platform in _win_res else "lin" if _platform in _lin_res else None
-    if not _user_sys:
-        raise EnvironmentError(f"Plataform `{_platform}` can not be parsed to DeSOTA Options: Windows={_win_res}; Linux={_lin_res}")
-    return _user_sys
-USER_SYS=get_platform()
+USER_SYS = detools.get_platform()
 
 # :: os.getcwd() = C:\users\[user]\Desota\DeRunner\Tools
 # WORKING_FOLDER = os.getcwd()
@@ -38,12 +29,6 @@ elif USER_SYS == "lin":
     desota_idx = [ps.lower() for ps in path_split].index("desota")
     USER=path_split[desota_idx-1]
     USER_PATH = "/".join(path_split[:desota_idx])
-def user_chown(path):
-    '''Remove root previleges for files and folders: Required for Linux'''
-    if USER_SYS == "lin":
-        #CURR_PATH=/home/[USER]/Desota/DeRunner
-        os.system(f"chown -R {USER} {path}")
-    return
 
 DESOTA_ROOT_PATH = os.path.join(USER_PATH, "Desota")
 APP_PATH = os.path.join(DESOTA_ROOT_PATH, "DeRunner")
@@ -51,7 +36,7 @@ LOG_PATH = os.path.join(DESOTA_ROOT_PATH, "demanager.log")
 TMP_PATH=os.path.join(DESOTA_ROOT_PATH, "tmp")
 if not os.path.isdir(TMP_PATH):
     os.mkdir(TMP_PATH)
-    user_chown(TMP_PATH)
+    detools.user_chown(TMP_PATH)
 
 CONFIG_PATH = os.path.join(DESOTA_ROOT_PATH, "Configs")
 SERV_CONF_PATH = os.path.join(CONFIG_PATH, "services.config.yaml")
@@ -95,13 +80,14 @@ parser.add_argument("-it", "--input-type",
 parser.add_argument("-if", "--input-file", 
                     nargs='?',
                     const='', default='',
-                    help='[OPTION 1] Pass file path | url to test model. Works for the majority of experts. By calling this argument will be ignored `--input-dict`')
+                    help='[OPTION 1] Pass file path | url to test model. Works for the majority of experts. By calling this argument will be ignored `--input-dict`',
+                    type=str)
 # SPECIAL INPUT ARGS, used by special types args experts (eg. question-answering)
 parser.add_argument("-id", "--input-dict",
                     nargs='?',
                     const={}, default={},
                     help='[OPTION 2] Pass model parameters {"input_type1":"input_content1", "input_type2":"input_content2", ...}. Only works for selected experts. By calling this argument will be ignored `--input-type` and `--input-file` arguments',
-                    type=ast.literal_eval)
+                    type=json.loads)
 # TARGET PATH OS TEST REPORT
 parser.add_argument("-rf", "--report-file", 
                     help='Test report path | url as json file',
@@ -127,7 +113,7 @@ def delogger(query):
         elif isinstance(query, dict):
             fa.write(json.dumps(query, indent=2))
             fa.write("\n")
-    user_chown(LOG_PATH)
+    detools.user_chown(LOG_PATH)
 
 
 # Simulate `monitor_model_request` method from DeRunner.py
@@ -174,7 +160,7 @@ def get_expert_query(expert):
             return f"Behave as a {expert} model"
 
 #   > Construct model_request_dict
-def get_model_request_dict(model, expert, input_query, input_type, input_idx, input_dict):
+def get_model_request_dict(model, expert, input_query, input_type, input_idx, input_dict): 
     if not input_query:
         input_query = get_expert_query(expert)
 
@@ -187,48 +173,33 @@ def get_model_request_dict(model, expert, input_query, input_type, input_idx, in
     }
     # INPUT VARS
     if input_dict:
-        input_dict["text_prompt"] = [input_query]
+        input_dict["text_prompt"] = input_query
         model_request_dict["input_args"] = input_dict
     else:
-        try:
-            input_idx = ast.literal_eval(input_idx)
-        except:
-            pass
-        if isinstance(input_idx, str):
-            input_idx = [input_idx]
-        input_file = []
-        for in_f in input_idx:
-            if validators.url(in_f):
-                print("IM URL")
-                input_file.append(in_f)
-            else:
-                if os.path.isfile(in_f):
-                    input_file.append(in_f)
-                else:
-                    input_file_pth = os.path.join(USER_PATH, in_f)
-                    if not os.path.isfile(input_file_pth):
-                        print("IM RAW")
-                        input_file.append(in_f)
-            
+        if validators.url(input_idx):
+            print("IM URL")
+            input_file = input_idx
+        else:
+            if not os.path.isfile(input_idx):
+                input_file = os.path.join(USER_PATH, input_idx)
+                if not os.path.isfile(input_file):
+                    print("IM RAW")
+                    input_file = input_idx
+        
         if input_type in ["text"]:
-            model_request_dict["input_args"] = {
-                "text_prompt": [input_query]+input_file
+            model_request_dict["input_args"] = {          
+                input_type: input_file,
+                "text_prompt": input_query
             }
         else:
-            try:
-                assert model_request_dict["input_args"][input_type]
-            except:
-                model_request_dict["input_args"][input_type] = []
-            for _file in input_file:
-                file_basename = os.path.basename(_file)
-                model_request_dict["input_args"][input_type].append(
-                    {
-                        "file_name": file_basename,
-                        "file_url": input_file
-                    }
-                )
-            model_request_dict["input_args"]["text_prompt"] = [input_query]
-
+            file_basename = os.path.basename(input_idx)
+            model_request_dict["input_args"] = {          
+                input_type: {
+                    "file_name": file_basename,
+                    "file_url": input_file
+                },
+                "text_prompt": input_query
+            }
     return model_request_dict
 
 
@@ -408,7 +379,7 @@ def main(args):
                 print(f"[ ERROR ] -> Undefined Model ERROR. Return Code: {model_res}")
                 delogger(f"[ ERROR ] -> Undefined Model ERROR. Return Code: {model_res}")
         
-    except Exception as e:
+    except Exception as e:des
         print(f'''[ CRITICAL FAIL ] -> DeRunner Fail INFO:
   Exception: {e}
   {traceback.format_exc()}''')
