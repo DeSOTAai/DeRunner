@@ -1,4 +1,4 @@
-import sys, os, time, json
+import sys, os, time, json, ast
 import yaml, validators
 
 import subprocess, requests, traceback
@@ -80,14 +80,13 @@ parser.add_argument("-it", "--input-type",
 parser.add_argument("-if", "--input-file", 
                     nargs='?',
                     const='', default='',
-                    help='[OPTION 1] Pass file path | url to test model. Works for the majority of experts. By calling this argument will be ignored `--input-dict`',
-                    type=str)
+                    help='[OPTION 1] Pass file path | url to test model. Works for the majority of experts. By calling this argument will be ignored `--input-dict`')
 # SPECIAL INPUT ARGS, used by special types args experts (eg. question-answering)
 parser.add_argument("-id", "--input-dict",
                     nargs='?',
                     const={}, default={},
                     help='[OPTION 2] Pass model parameters {"input_type1":"input_content1", "input_type2":"input_content2", ...}. Only works for selected experts. By calling this argument will be ignored `--input-type` and `--input-file` arguments',
-                    type=json.loads)
+                    type=ast.literal_eval)
 # TARGET PATH OS TEST REPORT
 parser.add_argument("-rf", "--report-file", 
                     help='Test report path | url as json file',
@@ -160,7 +159,7 @@ def get_expert_query(expert):
             return f"Behave as a {expert} model"
 
 #   > Construct model_request_dict
-def get_model_request_dict(model, expert, input_query, input_type, input_idx, input_dict): 
+def get_model_request_dict(model, expert, input_query, input_type, input_idx, input_dict):
     if not input_query:
         input_query = get_expert_query(expert)
 
@@ -176,30 +175,45 @@ def get_model_request_dict(model, expert, input_query, input_type, input_idx, in
         input_dict["text_prompt"] = input_query
         model_request_dict["input_args"] = input_dict
     else:
-        if validators.url(input_idx):
-            print("IM URL")
-            input_file = input_idx
-        else:
-            if not os.path.isfile(input_idx):
-                input_file = os.path.join(USER_PATH, input_idx)
-                if not os.path.isfile(input_file):
-                    print("IM RAW")
-                    input_file = input_idx
-        
+        try:
+            input_idx = ast.literal_eval(input_idx)
+        except:
+            pass
+        if isinstance(input_idx, str):
+            input_idx = [input_idx]
+        input_file = []
+        for in_f in input_idx:
+            if validators.url(in_f):
+                print("IM URL")
+                input_file.append(in_f)
+            else:
+                if os.path.isfile(in_f):
+                    input_file.append(in_f)
+                else:
+                    input_file_pth = os.path.join(USER_PATH, in_f)
+                    if not os.path.isfile(input_file_pth):
+                        print("IM RAW")
+                        input_file.append(in_f)
+            
         if input_type in ["text"]:
-            model_request_dict["input_args"] = {          
-                input_type: input_file,
-                "text_prompt": input_query
+            model_request_dict["input_args"] = {
+                "text_prompt": [input_query]+input_file
             }
         else:
-            file_basename = os.path.basename(input_idx)
-            model_request_dict["input_args"] = {          
-                input_type: {
-                    "file_name": file_basename,
-                    "file_url": input_file
-                },
-                "text_prompt": input_query
-            }
+            try:
+                assert model_request_dict["input_args"][input_type]
+            except:
+                model_request_dict["input_args"][input_type] = []
+            for _file in input_file:
+                file_basename = os.path.basename(_file)
+                model_request_dict["input_args"][input_type].append(
+                    {
+                        "file_name": file_basename,
+                        "file_url": input_file
+                    }
+                )
+            model_request_dict["input_args"]["text_prompt"] = [input_query]
+
     return model_request_dict
 
 
@@ -379,10 +393,8 @@ def main(args):
                 print(f"[ ERROR ] -> Undefined Model ERROR. Return Code: {model_res}")
                 delogger(f"[ ERROR ] -> Undefined Model ERROR. Return Code: {model_res}")
         
-    except Exception as e:des
-        print(f'''[ CRITICAL FAIL ] -> DeRunner Fail INFO:
-  Exception: {e}
-  {traceback.format_exc()}''')
+    except Exception as e:
+        print(f'[ CRITICAL FAIL ] -> DeRunner Fail INFO:\n  Exception: {e}\n  {traceback.format_exc()}')
         delogger([
             f"[ CRITICAL FAIL ] -> Re-Install DeRunner: \n",
             f"  Exception: {e}\n",

@@ -101,7 +101,7 @@ def delogger(query):
         elif isinstance(query, dict):
             fa.write(json.dumps(query, indent=2))
             fa.write("\n")
-    user_chown(LOG_PATH)
+    detools.user_chown(LOG_PATH)
 # Decifer Desota Files
 def fix_file_name(file_name):
     # TEMPORARY FIX
