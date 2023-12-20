@@ -424,7 +424,7 @@ services_params: {
         run_constantly: false,
         submodel: false,
         child_models: null
-    }
+    },
     spacewalkingninja/DesotaControlVideo/text-and-pose: {
         win: {
             version: 0.0.0,
