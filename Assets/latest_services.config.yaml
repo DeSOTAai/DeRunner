@@ -480,7 +480,7 @@ services_params: {
             python_path: ,
             cli_cmd: 
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         required: false,
         source_code: https://github.com/spacewalkingninja/DesotaControlVideo,
@@ -529,7 +529,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -552,7 +552,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -575,7 +575,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -598,7 +598,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -621,7 +621,7 @@ services_params: {
           desota_runner: ,
           python_path:
       },
-      service_type: tool,
+      service_type: model,
       timeout: 1240,
       submodel: true,
       parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -644,7 +644,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -667,7 +667,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -690,7 +690,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -713,7 +713,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -736,7 +736,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -759,7 +759,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -782,7 +782,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -805,7 +805,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -828,7 +828,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -851,7 +851,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -874,7 +874,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
@@ -897,7 +897,7 @@ services_params: {
             desota_runner: ,
             python_path:
         },
-        service_type: tool,
+        service_type: model,
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/DesotaControlVideo/text-and-pose
