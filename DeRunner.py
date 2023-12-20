@@ -1338,6 +1338,206 @@ class Derunner():
                     ],
                     "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
                 }
+            case "spacewalkingninja/DesotaControlVideo/text-and-pose":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/text-and-softedge":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Beautiful Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/text-and-canny":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Hulk walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/text-and-geometry":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Obama walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/text-and-depth":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Robot walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/text-and-shuffle":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'HAPPY Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/text-and-lineart":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Cartoon Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/text-to-anime-style":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Anime Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-canny":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-pose":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-scribble":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-softedge":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-depth":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-face-geometry":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-normals":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-geometry":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-lineart":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+            case "spacewalkingninja/DesotaControlVideo/extract-anime":
+                return {
+                    "cmd": [
+                        '--model', model,
+                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-type', 'video',        # Can go to service_config
+                        '--input-file', 'https://desota.net/assistant/api_uploads/manwalking.mp4',  # Can go to service_config
+                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
+                    ],
+                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
+                }
+                
+
             case _:
                 print(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
                 delogger(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
