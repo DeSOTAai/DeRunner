@@ -496,7 +496,7 @@ services_params: {
               spacewalkingninja/DesotaControlVideo/text-and-geometry,
               spacewalkingninja/DesotaControlVideo/text-and-depth,
               spacewalkingninja/DesotaControlVideo/text-and-shuffle,
-              spacewalkingninja/DesotaControlVideo/text-and-lineart
+              spacewalkingninja/DesotaControlVideo/text-and-lineart,
               spacewalkingninja/DesotaControlVideo/extract-canny,
               spacewalkingninja/DesotaControlVideo/extract-pose,
               spacewalkingninja/DesotaControlVideo/extract-scribble,
