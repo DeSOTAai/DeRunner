@@ -910,7 +910,7 @@ manager_params: {
         version: 0.2.1,
         project_dir: Desota\Desota_Models\DeManagerTools,
         build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.2.0/v0.2.1-win64.zip,
-        release_desc: Alpha Pre-Release > Tools accept dependencies C:
+        release_desc: Alpha Pre-Release > Tools accept dependencies
     },
     lin: {
         version: 0.2.0,
