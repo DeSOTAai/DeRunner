@@ -1612,9 +1612,18 @@ class Derunner():
                 models2test[model] = version
         return models2test, models_tested
     
-    def test_models(self):
+    def test_models(self, in_models=None):
         # Monitor newby models to test
         models2test, models_tested = self.grab_models2test()
+        if in_models != None:
+            models2test = {}
+            user_config = self.get_user_config()
+            for in_model in in_models:
+                try:
+                    assert user_config["models"][in_model]
+                except:
+                    continue
+                models2test[in_model] = user_config["models"][in_model]
         # If no Model Found
         if not models2test:
             return models_tested
@@ -1881,8 +1890,10 @@ class Derunner():
                 ])
                 error_level = 8
                 error_msg = f"DeRunner CRITICAL FAIL"
-                if not DEVELOPMENT:
-                    _reinstall_model = DERRUNER_ID
+                # > Something to think about Pos Beta-Release:
+                # > _reinstall_model is now on treated as a model to Re-Test, derunner cannot test itself...
+                # if not DEVELOPMENT:
+                #     _reinstall_model = DERRUNER_ID
                 pass
 
             if error_level:
@@ -1906,12 +1917,9 @@ class Derunner():
                     time.sleep(.8)
             
             if _reinstall_model:
-                req_reinstall = self.request_model_reinstall(_reinstall_model, init=True)
-                # DeRunner Upgrade Requested
-                if req_reinstall == 2:
-                    # STOP SERVICE
-                    exit(66)
-
+                admmit_models = self.test_models([_reinstall_model])
+                
+                
 if __name__ == "__main__":
     # Check Service Stop Request
     check_status()
