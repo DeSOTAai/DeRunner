@@ -907,10 +907,10 @@ services_params: {
 ## DeSOTA Manager Tools Params
 manager_params: {
     win: {
-        version: 0.2.0,
+        version: 0.2.1,
         project_dir: Desota\Desota_Models\DeManagerTools,
-        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.2.0/v0.2.0-win64.zip,
-        release_desc: Alpha Release > DeSOTA API Comunication
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.2.0/v0.2.1-win64.zip,
+        release_desc: Alpha Pre-Release > Tools accept dependencies C:
     },
     lin: {
         version: 0.2.0,
