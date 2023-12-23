@@ -172,7 +172,7 @@ def check_status():
 # DeRunner Class
 class Derunner():
     # Configurations
-    def __init__(self, ignore_update=False) -> None:
+    def __init__(self, ignore_update=DEVELOPMENT) -> None:
         self.serv_conf, self.last_serv_conf = self.get_services_config(ignore_update=ignore_update)
         self.user_conf = self.get_user_config()
         self.user_models = self.user_conf['models']
