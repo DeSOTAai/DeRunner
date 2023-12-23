@@ -197,6 +197,65 @@ class Derunner():
         with open( USER_CONF_PATH ) as f_user:
             return yaml.load(f_user, Loader=SafeLoader)
     
+    def add_quarantine_model(self, model_ids):
+        if isinstance(model_ids, str):
+            model_ids = [model_ids]
+        quarantine_config_key = "quarantine"
+        # Assert quarantine config_key
+        user_config = self.get_user_config()
+        try:
+            assert user_config[quarantine_config_key]
+        except:
+            user_config[quarantine_config_key] = {}
+        for model in model_ids:
+            model_version = None
+            # Get Model Version
+            try:
+                assert user_config["models"][model]
+                model_version = user_config["models"][model]
+            except:
+                pass
+            try:
+                serv_config, latest_serv_config = self.get_services_config(ignore_update=False)
+                try:
+                    assert serv_config["services_params"][model]
+                    service_config = serv_config["services_params"][model]
+                    parent_model = model
+                    if service_config["submodel"]:
+                        parent_model = service_config["parent_model"]
+                    if not model_version:
+                        assert serv_config["services_params"][parent_model]
+                        model_version = serv_config["services_params"][parent_model][USER_SYS]["version"]
+                except:
+                    try:
+                        assert latest_serv_config["services_params"][model]
+                        service_config = latest_serv_config["services_params"][model]
+                        parent_model = model
+                        if service_config["submodel"]:
+                            parent_model = service_config["parent_model"]
+                        if not model_version:
+                            assert serv_config["services_params"][parent_model]
+                            model_version = serv_config["services_params"][parent_model][USER_SYS]["version"]
+                    except:
+                        continue
+            except:
+                continue
+            try:
+                assert parent_model
+                assert model_version
+            except:
+                continue
+            print(f"[ INFO ] -> New quarantine model:\n\tID: {parent_model}\n\t#V: {model_version}")
+            delogger([
+                f"[ INFO ] -> New quarantine model:\n",
+                f"         ID: {parent_model}:\n", 
+                f"    Version: {model_version}:\n",
+            ])
+            if model not in user_config[quarantine_config_key] and model_version:
+                user_config[quarantine_config_key][parent_model] = model_version
+
+        self.set_user_config(user_config)
+
     def set_user_config(self, configs):
         with open( USER_CONF_PATH, "w" ) as f_user:
             yaml.dump(configs,f_user,sort_keys=False)
@@ -1241,6 +1300,12 @@ class Derunner():
         # UPGRADE CONFIGURATIONS (Target: self.last_serv_conf)
         self.__init__()
         user_models = self.user_models
+        try:
+            assert self.user_conf["quarantine"]
+            for q_model in self.user_conf["quarantine"]:
+                user_models[q_model] = self.user_conf["quarantine"][q_model]
+        except: pass
+        print("[ INFO ] -> UPG MODELS: ", json.dumps(user_models, indent=2))
         if not user_models:
             delogger(f"[ UPGRADE ] - No model found. Next upgrade in {int(UPG_FREQ/3600)}h")
             print(f"[ UPGRADE ] - No model found. Next upgrade in {int(UPG_FREQ/3600)}h")
@@ -1617,6 +1682,8 @@ class Derunner():
         return models2test, models_tested
     
     def test_models(self, in_models=None):
+        if isinstance(in_models, str):
+            in_models = [in_models]
         # Monitor newby models to test
         models2test, models_tested = self.grab_models2test()
         if in_models != None:
@@ -1683,7 +1750,9 @@ class Derunner():
                 ])
             elif not DEVELOPMENT:
                 # CRITICAL FAILURE
+                self.add_quarantine_model(model)
                 req_uninstall = self.request_model_uninstall(model)
+                
                 # DeRunner Uninstall Requested
                 if req_uninstall == 2:
                     # STOP SERVICE
@@ -1922,8 +1991,13 @@ class Derunner():
             
             if _reinstall_model:
                 admmit_models = self.test_models([_reinstall_model])
-                
-                
+                if _reinstall_model in admmit_models:
+                    log = f"[ INFO ] -> Model [{_reinstall_model}] Re-Admited"
+                else:
+                    log = f"[ WARNING ] -> Model [{_reinstall_model}] Uninstalled after failure!"
+                print(log)
+                delogger(log)
+
 if __name__ == "__main__":
     # Check Service Stop Request
     check_status()
