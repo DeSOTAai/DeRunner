@@ -1679,8 +1679,8 @@ class Derunner():
                     f"    response: {_add_service_res.text}\n",
                     f"      result: {_add_service_res}\n"
                 ])
-            else:
-                # REQUEST MODEL UNINSTALL
+            elif not DEVELOPMENT:
+                # CRITICAL FAILURE
                 req_uninstall = self.request_model_uninstall(model)
                 # DeRunner Uninstall Requested
                 if req_uninstall == 2:
