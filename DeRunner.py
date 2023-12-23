@@ -1228,6 +1228,8 @@ class Derunner():
         1 - Upgrade Started W/O DeRunner (Not Required to Stop Services)
         0 - No Model to Upgrade
         '''
+        if DEVELOPMENT:
+            return 0
         # Timer check
         upgrade_timer = self.handle_upgrade_timer()
         if upgrade_timer != "go for it":
