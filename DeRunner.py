@@ -898,10 +898,12 @@ class Derunner():
     def request_model_reinstall(self, reinstall_models, init=False) -> bool:
         '''
         Exit Codes:
-         1 - Reinstall Started W/O DeRunner (Not Required to Stop Services)
-         2 - Reinstall Started W DeRunner
-         9 - Reinstall Fail
         10 - Submodel Critical Fail
+         9 - Reinstall Fail
+
+         2 - Reinstall Started W DeRunner
+         1 - Reinstall Started W/O DeRunner (Not Required to Stop Services)
+         0 - No Model to re-install
         '''
         if init:
             # UPGRADE CONFIGURATIONS (Target: self.last_serv_conf)
@@ -959,10 +961,11 @@ class Derunner():
             except:
                 pass
         
-        if submodel_critical_fail:
+        if submodel_critical_fail: # Re-Install Fail - Uninstall Model!!
             _res_uconf = _compare_conf.copy()
+            cprint(f"[ UPGRADE ] -> pre user_configs: {json.dumps(_res_uconf, indent = 2)}", DEBUG)
             try:
-                # edit user config admissions
+                # REM admissions from user configs 
                 if "admissions" in _compare_conf and _compare_conf["admissions"]:
                     for _model in reinstall_models:
                         for admn_key, admissions in _compare_conf["admissions"].items():
@@ -970,11 +973,9 @@ class Derunner():
                                 _res_uconf["admissions"][admn_key].pop(_model)
             except:
                 pass
-            cprint(f"[ UPGRADE ] -> pre user_configs: {json.dumps(_res_uconf, indent = 2)}", DEBUG)
             self.set_user_config(_res_uconf)
             return 10
 
-        cprint(f"[ UPGRADE ] -> pre user_configs: {json.dumps(_res_uconf, indent = 2)}", DEBUG)
         self.set_user_config(_res_uconf)
 
         # Generate Reinstall Script
@@ -1221,10 +1222,11 @@ class Derunner():
     def req_service_upgrade(self):
         '''
         Exit Codes:
-        0 - No Model to Upgrade
-        1 - Upgrade Started W/O DeRunner (Not Required to Stop Services)
-        2 - Upgrade Started W DeRunner
         9 - Upgrade Fail
+
+        2 - Upgrade Started W DeRunner
+        1 - Upgrade Started W/O DeRunner (Not Required to Stop Services)
+        0 - No Model to Upgrade
         '''
         # Timer check
         upgrade_timer = self.handle_upgrade_timer()
@@ -1236,7 +1238,7 @@ class Derunner():
         print(f"[ INFO:{int(time.time())} ] - Searching for models upgrade.")
         # UPGRADE CONFIGURATIONS (Target: self.last_serv_conf)
         self.__init__()
-        user_models = self.user_conf["models"]
+        user_models = self.user_models
         if not user_models:
             delogger(f"[ UPGRADE ] - No model found. Next upgrade in {int(UPG_FREQ/3600)}h")
             print(f"[ UPGRADE ] - No model found. Next upgrade in {int(UPG_FREQ/3600)}h")
