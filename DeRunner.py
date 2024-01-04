@@ -1411,7 +1411,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1422,7 +1422,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Beautiful Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Beautiful Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1433,7 +1433,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Hulk walking in the forest',  # Can go to service_config
+                        '--input-query', '"Hulk walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1444,7 +1444,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Obama walking in the forest',  # Can go to service_config
+                        '--input-query', '"Obama walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1455,7 +1455,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Robot walking in the forest',  # Can go to service_config
+                        '--input-query', '"Robot walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1466,7 +1466,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'HAPPY Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"HAPPY Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1477,7 +1477,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Cartoon Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Cartoon Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1488,7 +1488,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Anime Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Anime Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1499,7 +1499,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1510,7 +1510,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1521,7 +1521,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1532,7 +1532,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1543,7 +1543,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1554,7 +1554,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1565,7 +1565,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1576,7 +1576,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1587,7 +1587,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
@@ -1598,7 +1598,7 @@ class Derunner():
                 return {
                     "cmd": [
                         '--model', model,
-                        '--input-query', 'Shrek walking in the forest',  # Can go to service_config
+                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
                         '--input-type', 'video',        # Can go to service_config
                         '--input-file', 'Desota\Desota_Models\DesotaControlVideo\data\moonwalk.mp4',  # Can go to service_config
                         '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")

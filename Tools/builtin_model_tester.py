@@ -162,7 +162,7 @@ def get_expert_query(expert):
 def get_model_request_dict(model, expert, input_query, input_type, input_idx, input_dict):
     if not input_query:
         input_query = get_expert_query(expert)
-
+    
     model_request_dict = {
         "task_type": "not_defined",      # TASK VARS
         "task_model": model,
@@ -194,12 +194,18 @@ def get_model_request_dict(model, expert, input_query, input_type, input_idx, in
                     if not os.path.isfile(input_file_pth):
                         print("IM RAW")
                         input_file.append(in_f)
-            
+
         if input_type in ["text"]:
             model_request_dict["input_args"] = {
                 "text_prompt": [input_query]+input_file
             }
         else:
+            #does model have input_arg dict?
+            try:
+                assert model_request_dict["input_args"]
+            except:
+                model_request_dict["input_args"]={} #here we create it if not
+            
             try:
                 assert model_request_dict["input_args"][input_type]
             except:
