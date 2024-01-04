@@ -427,8 +427,8 @@ services_params: {
     },
     spacewalkingninja/DesotaControlVideo/text-and-pose: {
         win: {
-            version: 0.0.2,
-            commit: 7b1cce49d31f35a0e8d2b862647036630b767c73,
+            version: 0.0.3,
+            commit: 3b1069bfa1bd1a58f83c6825285f749a72793610,
             project_dir: Desota\Desota_Models\DesotaControlVideo,
             execs_path: executables\Windows,
             setup: desotacontrolvideo.setup.bat,
