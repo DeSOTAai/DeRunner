@@ -1358,8 +1358,11 @@ class Derunner():
         return ret_code
     
     def grab_model_info(self, model, version):
-        # TODO: Implement DeSota Model Info Req
-        #   perhaps is only required test "res url upload" and "model timeout"
+        '''
+        DEPRECATED !!
+         This Funk will be removed after futures releases:
+         - this info is now gathered from [latest_services.config.yaml](https://github.com/DeSOTAai/DeRunner/blob/main/Assets/latest_services.config.yaml)
+        '''
         match model:
             case "franciscomvargas/deurlcruncher":
                 return {
