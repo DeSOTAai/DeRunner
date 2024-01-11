@@ -19,18 +19,18 @@
 ## LINUX
 ### DeUrlCruncher
 ```
-~/env/bin/python3 ~/Tools/builtin_model_tester.py --model franciscomvargas/deurlcruncher --expert web-scraper --input-type text --input-file "Search Engine" --report-file ~/Desota/duc_report.json
+~/Desota/DeRunner/env/bin/python3 ~/Desota/DeRunner/Tools/builtin_model_tester.py --model franciscomvargas/deurlcruncher --expert web-scraper --input-type text --input-file "Search Engine" --report-file ~/Desota/duc_report.json
 ```
 ### Whisper:
 ```
-~/env/bin/python3 ~/Tools/builtin_model_tester.py --model franciscomvargas/whisper.cpp --expert audio-recognition --input-type audio
+~/Desota/DeRunner/env/bin/python3 ~/Desota/DeRunner/Tools/builtin_model_tester.py --model franciscomvargas/whisper.cpp --expert audio-recognition --input-type audio
 --input-file 'Desota/Desota_Models/WhisperCpp/samples/jfk.wav' --report-file ~/Desota/whisper_report.json
 ```
 ### DeScraper/Url:
 ```
-~/env/bin/python3 ~/Tools/builtin_model_tester.py --model franciscomvargas/descraper/url --expert web-scraper --input-dict '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}' --report-file Desota\descraper_report.json
+~/Desota/DeRunner/env/bin/python3 ~/Desota/DeRunner/Tools/builtin_model_tester.py --model franciscomvargas/descraper/url --expert web-scraper --input-dict '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}' --report-file Desota\descraper_report.json
 ```
 ### DeScraper/Html:
 ```
-~/env/bin/python3 ~/Tools/builtin_model_tester.py --model franciscomvargas/descraper/html --expert web-scraper --input-dict '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}' --report-file ~/Desota/descraper_report.json
+~/Desota/DeRunner/env/bin/python3 ~/Desota/DeRunner/Tools/builtin_model_tester.py --model franciscomvargas/descraper/html --expert web-scraper --input-dict '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}' --report-file ~/Desota/descraper_report.json
 ```
