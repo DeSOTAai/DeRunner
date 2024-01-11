@@ -5,6 +5,11 @@ config.yaml
 .vscode
 neuralqa/server/test_query.py
 
+# Linux USER Files @franciscomvargas
+derunner.service.bash
+derunner.service
+status.txt
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
