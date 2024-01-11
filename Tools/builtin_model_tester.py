@@ -367,6 +367,14 @@ def main(args):
     _input_file = args.input_file
     _input_dict = args.input_dict
     _report_file = args.report_file
+    print("BuiltInTester [_service_params]:", _service_params)
+    print("BuiltInTester [_expert]:", _expert)
+    print("BuiltInTester [_model]:", _model)
+    print("BuiltInTester [_input_query]:", _input_query)
+    print("BuiltInTester [_input_type]:", _input_type)
+    print("BuiltInTester [_input_file]:", _input_file)
+    print("BuiltInTester [_input_dict]:", _input_dict)
+    print("BuiltInTester [_report_file]:", _report_file)
     if _service_params:
         SERV_PARAMS = get_services_config(_service_params)
     else:
