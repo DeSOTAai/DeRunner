@@ -28,9 +28,9 @@
 ```
 ### DeScraper/Url:
 ```
-~/Desota/DeRunner/env/bin/python3 ~/Desota/DeRunner/Tools/builtin_model_tester.py --model franciscomvargas/descraper/url --expert web-scraper --input-dict '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}' --report-file Desota\descraper_report.json
+sudo ~/Desota/DeRunner/env/bin/python3 ~/Desota/DeRunner/Tools/builtin_model_tester.py --model franciscomvargas/descraper/url --expert web-scraper --input-dict '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}' --report-file Desota\descraper_report.json
 ```
 ### DeScraper/Html:
 ```
-~/Desota/DeRunner/env/bin/python3 ~/Desota/DeRunner/Tools/builtin_model_tester.py --model franciscomvargas/descraper/html --expert web-scraper --input-dict '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}' --report-file ~/Desota/descraper_report.json
+sudo ~/Desota/DeRunner/env/bin/python3 ~/Desota/DeRunner/Tools/builtin_model_tester.py --model franciscomvargas/descraper/html --expert web-scraper --input-dict '{"url":"https://pt.wikipedia.org/wiki/Os_Simpsons"}' --report-file ~/Desota/descraper_report.json
 ```

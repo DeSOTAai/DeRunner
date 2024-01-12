@@ -508,149 +508,176 @@ class Derunner():
             cprint(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {select_task.status_code}", debug)
             if select_task.status_code != 200:
                 continue
-            else:
-                cprint(f"MODEL: {model}", debug)     
+            
+            cprint(f"MODEL: {model}", debug)     
+            
+            cont = str(select_task.content.decode('UTF-8'))
+            # print(cont)
+            try:
+                # print(selected_task)
+                selected_task = json.loads(cont)
+                # print(json.dumps(selected_task, indent=2))
+            except:
+                cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   
+                cont = cont.replace("FIXME!!!", "")
+                ''' 
+                cont = cont.replace("\n", "")
+                #cont = cont.replace(r'\\\\', "")
+                #cont = cont.replace("\\\\\\", "")
+                #cont = cont.replace('\\', '')
+                #cont = cont.replace("\n", "")
+                #cont = cont.replace("\\", "")
+                '''
                 
-                cont = str(select_task.content.decode('UTF-8'))
-                # print(cont)
                 try:
-                    # print(selected_task)
                     selected_task = json.loads(cont)
-                    # print(json.dumps(selected_task, indent=2))
                 except:
-                    cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   
-                    cont = cont.replace("FIXME!!!", "")
-                    ''' 
-                    cont = cont.replace("\n", "")
-                    #cont = cont.replace(r'\\\\', "")
-                    #cont = cont.replace("\\\\\\", "")
-                    #cont = cont.replace('\\', '')
-                    #cont = cont.replace("\n", "")
-                    #cont = cont.replace("\\", "")
-                    '''
-                    
-                    try:
-                        selected_task = json.loads(cont)
-                    except:
-                        selected_task = "error"
-                        # print(selected_task)
+                    selected_task = "error"
+                    # print(selected_task)
 
-                if "error" in selected_task:
-                    #error = selected_task['error']
-                    cprint(f"[ WARNING ] -> API Model Request fail for model `{model}`", debug)
-                    selected_task = False
-                    continue
-                
-                # cprint(selected_task, debug)     
-                #cprint(selected_task['task'], debug)
-                
+            if "error" in selected_task:
+                #error = selected_task['error']
+                cprint(f"[ WARNING ] -> API Model Request fail for model `{model}`", debug)
+                selected_task = False
+                continue
+            
+            # cprint(selected_task, debug)     
+            #cprint(selected_task['task'], debug)
+            
+            print("[ DEBUG ] DeSOTA API Request", json.dumps(selected_task, indent=2))
+            try:
+                task_dic = ast.literal_eval(str(selected_task['task']))
+            except:
+                task_dic = None
+
+            if isinstance(task_dic, dict) and task_dic:
+                model_request_dict['input_args'] = {}
+
+                ######
+                ###### DeScraper Gets file in URL! TODO: Improve
+                ######
                 try:
-                    task_dic = ast.literal_eval(str(selected_task['task']))
+                    assert task_dic["url"]
+                    _tmp_target = [i for i in task_dic["url"]]
+                    for _iter_url in task_dic["url"]:
+                        if len(detools.get_url_from_str(_iter_url)) == 0:
+                            try:
+                                assert task_dic["file"]
+                            except:
+                                task_dic["file"] = []
+                            
+                            task_dic["file"].append(_iter_url)
+                            task_dic["url"].remove(_iter_url)
+
+                    if not task_dic["url"]:
+                        del task_dic["url"]
                 except:
-                    task_dic = None
+                    pass
 
-                if isinstance(task_dic, dict) and task_dic:
-                    #print(json.dumps(task_dic, indent=2))
-                    model_request_dict['input_args'] = {}
-                    for file_type, file_values in task_dic.items():
-                        if isinstance(file_values, str):
-                            file_values = [file_values]
-                        if not isinstance(file_values, list):
-                            continue
-                        for duck_file in file_values:
-                            file_value_fixed = fix_file_name(duck_file)
-                            #print(file_type)
-                            if file_type == "text":
-                                # cprint(f'text select on 0', debug)
-                                try:
-                                    assert model_request_dict['input_args']['text_prompt']
-                                except:
-                                    model_request_dict['input_args']['text_prompt'] = []
-                                model_request_dict['input_args']['text_prompt'].append(detools.download_file(file_value_fixed, get_file_content=True))
-                            elif file_type in ['image', 'video', 'audio', 'file']:
-                                try:
-                                    assert model_request_dict['input_args'][file_type]
-                                except:
-                                    model_request_dict['input_args'][file_type] = []
-                                model_request_dict['input_args'][file_type].append({
-                                    "file_name": str(file_value_fixed),
-                                    "file_url": f"{API_UP}/{file_value_fixed}"
-                                })
-                            else:
-                                try:
-                                    assert model_request_dict['input_args'][file_type]
-                                except:
-                                    model_request_dict['input_args'][file_type] = []
-                                model_request_dict['input_args'][file_type].append(detools.download_file(file_value_fixed))
-                                
-                    cprint(f"Request INPUT Files: {json.dumps(model_request_dict['input_args'], indent=2)}", debug)
-                        
-                    model_request_dict["task_type"] = selected_task['type']
-                    task_dep = str(selected_task['dep']).replace("\\\\n", "").replace("\\", "")
-                    task_dep = ast.literal_eval(task_dep)
-                    model_request_dict["task_dep"] = task_dep
-                    cprint(f"task type is {model_request_dict['task_type']}", debug)     
-                    # cprint(f"task deps are {task_dep} {type(task_dep[0])}", debug)   
-                    cprint(f"task deps are {task_dep}", debug)   
-                    #if json.loads(str(task_dep.decode('UTF-8'))):
-                    if task_dep != [-1]:
-                        cprint("Dependencies:", debug)   
-                        #deps = json.loads(str(task_dep.decode('UTF-8')))
-                        model_request_dict['dep_args'] = {}
-                        for dep_key, dep_args in task_dep.items():
-                            if isinstance(dep_args, str):
-                                dep_args = [dep_args]
-                            if not isinstance(dep_args, list):
-                                continue
-                            for duck_file in dep_args:
-                                file_value_fixed = fix_file_name(duck_file)
-                                try:
-                                    dep_id = int(dep_key)
-                                    dep_dic = json.loads(str(dep_args))
-                                except:
-                                    try:
-                                        dep_dic = find_json(str(dep_args))
-                                        dep_dic = json.loads(dep_dic)   
-                                    except:
-                                        dep_dic = None
-                                        if not model_request_dict['dep_args'] and debug:
-                                            cprint("no filename found" , debug)
-                                if dep_dic:
-                                    model_request_dict['dep_args'][dep_id] = {}
-                                    for file_type, file_value in dep_dic.items():
-                                        file_value_fixed = fix_file_name(file_value)
-                                        #print(file_type)
-                                        if file_type == "text":
-                                            # cprint(f'text select on 0', debug)
-                                            try:
-                                                assert model_request_dict['dep_args'][dep_id]['text_prompt']
-                                            except:
-                                                model_request_dict['dep_args'][dep_id]['text_prompt'] = []
-                                            model_request_dict['dep_args'][dep_id]['text_prompt'].append(detools.download_file(file_value_fixed, get_file_content=True))
-                                        elif file_type in ['image', 'video', 'audio', 'file']:
-                                            try:
-                                                assert model_request_dict['dep_args'][dep_id][file_type]
-                                            except:
-                                                model_request_dict['dep_args'][dep_id][file_type] = []
-                                            model_request_dict['dep_args'][dep_id][file_type].append({
-                                                "file_name": str(file_value_fixed),
-                                                "file_url": f"{API_UP}/{file_value_fixed}"
-                                            })
-                                        else:
-                                            try:
-                                                assert model_request_dict['dep_args'][dep_id][file_type]
-                                            except:
-                                                model_request_dict['dep_args'][dep_id][file_type] = []
-                                            model_request_dict['dep_args'][dep_id][file_type].append(detools.download_file(file_value_fixed))
-                                            
-                        cprint(f"Request DEP Files: {json.dumps(model_request_dict['dep_args'], indent=2)}", debug)
-                        
+                for file_type, file_values in task_dic.items():
+                    if isinstance(file_values, str):
+                        file_values = [file_values]
+                    if not isinstance(file_values, list):
+                        continue
+                    for duck_file in file_values:
+                        file_value_fixed = fix_file_name(duck_file)
+                        #print(file_type)
 
-                    cprint("No Dependencies!", debug)    
-                    #exit()
+                        if file_type == "text":
+                            # cprint(f'text select on 0', debug)
+                            try:
+                                assert model_request_dict['input_args']['text_prompt']
+                            except:
+                                model_request_dict['input_args']['text_prompt'] = []
+                            model_request_dict['input_args']['text_prompt'].append(detools.download_file(file_value_fixed, get_file_content=True))
+                        elif file_type in ['image', 'video', 'audio', 'file']:
+                            try:
+                                assert model_request_dict['input_args'][file_type]
+                            except:
+                                model_request_dict['input_args'][file_type] = []
+                            model_request_dict['input_args'][file_type].append({
+                                "file_name": str(file_value_fixed),
+                                "file_url": f"{API_UP}/{file_value_fixed}"
+                            })
+                        else:
+                            try:
+                                assert model_request_dict['input_args'][file_type]
+                            except:
+                                model_request_dict['input_args'][file_type] = []
+                            model_request_dict['input_args'][file_type].append(detools.download_file(file_value_fixed))
+                            
+                cprint(f"Request INPUT Files: {json.dumps(model_request_dict['input_args'], indent=2)}", debug)
+                    
+                model_request_dict["task_type"] = selected_task['type']
+                task_dep = str(selected_task['dep']).replace("\\\\n", "").replace("\\", "")
+                task_dep = ast.literal_eval(task_dep)
+                model_request_dict["task_dep"] = task_dep
+                cprint(f"task type is {model_request_dict['task_type']}", debug)     
+                # cprint(f"task deps are {task_dep} {type(task_dep[0])}", debug)   
+                cprint(f"task deps are {task_dep}", debug)   
+                #if json.loads(str(task_dep.decode('UTF-8'))):
+                
+                # TODO: Implement Dependencies Args!!
 
-                cprint(f"No task for {model}!", debug)   
+                # if task_dep != [-1]:
+                #     cprint("Dependencies:", debug)   
+                #     #deps = json.loads(str(task_dep.decode('UTF-8')))
+                #     model_request_dict['dep_args'] = {}
+                #     for dep_key, dep_args in task_dep.items():
+                #         if isinstance(dep_args, str):
+                #             dep_args = [dep_args]
+                #         if not isinstance(dep_args, list):
+                #             continue
+                #         for duck_file in dep_args:
+                #             print("[ DEBUG ] duck_file(" + str(type(duck_file)) + ")", duck_file)
+                #             file_value_fixed = fix_file_name(duck_file)
+                #             try:
+                #                 dep_id = int(dep_key)
+                #                 dep_dic = json.loads(str(dep_args))
+                #             except:
+                #                 try:
+                #                     dep_dic = find_json(str(dep_args))
+                #                     dep_dic = json.loads(dep_dic)   
+                #                 except:
+                #                     dep_dic = None
+                #                     if not model_request_dict['dep_args'] and debug:
+                #                         cprint("no filename found" , debug)
+                #             if dep_dic:
+                #                 model_request_dict['dep_args'][dep_id] = {}
+                #                 for file_type, file_value in dep_dic.items():
+                #                     file_value_fixed = fix_file_name(file_value)
+                #                     #print(file_type)
+                #                     if file_type == "text":
+                #                         # cprint(f'text select on 0', debug)
+                #                         try:
+                #                             assert model_request_dict['dep_args'][dep_id]['text_prompt']
+                #                         except:
+                #                             model_request_dict['dep_args'][dep_id]['text_prompt'] = []
+                #                         model_request_dict['dep_args'][dep_id]['text_prompt'].append(detools.download_file(file_value_fixed, get_file_content=True))
+                #                     elif file_type in ['image', 'video', 'audio', 'file']:
+                #                         try:
+                #                             assert model_request_dict['dep_args'][dep_id][file_type]
+                #                         except:
+                #                             model_request_dict['dep_args'][dep_id][file_type] = []
+                #                         model_request_dict['dep_args'][dep_id][file_type].append({
+                #                             "file_name": str(file_value_fixed),
+                #                             "file_url": f"{API_UP}/{file_value_fixed}"
+                #                         })
+                #                     else:
+                #                         try:
+                #                             assert model_request_dict['dep_args'][dep_id][file_type]
+                #                         except:
+                #                             model_request_dict['dep_args'][dep_id][file_type] = []
+                #                         model_request_dict['dep_args'][dep_id][file_type].append(detools.download_file(file_value_fixed))
+                                        
+                #     cprint(f"Request DEP Files: {json.dumps(model_request_dict['dep_args'], indent=2)}", debug)
+                    
+
+                cprint("No Dependencies!", debug)    
                 #exit()
+
+            cprint(f"No task for {model}!", debug)   
+            #exit()
 
 
             model_request_dict["task_model"] = model    # Return Model to work on
