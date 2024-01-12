@@ -1387,9 +1387,10 @@ class Derunner():
     def grab_model_info(self, model, version):
         '''
         DEPRECATED !!
-         This Funk will be removed after futures releases:
+         This Funk will be removed after future releases:
          - this info is now gathered from [latest_services.config.yaml](https://github.com/DeSOTAai/DeRunner/blob/main/Assets/latest_services.config.yaml)
         '''
+        return {}
         match model:
             case "franciscomvargas/deurlcruncher":
                 return {
@@ -1714,20 +1715,41 @@ class Derunner():
             print(f"[ INFO ] -> Model Tester start:\n  Model ID: {model}")
             delogger(f"[ INFO ] -> Model Tester start:\n  Model ID: {model}")
             
+            ''' grab_model_info is DEPRECATED !! This Funk will be removed after future releases '''
+            # model_test_info = self.grab_model_info(model, version)
+            # # Confirm Info
+            # if not model_test_info:
+            #     continue
+            # else:
+            #     for key in ["cmd", "timeout"]:
+            #         if key not in model_test_info or not model_test_info[key]:
+            #             continue
+            
+
+            # Get Model Test TimeOut
+            try: # from service ~ test_timeout
+                assert self.serv_conf["services_params"][model][USER_SYS]["test_args"]["test_timout"]
+                model_test_timeout = self.serv_conf["services_params"][model][USER_SYS]["test_args"]["test_timout"]
+            except:
+                try: # from service ~ timeout
+                    assert self.serv_conf["services_params"][model]["timout"]
+                    model_test_timeout = self.serv_conf["services_params"][model]["timout"]
+                except:
+                    try: # from latest_service ~ test_timeout
+                        assert self.last_serv_conf["services_params"][model][USER_SYS]["test_args"]["test_timout"]
+                        model_test_timeout = self.last_serv_conf["services_params"][model][USER_SYS]["test_args"]["test_timout"]
+                    except:
+                        try: # from latest_service ~ timeout
+                            assert self.last_serv_conf["services_params"][model]["timout"]
+                            model_test_timeout = self.last_serv_conf["services_params"][model]["timout"]
+                        except:
+                            model_test_timeout = 1240
+            
             # Get Model Test CMD
-            # TODO: expert info will be provided by desota
-            model_test_info = self.grab_model_info(model, version)
-            # Confirm Info
-            if not model_test_info:
-                continue
-            else:
-                for key in ["cmd", "timeout"]:
-                    if key not in model_test_info or not model_test_info[key]:
-                        continue
-            model_test_cmd = model_test_info["cmd"]
-            model_test_timeout = model_test_info["timeout"]
+            model_test_cmd = ['--model', model]
             model_test_cmd = [self.pypath, test_script_path] + model_test_cmd
             print("TEST CMD:", " ".join(model_test_cmd))
+
             test_res = self.quiet_subprocess(model_test_cmd, model_test_timeout)
             if test_res == 0:
                 self.__init__(ignore_update=True)

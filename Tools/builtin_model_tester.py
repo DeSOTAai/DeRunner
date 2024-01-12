@@ -50,7 +50,8 @@ parser = argparse.ArgumentParser()
 # MODEL ID
 parser.add_argument("-m", "--model", 
                     help='Model to be tested',
-                    type=str)
+                    type=str,
+                    required=True)
 # EXPERT - Auto-Complete --input-query
 parser.add_argument("-e", "--expert", 
                     nargs='?',
@@ -367,6 +368,33 @@ def main(args):
     _input_file = args.input_file
     _input_dict = args.input_dict
     _report_file = args.report_file
+    
+    if _service_params:
+        SERV_PARAMS = get_services_config(_service_params)
+    else:
+        SERV_PARAMS = get_services_config(SERV_CONF_PATH)["services_params"]
+    
+    if _model not in SERV_PARAMS:
+        print(f"[ ERROR ] -> Coulnd't find {_model} in Services Params:", json.dumps(SERV_PARAMS, indent=2))
+    
+    try:
+        if not (_input_file and _input_dict):
+            test_args = SERV_PARAMS[_model][USER_SYS]["test_args"]
+            _input_query = test_args["query"]
+            _input_type = test_args["type"]
+            _input_file = test_args["file"]
+            _input_dict = test_args["raw_dict"]
+    except:
+        print(f"[ ERROR ] -> Coulnd't Retrieve {_model} test args from Services Params:", json.dumps(SERV_PARAMS, indent=2))
+
+    if not _report_file: # Consider Main DeRunner Default Test
+        # TODO: Send Report to DeSOTA
+        clean_model_name = _model.replace("/", "_").replace("\\", "_")
+        name_split = clean_model_name.split("_")
+        if len(name_split) > 1:
+            clean_model_name = "_".join(name_split[1:])
+        _report_file = os.path.join(DESOTA_ROOT_PATH, f"{clean_model_name}_report.json")
+    
     print("BuiltInTester [_service_params]:", _service_params)
     print("BuiltInTester [_expert]:", _expert)
     print("BuiltInTester [_model]:", _model)
@@ -375,14 +403,8 @@ def main(args):
     print("BuiltInTester [_input_file]:", _input_file)
     print("BuiltInTester [_input_dict]:", _input_dict)
     print("BuiltInTester [_report_file]:", _report_file)
-    if _service_params:
-        SERV_PARAMS = get_services_config(_service_params)
-    else:
-        SERV_PARAMS = get_services_config(SERV_CONF_PATH)["services_params"]
-    
-    if _model not in SERV_PARAMS:
-        print(f"[ ERROR ] -> Coulnd't find {_model} in Services Params:", json.dumps(SERV_PARAMS, indent=2))
-    try:
+
+    try: # Run Test
         model_req = get_model_request_dict(_model, _expert, _input_query, _input_type, _input_file, _input_dict)
         print("*"*80)
         delogger("*"*80)

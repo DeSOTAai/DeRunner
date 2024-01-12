@@ -210,7 +210,16 @@ services_params: {
             starter: descraper.start.bat,
             stoper: descraper.stop.bat,
             status: descraper.status.bat,
-            
+            test_args: {
+                query: Scrape,
+                type: null,
+                file: null,
+                raw_dict: {
+                    url: https://pt.wikipedia.org/wiki/Os_Simpsons
+                }
+                # test_timout = OPTIONAL (default = timeout)
+            },
+
             desota_runner: url_runner.py,
             python_path: Desota\Desota_Models\DeScraper\env\python.exe
         },
@@ -226,6 +235,15 @@ services_params: {
             starter: descraper.start.bash,
             stoper: descraper.stop.bash,
             status: descraper.status.bash,
+            test_args: {
+                query: Scrape,
+                type: null,
+                file: null,
+                raw_dict: {
+                    url: https://pt.wikipedia.org/wiki/Os_Simpsons
+                }
+                # test_timout = OPTIONAL (default = timeout)
+            },
             
             desota_runner: url_runner.py,
             python_path: Desota/Desota_Models/DeScraper/env/bin/python3
@@ -267,11 +285,29 @@ services_params: {
     franciscomvargas/descraper/html: {
         win: {
             project_dir: Desota\Desota_Models\DeScraper,
+            test_args: {
+                query: Scrape,
+                type: null,
+                file: null,
+                raw_dict: {
+                    url: https://pt.wikipedia.org/wiki/Os_Simpsons
+                }
+                # test_timout = OPTIONAL (default = timeout)
+            },
             desota_runner: html_runner.py,
             python_path: Desota\Desota_Models\DeScraper\env\python.exe
         },
         lin: {
             project_dir: Desota/Desota_Models/DeScraper,
+            test_args: {
+                query: Scrape,
+                type: null,
+                file: null,
+                raw_dict: {
+                    url: https://pt.wikipedia.org/wiki/Os_Simpsons
+                }
+                # test_timout = OPTIONAL (default = timeout)
+            },
             desota_runner: html_runner.py,
             python_path: Desota/Desota_Models/DeScraper/env/bin/python3
         },
@@ -298,7 +334,13 @@ services_params: {
             starter: ,
             stoper: ,
             status: ,
-
+            test_args: {
+                query: Transcribe,
+                type: audio,
+                file: Desota\Desota_Models\WhisperCpp\samples\jfk.wav,
+                raw_dict: null,
+                # test_timout = OPTIONAL (default = timeout)
+            },
             desota_runner: runner.py,
             python_path: Desota\Portables\TinyPython\env\python.exe,
             cli_cmd: []
@@ -315,6 +357,13 @@ services_params: {
             starter: ,
             stoper: ,
             status: ,
+            test_args: {
+                query: Transcribe,
+                type: audio,
+                file: Desota/Desota_Models/WhisperCpp/samples/jfk.wav,
+                raw_dict: null,
+                # test_timout = OPTIONAL (default = timeout)
+            },
 
             desota_runner: runner.py,
             python_path: Desota/Portables/TinyPython/env/bin/python3,
@@ -368,6 +417,13 @@ services_params: {
             starter: ,
             stoper: ,
             status: ,
+            test_args: {
+                query: News about,
+                type: text,
+                file: Artificial General Intelligence,
+                raw_dict: null,
+                # test_timout = OPTIONAL (default = timeout)
+            },
 
             desota_runner: runner.py,
             python_path: Desota\Desota_Models\DeUrlCruncher\env\python.exe,
@@ -388,6 +444,13 @@ services_params: {
             starter: ,
             stoper: ,
             status: ,
+            test_args: {
+                query: News about,
+                type: text,
+                file: Artificial General Intelligence,
+                raw_dict: null,
+                # test_timout = OPTIONAL (default = timeout)
+            },
 
             desota_runner: runner.py,
             python_path: Desota/Desota_Models/DeUrlCruncher/env/bin/python3,
