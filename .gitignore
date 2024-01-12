@@ -6,9 +6,12 @@ config.yaml
 neuralqa/server/test_query.py
 
 # Linux USER Files @franciscomvargas
+# Linux Service Files
 derunner.service.bash
 derunner.service
 status.txt
+# BuiltInTest Model Reports
+*_report.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
