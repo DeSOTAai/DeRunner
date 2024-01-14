@@ -104,99 +104,99 @@ services_params: {
         child_models: 
     },
     # Models
-    franciscomvargas/neuralqa/qa: {
-        win: {
-            version: 0.0.0,
-            commit: a40bfe1e4a4b4c834bae9c9663a89659b80316a8,
-            install_dir: Desota\Desota_Models\NeuralQA, # OPTIONAL - `project_dir`as default 
-            project_dir: Desota\Desota_Models\NeuralQA\neuralqa,
-            execs_path: executables\Windows,
-            setup: neuralqa.setup.bat,
-            setup_args: [/manualstart],
-            uninstaller: neuralqa.uninstall.bat,
-            uninstaller_args: [/Q],
-            starter: neuralqa.start.bat,
-            stoper: neuralqa.stop.bat,
-            status: neuralqa.status.bat,
+    #TODO franciscomvargas/neuralqa/qa: {
+    #     win: {
+    #         version: 0.0.0,
+    #         commit: a40bfe1e4a4b4c834bae9c9663a89659b80316a8,
+    #         install_dir: Desota\Desota_Models\NeuralQA, # OPTIONAL - `project_dir`as default 
+    #         project_dir: Desota\Desota_Models\NeuralQA\neuralqa,
+    #         execs_path: executables\Windows,
+    #         setup: neuralqa.setup.bat,
+    #         setup_args: [/manualstart],
+    #         uninstaller: neuralqa.uninstall.bat,
+    #         uninstaller_args: [/Q],
+    #         starter: neuralqa.start.bat,
+    #         stoper: neuralqa.stop.bat,
+    #         status: neuralqa.status.bat,
 
-            desota_runner: qa_runner.py,
-            python_path: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe
-        },
-        lin: {
-            version: 0.0.0,
-            commit: a40bfe1e4a4b4c834bae9c9663a89659b80316a8,
-            project_dir: Desota/Desota_Models/NeuraQA/neuralqa,
-            execs_path: executables/Linux,
-            setup: neuralqa.setup.bash,
-            setup_args: [-m],
-            uninstaller: neuralqa.uninstall.bash,
-            uninstaller_args: [-q],
-            starter: neuralqa.start.bash,
-            stoper: neuralqa.stop.bash,
-            status: neuralqa.status.bash,
+    #         desota_runner: qa_runner.py,
+    #         python_path: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe
+    #     },
+    #     lin: {
+    #         version: 0.0.0,
+    #         commit: a40bfe1e4a4b4c834bae9c9663a89659b80316a8,
+    #         project_dir: Desota/Desota_Models/NeuraQA/neuralqa,
+    #         execs_path: executables/Linux,
+    #         setup: neuralqa.setup.bash,
+    #         setup_args: [-m],
+    #         uninstaller: neuralqa.uninstall.bash,
+    #         uninstaller_args: [-q],
+    #         starter: neuralqa.start.bash,
+    #         stoper: neuralqa.stop.bash,
+    #         status: neuralqa.status.bash,
 
-            desota_runner: qa_runner.py,
-            python_path: Desota/Desota_Models/NeuraQA/neuralqa/env/bin/python3
-        },
-        mac: {
-            version: ,
-            commit: ,
-            project_dir: Desota/Desota_Models/NeuraQA/neuralqa,
-            execs_path: executables/MacOS,
-            setup: ,
-            setup_args: ,
-            uninstaller: ,
-            uninstaller_args: ,
-            starter: ,
-            stoper: ,
-            status: ,
+    #         desota_runner: qa_runner.py,
+    #         python_path: Desota/Desota_Models/NeuraQA/neuralqa/env/bin/python3
+    #     },
+    #     mac: {
+    #         version: ,
+    #         commit: ,
+    #         project_dir: Desota/Desota_Models/NeuraQA/neuralqa,
+    #         execs_path: executables/MacOS,
+    #         setup: ,
+    #         setup_args: ,
+    #         uninstaller: ,
+    #         uninstaller_args: ,
+    #         starter: ,
+    #         stoper: ,
+    #         status: ,
 
-            desota_runner: ,
-            python_path:
-        },
-        service_type: model,
-        timeout: 600,
-        required: false,
-        source_code: https://github.com/franciscomvargas/neuralqa,
-        report_issue: https://github.com/franciscomvargas/neuralqa/issues,
-        description: https://github.com/franciscomvargas/neuralqa/tree/master#readme,
-        short_description: Library for Question Answering on Large Datasets with BERT,
-        model_ui: http://127.0.0.1:8888/,
-        handshake_req: http://127.0.0.1:8888/api/handshake/,
-        handshake_res: {
-            status: ready
-        },
-        run_constantly: false,
-        submodel: false,
-        child_models: [
-            franciscomvargas/neuralqa/expansion
-        ]
-    },
-    franciscomvargas/neuralqa/expansion: {
-        win: {
-            project_dir: Desota\Desota_Models\NeuralQA\neuralqa,
-            desota_runner: expansion_runner.py,
-            python_path: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe,
+    #         desota_runner: ,
+    #         python_path:
+    #     },
+    #     service_type: model,
+    #     timeout: 600,
+    #     required: false,
+    #     source_code: https://github.com/franciscomvargas/neuralqa,
+    #     report_issue: https://github.com/franciscomvargas/neuralqa/issues,
+    #     description: https://github.com/franciscomvargas/neuralqa/tree/master#readme,
+    #     short_description: Library for Question Answering on Large Datasets with BERT,
+    #     model_ui: http://127.0.0.1:8888/,
+    #     handshake_req: http://127.0.0.1:8888/api/handshake/,
+    #     handshake_res: {
+    #         status: ready
+    #     },
+    #     run_constantly: false,
+    #     submodel: false,
+    #     child_models: [
+    #         franciscomvargas/neuralqa/expansion
+    #     ]
+    # },
+    #TODO franciscomvargas/neuralqa/expansion: {
+    #     win: {
+    #         project_dir: Desota\Desota_Models\NeuralQA\neuralqa,
+    #         desota_runner: expansion_runner.py,
+    #         python_path: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe,
 
             
-            runner: Desota\Desota_Models\NeuralQA\neuralqa\expansion_runner.py,
-            runner_py: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe
-        },
-        lin: {
-            project_dir: Desota/Desota_Models/NeuraQA/neuralqa,
-            desota_runner: expansion_runner.py,
-            python_path: Desota/Desota_Models/NeuraQA/neuralqa/env/bin/python3
-        },
-        mac: {
-            project_dir: ,
-            desota_runner: ,
-            python_path:
-        },
-        service_type: model,
-        timeout: 600,
-        submodel: true,
-        parent_model: franciscomvargas/neuralqa/qa
-    },
+    #         runner: Desota\Desota_Models\NeuralQA\neuralqa\expansion_runner.py,
+    #         runner_py: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe
+    #     },
+    #     lin: {
+    #         project_dir: Desota/Desota_Models/NeuraQA/neuralqa,
+    #         desota_runner: expansion_runner.py,
+    #         python_path: Desota/Desota_Models/NeuraQA/neuralqa/env/bin/python3
+    #     },
+    #     mac: {
+    #         project_dir: ,
+    #         desota_runner: ,
+    #         python_path:
+    #     },
+    #     service_type: model,
+    #     timeout: 600,
+    #     submodel: true,
+    #     parent_model: franciscomvargas/neuralqa/qa
+    # },
     franciscomvargas/descraper/url: {
         win: {
             version: 0.0.1,
