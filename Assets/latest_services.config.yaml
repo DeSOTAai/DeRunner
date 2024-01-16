@@ -4,7 +4,7 @@ services_params: {
     desotaai/derunner: {
         win: {
             version: 0.1.1,
-            commit: 2ae565aaf98045ab6c8428a0a8c65bde58ea22ca,
+            commit: 477188a68abf97caf5f98bcc529c2d83b2a348dd,
             project_dir: Desota\DeRunner,
             execs_path: executables\Windows,
             setup: derunner.setup.bat,
@@ -17,7 +17,7 @@ services_params: {
         },
         lin: {
             version: 0.1.1,
-            commit: 2ae565aaf98045ab6c8428a0a8c65bde58ea22ca,
+            commit: 477188a68abf97caf5f98bcc529c2d83b2a348dd,
             project_dir: Desota/DeRunner,
             execs_path: executables/Linux,
             setup: derunner.setup.bash,
@@ -204,7 +204,7 @@ services_params: {
     franciscomvargas/descraper/url: {
         win: {
             version: 0.0.2,
-            commit: de3a592f5f3feededc5d9449c91ee7ec3c4d9aad,
+            commit: ddfc5c409c7a339f9a74b94f8abeb590021dd6f1,
             project_dir: Desota\Desota_Models\DeScraper,
             execs_path: executables\Windows,
             setup: descraper.setup.bat,
@@ -230,7 +230,7 @@ services_params: {
         },
         lin: {
             version: 0.0.2,
-            commit: de3a592f5f3feededc5d9449c91ee7ec3c4d9aad,
+            commit: ddfc5c409c7a339f9a74b94f8abeb590021dd6f1,
             project_dir: Desota/Desota_Models/DeScraper,
             execs_path: executables/Linux,
             setup: descraper.setup.bash,
@@ -416,8 +416,8 @@ services_params: {
     # Tools
     franciscomvargas/deurlcruncher: {
         win: {
-            version: 0.0.1,
-            commit: e04f6afb2d98adb65a05e6a59659786c15b9f863,
+            version: 0.0.2,
+            commit: fb32f53a53bb52bf188ec3258a67217a1243ecd6,
             project_dir: Desota\Desota_Models\DeUrlCruncher,
             execs_path: executables\Windows,
             setup: deurlcruncher.setup.bat,
@@ -444,8 +444,8 @@ services_params: {
             ]
         },
         lin: {
-            version: 0.0.1,
-            commit: e04f6afb2d98adb65a05e6a59659786c15b9f863,
+            version: 0.0.2,
+            commit: fb32f53a53bb52bf188ec3258a67217a1243ecd6,
             project_dir: Desota/Desota_Models/DeUrlCruncher,
             execs_path: executables/Linux,
             setup: deurlcruncher.setup.bash,
