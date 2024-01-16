@@ -12,6 +12,8 @@ derunner.service
 status.txt
 # BuiltInTest Model Reports
 *_report.json
+# NSSM TMP Fix
+*.flag
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

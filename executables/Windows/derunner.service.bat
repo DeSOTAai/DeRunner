@@ -7,10 +7,12 @@ call cd %model_path%
 :: Delete Service Log on-start
 break>%model_path%\service.log
 :: Make sure every package required is installed
+IF EXIST %model_path%\NSSM.flag GOTO mainloop
+type nul > %model_path%\NSSM.flag
 call %model_path%\env\python -m pip install -r %model_path%\requirements.txt
 :mainloop
 :: Start DeRunner Service
-call %model_path%\env\python DeRunner.py
+call %model_path%\env\python DeRunner.py -dev
 IF errorlevel 66 GOTO exit_mainloop
 GOTO mainloop
 
