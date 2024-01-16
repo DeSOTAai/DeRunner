@@ -1743,12 +1743,13 @@ class Derunner():
                             assert self.last_serv_conf["services_params"][model]["timout"]
                             model_test_timeout = self.last_serv_conf["services_params"][model]["timout"]
                         except:
-                            model_test_timeout = 1240
+                            model_test_timeout = DEFAULT_MODEL_TIMEOUT
             
             # Get Model Test CMD
             model_test_cmd = ['--model', model]
             model_test_cmd = [self.pypath, test_script_path] + model_test_cmd
-            print("TEST CMD:", " ".join(model_test_cmd))
+            print(f"[ INFO ] Model Test CMD ({model}):", " ".join(model_test_cmd))
+            delogger(f"[ INFO ] Model Test CMD ({model}): {' '.join(model_test_cmd)}")
 
             test_res = self.quiet_subprocess(model_test_cmd, model_test_timeout)
             if test_res == 0:
