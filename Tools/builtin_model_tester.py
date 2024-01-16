@@ -305,7 +305,7 @@ def stop_model_serv(model_id) -> None:
 def call_model(model_req, result_file):
     global SERV_PARAMS
     # Create tmp model_req.yaml with request params for model runner
-    _tmp_req_path = os.path.join(APP_PATH, f"tmp_model_req{int(time.time())}.yaml")
+    _tmp_req_path = os.path.join(TMP_PATH, f"tmp_model_req{int(time.time())}.yaml")
     with open(_tmp_req_path, 'w',) as fw:
         yaml.dump(model_req,fw,sort_keys=False)
 
