@@ -315,29 +315,30 @@ def call_model(model_req, result_file):
     _model_runner = os.path.join(USER_PATH, _model_runner_param["project_dir"], _model_runner_param["desota_runner"])          # Model runner path
     _model_runner_py = os.path.join(USER_PATH, _model_runner_param["python_path"])    # Python with model runner packages
     _model_requirements = os.path.join(USER_PATH, _model_runner_param["pyrequirements"])
+    _model_isTool = (SERV_PARAMS[_model_id]["service_type"] == "tool")
     # API Response URLs
     _model_res_url = result_file
     
     # Pip Install Requirements ~ NSSM BUGFIX
-    if USER_SYS == "win" and SERV_PARAMS[_model_id]["service_type"] == "tool":
-            _pipInstall_cmd = [
-                _model_runner_py, "-m", 
-                "pip", "install", 
-                "-r", _model_requirements
-            ]
-            _sproc = Popen( 
-                _pipInstall_cmd,
-                stdin=subprocess.PIPE, 
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.STDOUT, 
-                encoding='utf-8',
-            )
-            while True:
-                _ret_code = _sproc.poll()
-                if _ret_code != None:
-                    delogger(f"[ DEBUG ] -> Pip Install stdout: {json.dumps(_sproc.stdout.readlines(), indent=2)}")
-                    break
-                continue
+    if USER_SYS == "win" and _model_isTool:
+        _pipInstall_cmd = [
+            _model_runner_py, "-m", 
+            "pip", "install", 
+            "-r", _model_requirements
+        ]
+        _sproc = Popen( 
+            _pipInstall_cmd,
+            stdin=subprocess.PIPE, 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.STDOUT, 
+            encoding='utf-8',
+        )
+        while True:
+            _ret_code = _sproc.poll()
+            if _ret_code != None:
+                delogger(f"[ DEBUG ] -> Pip Install stdout: {json.dumps(_sproc.stdout.readlines(), indent=2)}")
+                break
+            continue
 
     # Start / Wait Model
     # retrieved from https://stackoverflow.com/a/62226026
@@ -348,15 +349,19 @@ def call_model(model_req, result_file):
     ]
     print(f'[ INFO ] -> Model runner cmd:\n\t{" ".join(_modelCall_cmd)}', DEBUG)
     delogger(f'[ INFO ] ->Model runner cmd:\n\t{" ".join(_modelCall_cmd)}')
-    _sproc = Popen(
-        _modelCall_cmd,
-        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8',
-    )
+    if _model_isTool:
+        _sproc = Popen(
+            _modelCall_cmd,
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8',
+        )
+    else:
+        _sproc = Popen( _modelCall_cmd )
     # TODO: implement model timeout
     while True:
         _ret_code = _sproc.poll()
         if _ret_code != None:
-            delogger(f"[ DEBUG ] -> Process stdout: {json.dumps(_sproc.stdout.readlines(), indent=2)}")
+            if _model_isTool:
+                delogger(f"[ DEBUG ] -> Process stdout: {json.dumps(_sproc.stdout.readlines(), indent=2)}")
             break
         continue
 
