@@ -204,7 +204,7 @@ services_params: {
     franciscomvargas/descraper/url: {
         win: {
             version: 0.0.2,
-            commit: ddfc5c409c7a339f9a74b94f8abeb590021dd6f1,
+            commit: 19d4851aeebe376106a8686734952f8a4dfb2420,
             project_dir: Desota\Desota_Models\DeScraper,
             execs_path: executables\Windows,
             setup: descraper.setup.bat,
@@ -230,7 +230,7 @@ services_params: {
         },
         lin: {
             version: 0.0.2,
-            commit: ddfc5c409c7a339f9a74b94f8abeb590021dd6f1,
+            commit: 19d4851aeebe376106a8686734952f8a4dfb2420,
             project_dir: Desota/Desota_Models/DeScraper,
             execs_path: executables/Linux,
             setup: descraper.setup.bash,
