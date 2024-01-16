@@ -319,7 +319,7 @@ def call_model(model_req, result_file):
     _model_res_url = result_file
     
     # Pip Install Requirements ~ NSSM BUGFIX
-    if USER_SYS == "win":
+    if USER_SYS == "win" and SERV_PARAMS[_model_id]["service_type"] == "tool":
             _pipInstall_cmd = [
                 _model_runner_py, "-m", 
                 "pip", "install", 
