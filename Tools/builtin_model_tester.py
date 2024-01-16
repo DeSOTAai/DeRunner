@@ -314,38 +314,49 @@ def call_model(model_req, result_file):
     _model_runner_param = SERV_PARAMS[_model_id][USER_SYS]      # Model params from services.config.yaml
     _model_runner = os.path.join(USER_PATH, _model_runner_param["project_dir"], _model_runner_param["desota_runner"])          # Model runner path
     _model_runner_py = os.path.join(USER_PATH, _model_runner_param["python_path"])    # Python with model runner packages
-
+    _model_requirements = os.path.join(USER_PATH, _model_runner_param["pyrequirements"])
     # API Response URLs
     _model_res_url = result_file
     
+    # Pip Install Requirements ~ NSSM BUGFIX
+    if USER_SYS == "win":
+            _pipInstall_cmd = [
+                _model_runner_py, "-m", 
+                "pip", "install", 
+                "-r", _model_requirements
+            ]
+            _sproc = Popen( 
+                _pipInstall_cmd,
+                stdin=subprocess.PIPE, 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.STDOUT, 
+                encoding='utf-8',
+            )
+            while True:
+                _ret_code = _sproc.poll()
+                if _ret_code != None:
+                    delogger(f"[ DEBUG ] -> Pip Install stdout: {json.dumps(_sproc.stdout.readlines(), indent=2)}")
+                    break
+                continue
+
     # Start / Wait Model
     # retrieved from https://stackoverflow.com/a/62226026
-    if DEBUG or USER_SYS == "lin":
-        print(f'Model runner cmd:\n\t{" ".join([_model_runner_py, _model_runner, "--model_req", _tmp_req_path, "--model_res_url", _model_res_url])}', DEBUG)
-        _sproc = Popen(
-            [
-                _model_runner_py, _model_runner, 
-                "--model_req", _tmp_req_path, 
-                "--model_res_url", _model_res_url
-            ]
-        )
-    elif USER_SYS == "win":
-        _sproc = Popen(
-            [
-                _model_runner_py, _model_runner, 
-                "--model_req", _tmp_req_path, 
-                "--model_res_url", _model_res_url
-            ],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.STDOUT,
-            creationflags=subprocess.CREATE_NO_WINDOW
-        )
-    else:
-        return
+    _modelCall_cmd = [
+        _model_runner_py, _model_runner, 
+        "--model_req", _tmp_req_path, 
+        "--model_res_url", _model_res_url
+    ]
+    print(f'[ INFO ] -> Model runner cmd:\n\t{" ".join(_modelCall_cmd)}', DEBUG)
+    delogger(f'[ INFO ] ->Model runner cmd:\n\t{" ".join(_modelCall_cmd)}')
+    _sproc = Popen(
+        _modelCall_cmd,
+        stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8',
+    )
     # TODO: implement model timeout
     while True:
         _ret_code = _sproc.poll()
         if _ret_code != None:
+            delogger(f"[ DEBUG ] -> Process stdout: {json.dumps(_sproc.stdout.readlines(), indent=2)}")
             break
         continue
 
@@ -403,6 +414,15 @@ def main(args):
     print("BuiltInTester [_input_file]:", _input_file)
     print("BuiltInTester [_input_dict]:", _input_dict)
     print("BuiltInTester [_report_file]:", _report_file)
+
+    delogger(f"BuiltInTester [_service_params]: {_service_params}")
+    delogger(f"BuiltInTester [_expert]: {_expert}")
+    delogger(f"BuiltInTester [_model]: {_model}")
+    delogger(f"BuiltInTester [_input_query]: {_input_query}")
+    delogger(f"BuiltInTester [_input_type]: {_input_type}")
+    delogger(f"BuiltInTester [_input_file]: {_input_file}")
+    delogger(f"BuiltInTester [_input_dict]: {_input_dict}")
+    delogger(f"BuiltInTester [_report_file]: {_report_file}")
 
     try: # Run Test
         model_req = get_model_request_dict(_model, _expert, _input_query, _input_type, _input_file, _input_dict)
