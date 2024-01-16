@@ -63,7 +63,8 @@ services_params: {
             starter: ,
             stoper: ,
             status: ,
-            python_path: Desota\Portables\TinyPython\env\python.exe
+            python_path: Desota\Portables\TinyPython\env\python.exe,
+            pyrequirements: Desota\Portables\TinyPython\requirements.txt
         },
         lin: {
             version: 0.0.0,
@@ -77,7 +78,8 @@ services_params: {
             starter: ,
             stoper: ,
             status: ,
-            python_path: Desota/Portables/TinyPython/env/bin/python3
+            python_path: Desota/Portables/TinyPython/env/bin/python3,
+            pyrequirements: Desota/Portables/TinyPython/requirements.txt
         },
         mac: {
             version: ,
@@ -120,7 +122,8 @@ services_params: {
     #         status: neuralqa.status.bat,
 
     #         desota_runner: qa_runner.py,
-    #         python_path: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe
+    #         python_path: Desota\Desota_Models\NeuralQA\neuralqa\env\python.exe,
+    #         pyrequirements: Desota\Desota_Models\NeuralQA\neuralqa\requirements.txt
     #     },
     #     lin: {
     #         version: 0.0.0,
@@ -136,7 +139,8 @@ services_params: {
     #         status: neuralqa.status.bash,
 
     #         desota_runner: qa_runner.py,
-    #         python_path: Desota/Desota_Models/NeuraQA/neuralqa/env/bin/python3
+    #         python_path: Desota/Desota_Models/NeuraQA/neuralqa/env/bin/python3,
+    #         pyrequirements: Desota/Desota_Models/NeuraQA/neuralqa/requirements.txt
     #     },
     #     mac: {
     #         version: ,
@@ -221,7 +225,8 @@ services_params: {
             },
 
             desota_runner: url_runner.py,
-            python_path: Desota\Desota_Models\DeScraper\env\python.exe
+            python_path: Desota\Desota_Models\DeScraper\env\python.exe,
+            pyrequirements: Desota\Desota_Models\DeScraper\requirements.txt
         },
         lin: {
             version: 0.0.2,
@@ -246,7 +251,8 @@ services_params: {
             },
             
             desota_runner: url_runner.py,
-            python_path: Desota/Desota_Models/DeScraper/env/bin/python3
+            python_path: Desota/Desota_Models/DeScraper/env/bin/python3,
+            pyrequirements: Desota/Desota_Models/DeScraper/requirements.txt
         },
         mac: {
             version: ,
@@ -295,7 +301,8 @@ services_params: {
                 # test_timout = OPTIONAL (default = timeout)
             },
             desota_runner: html_runner.py,
-            python_path: Desota\Desota_Models\DeScraper\env\python.exe
+            python_path: Desota\Desota_Models\DeScraper\env\python.exe,
+            pyrequirements: Desota\Desota_Models\DeScraper\requirements.txt
         },
         lin: {
             project_dir: Desota/Desota_Models/DeScraper,
@@ -309,7 +316,8 @@ services_params: {
                 # test_timout = OPTIONAL (default = timeout)
             },
             desota_runner: html_runner.py,
-            python_path: Desota/Desota_Models/DeScraper/env/bin/python3
+            python_path: Desota/Desota_Models/DeScraper/env/bin/python3,
+            pyrequirements: Desota/Desota_Models/DeScraper/requirements.txt
         },
         mac: {
             project_dir: ,
@@ -343,6 +351,7 @@ services_params: {
             },
             desota_runner: runner.py,
             python_path: Desota\Portables\TinyPython\env\python.exe,
+            pyrequirements: Desota\Portables\TinyPython\requirements.txt,
             cli_cmd: []
         },
         lin: {
@@ -367,6 +376,7 @@ services_params: {
 
             desota_runner: runner.py,
             python_path: Desota/Portables/TinyPython/env/bin/python3,
+            pyrequirements: Desota\Portables\TinyPython\requirements.txt,
             cli_cmd: [
                 Desota/Desota_Models/WhisperCpp/stream, 
                 -m, Desota/Desota_Models/WhisperCpp/models/ggml-base.en.bin,
@@ -427,6 +437,7 @@ services_params: {
 
             desota_runner: runner.py,
             python_path: Desota\Desota_Models\DeUrlCruncher\env\python.exe,
+            pyrequirements: Desota\Desota_Models\DeUrlCruncher\requirements.txt,
             cli_cmd: [
                 Desota\Desota_Models\DeUrlCruncher\env\python.exe,
                 Desota\Desota_Models\DeUrlCruncher\main.py
@@ -454,6 +465,7 @@ services_params: {
 
             desota_runner: runner.py,
             python_path: Desota/Desota_Models/DeUrlCruncher/env/bin/python3,
+            pyrequirements: Desota\Desota_Models\DeUrlCruncher\requirements.txt,
             cli_cmd: [
                 Desota/Desota_Models/DeUrlCruncher/env/bin/python3,
                 Desota/Desota_Models/DeUrlCruncher/main.py
