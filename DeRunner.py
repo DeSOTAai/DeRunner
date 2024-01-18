@@ -20,9 +20,9 @@ I=0
 DEBUG = False
 DEVELOPMENT = False
 if len(sys.argv)>1:
-    if sys.argv[1] in ["-dev"]:
+    if "-dev" in sys.argv:
         DEVELOPMENT = True
-    elif sys.argv[1] in ["-deb"]:
+    if "-deb" in sys.argv:
         DEBUG = True
         
 USER_SYS = detools.get_platform()
@@ -489,7 +489,8 @@ class Derunner():
             
             task = simple_post(API_URL, data=data, timeout=30)
 
-            cprint(f"\nSignal DeSOTA that Model is wake up:\n{json.dumps(data, indent=2)}\nResponse Status = {task.status_code}", debug)
+            cprint(f"\nSignal DeSOTA that Model is wake up:\n{json.dumps(data, indent=2)}", debug)
+            cprint(f"Response Status = {task.status_code}", debug)
             if task.status_code != 200:
                 continue
 
@@ -505,7 +506,9 @@ class Derunner():
             
             select_task = simple_post(API_URL, data=data, timeout=30)
 
-            cprint(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}\nResponse Status = {select_task.status_code}", debug)
+            cprint(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}", debug)
+            cprint(f"Response Status = {task.status_code}", debug)
+            cprint(f"\n\n\n[ DEBUG ] -> MODEL REQ. Response Body: {task.text}\n\n\n", debug)
             if select_task.status_code != 200:
                 continue
             
@@ -617,6 +620,29 @@ class Derunner():
                 cprint(f"task deps are {task_dep}", debug)   
                 #if json.loads(str(task_dep.decode('UTF-8'))):
                 
+                print(f"\n\n\n[ DEBUG ] model_request_dict: {model_request_dict}\n\n\n")
+                print(f"\n\n\n[ DEBUG ] selected_task: {selected_task}\n\n\n")
+                
+                ## Model Request Mutations ~ Handle New User Prompt 
+                if model_request_dict['input_args']['text_prompt']:
+                    try:
+                        assert selected_task["arg"]["prompt"]
+                        if selected_task["arg"]["prompt"] != "$initial-prompt$":
+                            model_request_dict['input_args']['text_prompt'] = [selected_task["arg"]["prompt"]]
+                        del selected_task["arg"]["prompt"]
+                    except Exception:
+                        pass
+                
+                ## Append Model Request Arguments(dict) from DeSOTA API
+                try:
+                    assert selected_task["arg"]
+                    if selected_task["arg"]:
+                        model_request_dict['input_args']['model_args'] = selected_task["arg"]
+                except Exception:
+                        pass
+                
+
+
                 # TODO: Implement Dependencies Args!!
 
                 # if task_dep != [-1]:
