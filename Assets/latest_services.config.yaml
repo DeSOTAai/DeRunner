@@ -639,7 +639,10 @@ services_params: {
               spacewalkingninja/DesotaControlVideo/extract-lineart,
               spacewalkingninja/DesotaControlVideo/extract-anime,
 
-          ]
+          ],
+        dependencies: [
+            spacewalkingninja/transformers
+        ]
     },
     spacewalkingninja/DesotaControlVideo/text-and-softedge: {
         win: {
