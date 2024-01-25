@@ -105,6 +105,62 @@ services_params: {
         submodel: false,
         child_models: 
     },
+    #NOT REQUIRED ASSETS
+    spacewalkingninja/transformers: {
+            win: {
+                version: 0.0.0,
+                commit: 6ffc5d86c729dd4e4ed26ab9a7945ac65d7489c9,
+                project_dir: Desota\Portables\Transformers,
+                execs_path: executables\Windows,
+                setup: transformers.setup.bat,
+                setup_args: null,
+                uninstaller: transformers.uninstall.bat,
+                uninstaller_args: [/Q],
+                starter: ,
+                stoper: ,
+                status: ,
+                python_path: Desota\Portables\Transformers\env\python.exe,
+                pyrequirements: Desota\Portables\Transformers\requirements.txt
+            },
+            lin: {
+                version: ,
+                commit: ,
+                project_dir: ,
+                execs_path: ,
+                setup: ,
+                setup_args: null,
+                uninstaller: ,
+                uninstaller_args: ,
+                starter: ,
+                stoper: ,
+                status: ,
+                python_path: ,
+                pyrequirements: 
+            },
+            mac: {
+                version: ,
+                commit: ,
+                project_dir: ,
+                execs_path: ,
+                setup: ,
+                setup_args: ,
+                uninstaller: ,
+                uninstaller_args: ,
+                starter: ,
+                stoper: ,
+                status: ,
+                python_path:
+            },
+            service_type: asset,
+            required: false,
+            source_code: https://github.com/spacewalkingninja/Transformers,
+            report_issue: https://github.com/spacewalkingninja/Transformers/issues,
+            description: https://github.com/spacewalkingninja/Transformers/tree/main#readme,
+            short_description: Env for NVidia PyTorch Transformers models on DeSOTA ,
+            run_constantly: false,
+            submodel: false,
+            child_models: 
+        },
     # Models
     #TODO franciscomvargas/neuralqa/qa: {
     #     win: {
