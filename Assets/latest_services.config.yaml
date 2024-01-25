@@ -96,7 +96,7 @@ services_params: {
             python_path:
         },
         service_type: asset,
-        required: true,
+        required: false,
         source_code: https://github.com/DeSOTAai/TinyPython,
         report_issue: https://github.com/DeSOTAai/TinyPython/issues,
         description: https://github.com/DeSOTAai/TinyPython/tree/main#readme,
@@ -467,7 +467,10 @@ services_params: {
         model_cli: cli_cmd,
         run_constantly: false,
         submodel: false,
-        child_models: null
+        child_models: null,
+        dependencies: [
+            desotaai/tinypython
+        ]
     },
     # Tools
     franciscomvargas/deurlcruncher: {
@@ -639,10 +642,7 @@ services_params: {
               spacewalkingninja/DesotaControlVideo/extract-lineart,
               spacewalkingninja/DesotaControlVideo/extract-anime,
 
-          ],
-        dependencies: [
-            spacewalkingninja/transformers
-        ]
+          ]
     },
     spacewalkingninja/DesotaControlVideo/text-and-softedge: {
         win: {
