@@ -1041,10 +1041,10 @@ services_params: {
 ## DeSOTA Manager Tools Params
 manager_params: {
     win: {
-        version: 0.2.1,
+        version: 0.3.0,
         project_dir: Desota\Desota_Models\DeManagerTools,
-        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.2.0/v0.2.1-win64.zip,
-        release_desc: Alpha Pre-Release > Tools accept dependencies
+        build_url: https://github.com/DeSOTAai/DeManagerTools/releases/download/v0.3.0/v0.3.0-win64.zip,
+        release_desc: Alpha Pre-Release > Parent Services Accept Dependencies
     },
     lin: {
         version: 0.2.0,
