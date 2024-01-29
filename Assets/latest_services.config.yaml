@@ -109,7 +109,7 @@ services_params: {
     spacewalkingninja/transformers: {
             win: {
                 version: 0.0.0,
-                commit: 6ffc5d86c729dd4e4ed26ab9a7945ac65d7489c9,
+                commit: 95630914c2a659c761ecf6265ce213508bb29232,
                 project_dir: Desota\Portables\Transformers,
                 execs_path: executables\Windows,
                 setup: transformers.setup.bat,
@@ -261,7 +261,7 @@ services_params: {
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
             version: 0.0.0,
-            commit: de5abeefb9035368fa77404d7a69c5376d9f6bb9,
+            commit: 914dd4ef8527d9ccef92b32339c28cdfa4051fb9,
             project_dir: Desota\Desota_Models\audiocraft,
             execs_path: executables\Windows,
             setup: audiocraft.setup.bat,
@@ -277,7 +277,14 @@ services_params: {
             cli_cmd: [
                 Desota\Portables\Transformers\env\python.exe,
                 Desota\Desota_Models\audiocraft\main.py
-            ]
+            ],
+            test_args: {
+                query: "House Jazz Gypsy Flamenco Spanish One Third Five Quarters",
+                type: null,
+                file: null,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            }
         },
         lin: {
             version: ,
@@ -337,7 +344,14 @@ services_params: {
             python_path: Desota\Portables\Transformers\env\python.exe,
             
             runner: Desota\Desota_Models\audiocraft\audiocraft_music2music.py,
-            runner_py: Desota\Portables\Transformers\env\python.exe
+            runner_py: Desota\Portables\Transformers\env\python.exe,
+            test_args: {
+                query: House Jazz Gypsy Flamenco Spanish One Third Five Quarters,
+                type: audio,
+                file: Desota\Desota_Models\audiocraft\sample.wav,
+                raw_dict: null,
+                # test_timout = OPTIONAL (default = timeout)
+            },
         },
         lin: {
             project_dir: ,
