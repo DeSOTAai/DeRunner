@@ -257,6 +257,103 @@ services_params: {
     #     submodel: true,
     #     parent_model: franciscomvargas/neuralqa/qa
     # },
+
+    spacewalkingninja/audiocraft/text-to-music: {
+        win: {
+            version: 0.0.0,
+            commit: de5abeefb9035368fa77404d7a69c5376d9f6bb9,
+            project_dir: Desota\Desota_Models\audiocraft,
+            execs_path: executables\Windows,
+            setup: audiocraft.setup.bat,
+            setup_args: [/manualstart, /debug],
+            uninstaller: audiocraft.uninstall.bat,
+            uninstaller_args: [/Q],
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: audiocraft_txt2music.py,
+            python_path: Desota\Portables\Transformers\env\python.exe,
+            cli_cmd: [
+                Desota\Portables\Transformers\env\python.exe,
+                Desota\Desota_Models\audiocraft\main.py
+            ]
+        },
+        lin: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/audiocraft,
+            execs_path: executables/Linux,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        mac: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/audiocraft,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        service_type: tool,
+        timeout: 1240,
+        required: false,
+        source_code: https://github.com/spacewalkingninja/audiocraft,
+        report_issue: https://github.com/spacewalkingninja/audiocraft/issues,
+        description: https://github.com/spacewalkingninja/audiocraft/tree/main#readme,
+        short_description: Edit audio with audiocraft,
+        model_cli: cli_cmd,
+        run_constantly: false,
+        submodel: false,
+        dependencies:[
+            spacewalkingninja/transformers
+        ]
+        child_models: [
+            spacewalkingninja/audiocraft/music-to-music,
+        ]
+    },
+    spacewalkingninja/audiocraft/music-to-music: {
+        win: {
+            project_dir: Desota\Desota_Models\audiocraft,
+            desota_runner: audiocraft_music2music.py,
+            python_path: Desota\Portables\Transformers\env\python.exe,
+            
+            runner: Desota\Desota_Models\audiocraft\audiocraft_music2music.py,
+            runner_py: Desota\Portables\Transformers\env\python.exe
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/audiocraft/text-to-music
+    },
     franciscomvargas/descraper/url: {
         win: {
             version: 0.0.2,
