@@ -261,7 +261,7 @@ services_params: {
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
             version: 0.0.0,
-            commit: 914dd4ef8527d9ccef92b32339c28cdfa4051fb9,
+            commit: 07bdbcda822d677caeed9550d7928256451cfc46,
             project_dir: Desota\Desota_Models\audiocraft,
             execs_path: executables\Windows,
             setup: audiocraft.setup.bat,
