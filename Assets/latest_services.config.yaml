@@ -109,7 +109,7 @@ services_params: {
     spacewalkingninja/transformers: {
             win: {
                 version: 0.0.0,
-                commit: 95630914c2a659c761ecf6265ce213508bb29232,
+                commit: 7157ba0b221f05c3013678d8f722091fbfb2650a,
                 project_dir: Desota\Portables\Transformers,
                 execs_path: executables\Windows,
                 setup: transformers.setup.bat,
