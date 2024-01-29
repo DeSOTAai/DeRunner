@@ -284,7 +284,8 @@ services_params: {
                 file: null,
                 raw_dict: null
                 # test_timout = OPTIONAL (default = timeout)
-            }
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
         },
         lin: {
             version: ,
