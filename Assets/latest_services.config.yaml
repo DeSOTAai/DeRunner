@@ -353,6 +353,7 @@ services_params: {
                 raw_dict: null,
                 # test_timout = OPTIONAL (default = timeout)
             },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
         },
         lin: {
             project_dir: ,
