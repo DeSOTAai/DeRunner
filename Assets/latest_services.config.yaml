@@ -279,9 +279,8 @@ services_params: {
                 Desota\Desota_Models\audiocraft\main.py
             ],
             test_args: {
-                query: "House Jazz Gypsy Flamenco Spanish One Third Five Quarters",
-                type: null,
-                file: null,
+                query: House Jazz Gypsy Flamenco Spanish One Third Five Quarters,
+                type: text,
                 raw_dict: null
                 # test_timout = OPTIONAL (default = timeout)
             },
