@@ -314,32 +314,35 @@ def call_model(model_req, result_file):
     _model_runner_param = SERV_PARAMS[_model_id][USER_SYS]      # Model params from services.config.yaml
     _model_runner = os.path.join(USER_PATH, _model_runner_param["project_dir"], _model_runner_param["desota_runner"])          # Model runner path
     _model_runner_py = os.path.join(USER_PATH, _model_runner_param["python_path"])    # Python with model runner packages
-    _model_requirements = os.path.join(USER_PATH, _model_runner_param["pyrequirements"])
+    _model_requirements = os.path.join(USER_PATH, _model_runner_param["install_requirements"], )
     _model_isTool = (SERV_PARAMS[_model_id]["service_type"] == "tool")
     # API Response URLs
     _model_res_url = result_file
     
     # Pip Install Requirements ~ NSSM BUGFIX
-    if USER_SYS == "win" and _model_isTool:
-        _pipInstall_cmd = [
-            _model_runner_py, "-m", 
-            "pip", "install", 
-            "-r", _model_requirements
-        ]
+    if USER_SYS == "win" and _model_isTool and 1 == 2:
+        delogger(f"[ DEBUG ] -> Install Model Requirements...")
+        _install_cmd = [ _model_requirements ]
         _sproc = Popen( 
-            _pipInstall_cmd,
+            _install_cmd,
             stdin=subprocess.PIPE, 
             stdout=subprocess.PIPE, 
             stderr=subprocess.STDOUT, 
             encoding='utf-8',
         )
+        _total_stdout = []
         while True:
             _ret_code = _sproc.poll()
             if _ret_code != None:
-                delogger(f"[ DEBUG ] -> Pip Install stdout: {json.dumps(_sproc.stdout.readlines(), indent=2)}")
+                try:
+                    _total_stdout = _sproc.stdout.readlines()
+                except Exception as e:
+                    _total_stdout = []
+                if _model_isTool:
+                    delogger(f"[ DEBUG ] -> Process stdout: {json.dumps(_total_stdout, indent=2)}")
                 break
             continue
-
+        
     # Start / Wait Model
     # retrieved from https://stackoverflow.com/a/62226026
     _modelCall_cmd = [
@@ -349,19 +352,26 @@ def call_model(model_req, result_file):
     ]
     print(f'[ INFO ] -> Model runner cmd:\n\t{" ".join(_modelCall_cmd)}', DEBUG)
     delogger(f'[ INFO ] ->Model runner cmd:\n\t{" ".join(_modelCall_cmd)}')
-    if _model_isTool:
-        _sproc = Popen(
-            _modelCall_cmd,
-            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8',
-        )
-    else:
-        _sproc = Popen( _modelCall_cmd )
+    _sproc = Popen(
+        _modelCall_cmd,
+        stdin=subprocess.PIPE, 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.STDOUT, 
+        encoding='utf-8',
+    )
     # TODO: implement model timeout
+    _meme_time = time.time()
+    _stdout__lines_count = 0
+    delogger(f"[ DEBUG ] -> Initialize Model Test...")
     while True:
         _ret_code = _sproc.poll()
         if _ret_code != None:
+            try:
+                _total_stdout = _sproc.stdout.readlines()
+            except Exception as e:
+                _total_stdout = []
             if _model_isTool:
-                delogger(f"[ DEBUG ] -> Process stdout: {json.dumps(_sproc.stdout.readlines(), indent=2)}")
+                delogger(f"[ DEBUG ] -> Process stdout: {json.dumps(_total_stdout, indent=2)}")
             break
         continue
 
@@ -372,7 +382,6 @@ def call_model(model_req, result_file):
     delogger(f"[ INFO ] -> Model DEV `{model_req['task_model']}` returncode = {_ret_code}")
     
     return _ret_code
-
 
 def main(args):
     global SERV_PARAMS
