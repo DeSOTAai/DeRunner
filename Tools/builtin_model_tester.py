@@ -320,7 +320,7 @@ def call_model(model_req, result_file):
     _model_res_url = result_file
     
     # Pip Install Requirements ~ NSSM BUGFIX
-    if USER_SYS == "win" and _model_isTool and 1 == 2:
+    if USER_SYS == "win" and _model_isTool:
         delogger(f"[ DEBUG ] -> Install Model Requirements...")
         _install_cmd = [ _model_requirements ]
         _sproc = Popen( 
