@@ -109,7 +109,7 @@ services_params: {
     spacewalkingninja/transformers: {
             win: {
                 version: 0.0.0,
-                commit: 9a4665c0d25252560275c1f33ff710ab98346ae0,
+                commit: 70c372ef65ef9a703ca07fa05a0d3815f8af0834,
                 project_dir: Desota\Portables\Transformers,
                 execs_path: executables\Windows,
                 setup: transformers.setup.bat,
@@ -261,7 +261,7 @@ services_params: {
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
             version: 0.0.0,
-            commit: fbeb835fd5dae776a76fe9edcec2aead081c722e,
+            commit: 28ead8d4f71447405bcad29de6a6a5edd6f2e022,
             project_dir: Desota\Desota_Models\audiocraft,
             execs_path: executables\Windows,
             setup: audiocraft.setup.bat,
