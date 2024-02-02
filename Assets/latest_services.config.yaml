@@ -258,6 +258,83 @@ services_params: {
     #     parent_model: franciscomvargas/neuralqa/qa
     # },
 
+    spacewalkingninja/automatic/text-to-image: {
+        win: {
+            version: 0.0.0,
+            commit: f7f4fd2ab72ffa80aa77f4db3d2e962af70b6592,
+            project_dir: Desota\Desota_Models\automatic,
+            execs_path: executables\Windows,
+            setup: automatic.setup.bat,
+            install_requirements: Desota\Desota_Models\automatic\executables\Windows\automatic.requirements.bat,
+            setup_args: [/manualstart, /debug],
+            uninstaller: automatic.uninstall.bat,
+            uninstaller_args: [/Q],
+            starter: automatic.start.bat,
+            stoper: automatic.stop.bat,
+            status: automatic.status.bat,
+
+            desota_runner: runner_text_to_image.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Gypsy Flamenco Spanish Girl fibonacci portrait photography ultrahd,
+                type: text,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Desota_Models\automatic\requirements.txt
+        },        
+        lin: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/automatic,
+            execs_path: executables/Linux,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        mac: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/automatic,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        service_type: model,
+        timeout: 1280,
+        required: false,
+        source_code: https://github.com/spacewalkingninja/automatic,
+        report_issue: https://github.com/spacewalkingninja/automatic/issues,
+        description: https://github.com/spacewalkingninja/automatic/tree/main#readme,
+        short_description: SD.Next Stable Difusion AUTOMATIC111 for ALL GPU,
+        model_ui: http://127.0.0.1:7860/,
+        handshake_req: http://127.0.0.1:7860/token,
+        handshake_res: {
+            token: null, 
+            user: null
+        },
+        run_constantly: true,
+        submodel: false,
+        child_models: [
+        ]
+    },
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
             version: 0.0.0,
