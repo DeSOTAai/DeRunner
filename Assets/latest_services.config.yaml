@@ -261,7 +261,7 @@ services_params: {
     spacewalkingninja/automatic/text-to-image: {
         win: {
             version: 0.0.0,
-            commit: 5f6f4c17c5b3e16f42972ce9589867f2d748308d,
+            commit: 51af2128db5849765e8d61ff02d9f1bb621ebfa6,
             project_dir: Desota\Desota_Models\automatic,
             execs_path: executables\Windows,
             setup: automatic.setup.bat,
