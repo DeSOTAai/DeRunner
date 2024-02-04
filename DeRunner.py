@@ -1870,40 +1870,33 @@ class Derunner():
         _model_runner_sys_param = _model_runner_param[USER_SYS] 
         _model_runner = os.path.join(USER_PATH, _model_runner_sys_param["project_dir"], _model_runner_sys_param["desota_runner"])          # Model runner path
         _model_runner_py = os.path.join(USER_PATH, _model_runner_sys_param["python_path"])    # Python with model runner packages
-
+        _model_isTool = (_model_runner_param["service_type"] == "tool")
         # API Response URL
         _model_res_url = f"{API_URL}?api_key={self.user_api_key}&model={model_req['task_model']}&send_task=" + model_req['task_id']
         
         # Start / Wait Model
         # retrieved from https://stackoverflow.com/a/62226026
-        if DEBUG or USER_SYS == "lin":
-            cprint(f'Model runner cmd:\n\t{" ".join([_model_runner_py, _model_runner, "--model_req", _tmp_req_path, "--model_res_url", _model_res_url])}', DEBUG)
-            _sproc = Popen(
-                [
-                    _model_runner_py, _model_runner, 
-                    "--model_req", _tmp_req_path, 
-                    "--model_res_url", _model_res_url
-                ]
-            )
-        elif USER_SYS == "win":
-            _sproc = Popen(
-                [
-                    _model_runner_py, _model_runner, 
-                    "--model_req", _tmp_req_path, 
-                    "--model_res_url", _model_res_url
-                ],
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT,
-                creationflags=subprocess.CREATE_NO_WINDOW
-            )
-        else:
-            return
+        _modelCall_cmd = [
+            _model_runner_py, _model_runner, 
+            "--model_req", _tmp_req_path, 
+            "--model_res_url", _model_res_url
+        ]
+        cprint(f'[ INFO ] Model runner cmd:\n\t{" ".join([_model_runner_py, _model_runner, "--model_req", _tmp_req_path, "--model_res_url", _model_res_url])}', DEBUG)
+        _sproc = Popen(
+            _modelCall_cmd,
+            stdin=subprocess.PIPE, 
+            stdout=subprocess.PIPE, 
+            stderr=subprocess.STDOUT, 
+            encoding='utf-8',
+        )
+        
         # Model timeout
         try:
             _model_runner_timeout = _model_runner_param["timeout"]
         except:
             _model_runner_timeout = DEFAULT_MODEL_TIMEOUT
-        print(" [ DEBUG ] -> Model Timeout:", _model_runner_timeout)
+        print(" [ INFO ] -> Model Timeout:", _model_runner_timeout)
+        
         # Signal User Configs
         edit_user_conf = self.get_user_config()
         try:
@@ -1911,14 +1904,23 @@ class Derunner():
         except:
             edit_user_conf.update({"running":{self.user_api_key:_model_id}})
         self.set_user_config(edit_user_conf)
+        
+        # Lets GO!
         while True:
+            _ret_code = _sproc.poll()
+            if _ret_code != None:
+                try:
+                    _total_stdout = _sproc.stdout.readlines()
+                except Exception as e:
+                    _total_stdout = []
+                if _model_isTool:
+                    delogger(f"[ INFO ] -> Model main stdout: {json.dumps(_total_stdout, indent=2)}")
+                break
             # Check Timeout
             if time.time() - start_time > _model_runner_timeout:
                 _ret_code = 2
                 break
-            _ret_code = _sproc.poll()
-            if _ret_code != None:
-                break
+        
             # Signal DeSOTA API
             if time.time() - last_signal_time > signal_api_freq:
                 last_signal_time = time.time()
@@ -1928,6 +1930,7 @@ class Derunner():
                     "handshake":"1"
                 }
                 model_running_res = simple_post(url=API_URL, data=model_running_payload)
+                cprint(f"[ INFO ] -> Signal Desota about Server Alive: {json.dumps(model_running_res.json(), indent=2)}", DEBUG)
             continue
 
         # Remove Signal from User Configs
