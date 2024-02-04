@@ -45,6 +45,7 @@ def get_services_config(config_path):
     with open( config_path ) as f_curr:
         return yaml.load(f_curr, Loader=SafeLoader)
 SERV_PARAMS = {}
+DEFAULT_MODEL_TIMEOUT = 3600
 import argparse
 parser = argparse.ArgumentParser()
 # MODEL ID
@@ -359,10 +360,16 @@ def call_model(model_req, result_file):
         stderr=subprocess.STDOUT, 
         encoding='utf-8',
     )
-    # TODO: implement model timeout
-    _meme_time = time.time()
-    _stdout__lines_count = 0
+    # Model timeout
+    try:
+        _model_runner_timeout = _model_runner_param["timeout"]
+    except:
+        _model_runner_timeout = DEFAULT_MODEL_TIMEOUT
+    print(" [ INFO ] -> Model Timeout:", _model_runner_timeout)
+
+    # Lets GO!
     delogger(f"[ DEBUG ] -> Initialize Model Test...")
+    start_time = time.time()
     while True:
         _ret_code = _sproc.poll()
         if _ret_code != None:
@@ -372,6 +379,10 @@ def call_model(model_req, result_file):
                 _total_stdout = []
             if _model_isTool:
                 delogger(f"[ DEBUG ] -> Process stdout: {json.dumps(_total_stdout, indent=2)}")
+            break
+        # Check Timeout
+        if time.time() - start_time > _model_runner_timeout:
+            _ret_code = 2
             break
         continue
 
