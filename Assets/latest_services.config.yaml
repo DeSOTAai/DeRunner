@@ -265,7 +265,7 @@ services_params: {
             project_dir: Desota\Desota_Models\audiocraft,
             execs_path: executables\Windows,
             setup: audiocraft.setup.bat,
-            install_requirements: Desota\Portables\Transformers\executables\Windows\transformers.requirements.bat,
+            nssm_requirements: Desota\Portables\Transformers\executables\Windows\transformers.requirements.bat,
             setup_args: [/manualstart, /debug],
             uninstaller: audiocraft.uninstall.bat,
             uninstaller_args: [/Q],
@@ -596,6 +596,7 @@ services_params: {
             setup_args: [/manualstart],
             uninstaller: deurlcruncher.uninstall.bat,
             uninstaller_args: [/Q],
+            nssm_requirements: Desota\Desota_Models\DeUrlCruncher\executables\Windows\deurlcruncher.requirements.bat,
             starter: ,
             stoper: ,
             status: ,
@@ -609,8 +610,6 @@ services_params: {
 
             desota_runner: runner.py,
             python_path: Desota\Desota_Models\DeUrlCruncher\env\python.exe,
-            pyrequirements: Desota\Desota_Models\DeUrlCruncher\requirements.txt,
-            install_requirements: Desota\Desota_Models\DeUrlCruncher\executables\Windows\deurlcruncher.requirements.bat,
             cli_cmd: [
                 Desota\Desota_Models\DeUrlCruncher\env\python.exe,
                 Desota\Desota_Models\DeUrlCruncher\main.py
