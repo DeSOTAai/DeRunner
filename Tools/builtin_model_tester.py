@@ -314,13 +314,13 @@ def call_model(model_req, result_file):
     _model_runner_param = SERV_PARAMS[_model_id][USER_SYS]      # Model params from services.config.yaml
     _model_runner = os.path.join(USER_PATH, _model_runner_param["project_dir"], _model_runner_param["desota_runner"])          # Model runner path
     _model_runner_py = os.path.join(USER_PATH, _model_runner_param["python_path"])    # Python with model runner packages
-    _model_requirements = os.path.join(USER_PATH, _model_runner_param["install_requirements"], )
     _model_isTool = (SERV_PARAMS[_model_id]["service_type"] == "tool")
     # API Response URLs
     _model_res_url = result_file
     
     # Pip Install Requirements ~ NSSM BUGFIX
     if USER_SYS == "win" and _model_isTool:
+        _model_requirements = os.path.join(USER_PATH, _model_runner_param["nssm_requirements"], )
         delogger(f"[ DEBUG ] -> Install Model Requirements...")
         _install_cmd = [ _model_requirements ]
         _sproc = Popen( 
