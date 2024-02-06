@@ -1882,14 +1882,19 @@ class Derunner():
             "--model_res_url", _model_res_url
         ]
         cprint(f'[ INFO ] Model runner cmd:\n\t{" ".join([_model_runner_py, _model_runner, "--model_req", _tmp_req_path, "--model_res_url", _model_res_url])}', DEBUG)
-        _sproc = Popen(
-            _modelCall_cmd,
-            stdin=subprocess.PIPE, 
-            stdout=subprocess.PIPE, 
-            stderr=subprocess.STDOUT, 
-            encoding='utf-8',
-        )
-        
+        if _model_isTool:
+            _sproc = Popen(
+                _modelCall_cmd,
+                stdin=subprocess.PIPE, 
+                stdout=subprocess.PIPE, 
+                stderr=subprocess.STDOUT, 
+                encoding='utf-8',
+            )
+        else:
+            _sproc = Popen(
+                _modelCall_cmd
+            )
+            
         # Model timeout
         try:
             _model_runner_timeout = _model_runner_param["timeout"]
@@ -1909,12 +1914,13 @@ class Derunner():
         while True:
             _ret_code = _sproc.poll()
             if _ret_code != None:
-                try:
-                    _total_stdout = _sproc.stdout.readlines()
-                except Exception as e:
-                    _total_stdout = []
                 if _model_isTool:
-                    delogger(f"[ INFO ] -> Model main stdout: {json.dumps(_total_stdout, indent=2)}")
+                    try:
+                        _total_stdout = _sproc.stdout.readlines()
+                    except Exception as e:
+                        _total_stdout = []
+                    if _model_isTool:
+                        delogger(f"[ INFO ] -> Model main stdout: {json.dumps(_total_stdout, indent=2)}")
                 break
             # Check Timeout
             if time.time() - start_time > _model_runner_timeout:
