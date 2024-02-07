@@ -368,6 +368,83 @@ services_params: {
         submodel: true,
         parent_model: spacewalkingninja/automatic/text-to-image
     },
+    spacewalkingninja/ControlTextDepth: {
+        win: {
+            version: 0.0.0,
+            commit: fa45cb3310d139e9ed3c5212773c4e93a6cfe632,
+            project_dir: Desota\Desota_Models\ControlTextDepth,
+            execs_path: executables\Windows,
+            setup: controltdepth.setup.bat,
+            nssm_requirements: Desota\Desota_Models\ControlTextDepth\executables\Windows\transformers.requirements.bat,
+            setup_args: [/manualstart, /debug],
+            uninstaller: controltdepth.uninstall.bat,
+            uninstaller_args: [/Q],
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: runner_text_to_image_control_depth.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            cli_cmd: [
+                Desota\Desota_Models\automatic\env\python.exe,
+                Desota\Desota_Models\ControlTextDepth\runner_text_to_image_control_depth.py
+            ],
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/,
+            execs_path: executables/Linux,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        mac: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        service_type: tool,
+        timeout: 1240,
+        required: false,
+        source_code: https://github.com/spacewalkingninja/ControlTextDepth,
+        report_issue: https://github.com/spacewalkingninja/ControlTextDepth/issues,
+        description: https://github.com/spacewalkingninja/ControlTextDepth/tree/main#readme,
+        short_description: Must install SD NEXT Model!,
+        model_cli: cli_cmd,
+        run_constantly: false,
+        submodel: false,
+        child_models: [
+        ]
+    }
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
             version: 0.0.0,
