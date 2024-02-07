@@ -366,7 +366,7 @@ services_params: {
         service_type: model,
         timeout: 1280,
         submodel: true,
-        parent_model: spacewalkingninja/audiocraft/text-to-music
+        parent_model: spacewalkingninja/automatic/text-to-image
     },
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
