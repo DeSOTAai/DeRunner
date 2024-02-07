@@ -261,7 +261,7 @@ services_params: {
     spacewalkingninja/automatic/text-to-image: {
         win: {
             version: 0.0.0,
-            commit: 8ffae9c77aab6c9b5211f2f40c261a679c650213,
+            commit: 27d9865e36f0c8b36200842386ddef87ae859ccf,
             project_dir: Desota\Desota_Models\automatic,
             execs_path: executables\Windows,
             setup: automatic.setup.bat,
@@ -333,7 +333,40 @@ services_params: {
         run_constantly: true,
         submodel: false,
         child_models: [
+            spacewalkingninja/automatic/controlnet-depth-text-to-image,
         ]
+    },
+    spacewalkingninja/automatic/controlnet-depth-text-to-image: {
+        win: {
+            project_dir: Desota\Desota_Models\automatic,
+            desota_runner: runner_text_to_image_control_depth.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\automatic\runner_text_to_image_control_depth.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: Desota\Desota_Models\automatic\sample.png,
+                raw_dict: null,
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Desota_Models\automatic\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: model,
+        timeout: 1280,
+        submodel: true,
+        parent_model: spacewalkingninja/audiocraft/text-to-music
     },
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
@@ -408,7 +441,7 @@ services_params: {
         model_cli: cli_cmd,
         run_constantly: false,
         submodel: false,
-        dependencies:[
+        dependencies: [
             spacewalkingninja/transformers
         ],
         child_models: [
