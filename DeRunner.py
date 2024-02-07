@@ -178,7 +178,7 @@ class Derunner():
         self.user_models = self.user_conf['models']
         self.user_api_key = self.user_conf['api_key']
         if USER_SYS == "win":
-            self.pypath = os.path.join(APP_PATH, "env", "python")
+            self.pypath = os.path.join(APP_PATH, "env", "python.exe")
         elif USER_SYS == "lin":
             self.pypath = os.path.join(APP_PATH, "env", "bin", "python3")
 
