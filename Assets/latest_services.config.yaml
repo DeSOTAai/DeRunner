@@ -371,7 +371,7 @@ services_params: {
     spacewalkingninja/ControlTextDepth: {
         win: {
             version: 0.0.0,
-            commit: fa45cb3310d139e9ed3c5212773c4e93a6cfe632,
+            commit: 911abd349b4a152699fd647e38524808d175be72,
             project_dir: Desota\Desota_Models\ControlTextDepth,
             execs_path: executables\Windows,
             setup: controltdepth.setup.bat,
