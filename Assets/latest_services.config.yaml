@@ -444,7 +444,7 @@ services_params: {
         submodel: false,
         child_models: [
         ]
-    }
+    },
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
             version: 0.0.0,
