@@ -368,26 +368,26 @@ services_params: {
         submodel: true,
         parent_model: spacewalkingninja/automatic/text-to-image
     },
-    spacewalkingninja/ControlTextDepth: {
+    spacewalkingninja/controlnet: {
         win: {
             version: 0.0.0,
-            commit: 911abd349b4a152699fd647e38524808d175be72,
-            project_dir: Desota\Desota_Models\ControlTextDepth,
+            commit: 638c22d7cd92ba029027ed20ea904194f151b03a,
+            project_dir: Desota\Desota_Models\controlnet,
             execs_path: executables\Windows,
-            setup: controltdepth.setup.bat,
-            nssm_requirements: Desota\Desota_Models\ControlTextDepth\executables\Windows\transformers.requirements.bat,
+            setup: control.setup.bat,
+            nssm_requirements: Desota\Desota_Models\controlnet\executables\Windows\transformers.requirements.bat,
             setup_args: [/manualstart, /debug],
-            uninstaller: controltdepth.uninstall.bat,
+            uninstaller: control.uninstall.bat,
             uninstaller_args: [/Q],
             starter: ,
             stoper: ,
             status: ,
 
-            desota_runner: runner_text_to_image_control_depth.py,
+            desota_runner: txt2img-canny.py,
             python_path: Desota\Desota_Models\automatic\env\python.exe,
             cli_cmd: [
                 Desota\Desota_Models\automatic\env\python.exe,
-                Desota\Desota_Models\ControlTextDepth\runner_text_to_image_control_depth.py
+                Desota\Desota_Models\controlnet\txt2img-canny.py
             ],
             test_args: {
                 query: Beautiful shrek in the night,
@@ -435,15 +435,939 @@ services_params: {
         service_type: tool,
         timeout: 1240,
         required: false,
-        source_code: https://github.com/spacewalkingninja/ControlTextDepth,
-        report_issue: https://github.com/spacewalkingninja/ControlTextDepth/issues,
-        description: https://github.com/spacewalkingninja/ControlTextDepth/tree/main#readme,
-        short_description: Must install SD NEXT Model!,
+        source_code: https://github.com/spacewalkingninja/controlnet,
+        report_issue: https://github.com/spacewalkingninja/controlnet/issues,
+        description: https://github.com/spacewalkingninja/controlnet/tree/main#readme,
+        short_description: Edit Images with SD and Controlnet!,
         model_cli: cli_cmd,
         run_constantly: false,
         submodel: false,
         child_models: [
+            spacewalkingninja/img2text-clip,
+            spacewalkingninja/controlnet-img2img-anime,
+            spacewalkingninja/controlnet-img2img-depth,
+            spacewalkingninja/controlnet-img2img-inpaint,
+            spacewalkingninja/controlnet-img2img-ip2p,
+            spacewalkingninja/controlnet-img2img-lineart,
+            spacewalkingninja/controlnet-img2img-mlsd,
+            spacewalkingninja/controlnet-img2img-normalbae,
+            spacewalkingninja/controlnet-img2img-pose,
+            spacewalkingninja/controlnet-img2img-scribble,
+            spacewalkingninja/controlnet-img2img-segment,
+            spacewalkingninja/controlnet-img2img-shuffle,
+            spacewalkingninja/controlnet-img2img-softedge,
+            spacewalkingninja/controlnet-img2img-tile,
+            spacewalkingninja/controlnet-img2img-canny,
+            spacewalkingninja/controlnet-txt2img-anime,
+            spacewalkingninja/controlnet-txt2img-depth,
+            spacewalkingninja/controlnet-txt2img-inpaint,
+            spacewalkingninja/controlnet-txt2img-ip2p,
+            spacewalkingninja/controlnet-txt2img-lineart,
+            spacewalkingninja/controlnet-txt2img-mlsd,
+            spacewalkingninja/controlnet-txt2img-normalbae,
+            spacewalkingninja/controlnet-txt2img-pose,
+            spacewalkingninja/controlnet-txt2img-scribble,
+            spacewalkingninja/controlnet-txt2img-segment,
+            spacewalkingninja/controlnet-txt2img-shuffle,
+            spacewalkingninja/controlnet-txt2img-softedge,
+            spacewalkingninja/controlnet-txt2img-tile,
         ]
+    },
+    spacewalkingninja/img2text-clip: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2text-clip.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2text-clip.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-canny: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-canny.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-canny.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-tile: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-tile.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-tile.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-softedge: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-softedge.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-softedge.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-shuffle: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-shuffle.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-shuffle.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-segment: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-segment.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-segment.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-scribble: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-scribble.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-scribble.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-pose: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-pose.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-pose.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-normalbae: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-normalbae.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-normalbae.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-mlsd: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-mlsd.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-mlsd.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-lineart: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-lineart.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-lineart.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-ip2p: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-ip2p.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-ip2p.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-inpaint: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-inpaint.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-inpaint.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-depth: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-depth.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-depth.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-img2img-anime: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: img2img-anime.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\img2img-anime.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-tile: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-tile.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-tile.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-softedge: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-softedge.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-softedge.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-shuffle: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-shuffle.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-shuffle.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-segment: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-segment.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-segment.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-scribble: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-scribble.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-scribble.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-pose: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-pose.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-pose.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-normalbae: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-normalbae.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-normalbae.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-mlsd: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-mlsd.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-mlsd.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-lineart: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-lineart.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-lineart.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-ip2p: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-ip2p.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-ip2p.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-inpaint: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-inpaint.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-inpaint.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-depth: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-depth.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-depth.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
+    },
+    spacewalkingninja/controlnet-txt2img-anime: {
+        win: {
+            project_dir: Desota\Desota_Models\controlnet,
+            desota_runner: txt2img-anime.py,
+            python_path: Desota\Desota_Models\automatic\env\python.exe,
+            
+            runner: Desota\Desota_Models\controlnet\txt2img-anime.py,
+            runner_py: Desota\Desota_Models\automatic\env\python.exe,
+            test_args: {
+                query: Beautiful shrek in the night,
+                type: image,
+                file: sample.png,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/controlnet
     },
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
