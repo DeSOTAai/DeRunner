@@ -1369,6 +1369,114 @@ services_params: {
         submodel: true,
         parent_model: spacewalkingninja/controlnet
     },
+    spacewalkingninja/Shap-E: {
+        win: {
+            version: 0.0.0,
+            commit: 438f287476571ffb97093b0f80fc04a625b72d2c,
+            project_dir: Desota\Desota_Models\Shap-E,
+            execs_path: executables\Windows,
+            setup: shape.setup.bat,
+            setup_args: [/manualstart, /debug],
+            uninstaller: shape.uninstall.bat,
+            uninstaller_args: [/Q],
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: text-to-3d.py,
+            python_path: Desota\Desota_Models\Shap-E\env\python.exe,
+            cli_cmd: [
+                Desota\Desota_Models\Shap-E\env\python.exe,
+                Desota\Desota_Models\Shap-E\text-to-3d.py
+            ],
+            test_args: {
+                query: Super mario hat,
+                type: text,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Desota_Models\Shap-E\requirements.txt
+        },
+        lin: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/Shap-E,
+            execs_path: executables/Linux,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        mac: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/Shap-E,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        service_type: tool,
+        timeout: 1240,
+        required: false,
+        source_code: https://github.com/spacewalkingninja/Shap-E,
+        report_issue: https://github.com/spacewalkingninja/Shap-E/issues,
+        description: https://github.com/spacewalkingninja/Shap-E/tree/main#readme,
+        short_description: Edit audio with Shap-E,
+        model_cli: cli_cmd,
+        run_constantly: false,
+        submodel: false,
+        child_models: [
+            spacewalkingninja/Shap-E/img-to-3d,
+        ]
+    },
+    spacewalkingninja/Shap-E/img-to-3d: {
+        win: {
+            project_dir: Desota\Desota_Models\Shap-E,
+            desota_runner: img-to-3d.py,
+            python_path: Desota\Portables\Transformers\env\python.exe,
+            
+            runner: Desota\Desota_Models\Shap-E\img-to-3d.py,
+            runner_py: Desota\Desota_Models\Shap-E\env\python.exe,
+            test_args: {
+                query: Super mario hat,
+                type: image,
+                file: sample.png,
+                raw_dict: null,
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Desota_Models\Shap-E\requirements.txt
+        },
+        lin: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        mac: {
+            project_dir: ,
+            desota_runner: ,
+            python_path:
+        },
+        service_type: tool,
+        timeout: 1240,
+        submodel: true,
+        parent_model: spacewalkingninja/Shap-E
+    },
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
             version: 0.0.0,
