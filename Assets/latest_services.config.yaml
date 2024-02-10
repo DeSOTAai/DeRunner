@@ -1449,7 +1449,7 @@ services_params: {
         win: {
             project_dir: Desota\Desota_Models\Shap-E,
             desota_runner: img-to-3d.py,
-            python_path: Desota\Portables\Transformers\env\python.exe,
+            python_path: Desota\Desota_Models\Shap-E\env\python.exe,
             
             runner: Desota\Desota_Models\Shap-E\img-to-3d.py,
             runner_py: Desota\Desota_Models\Shap-E\env\python.exe,
