@@ -476,10 +476,10 @@ services_params: {
     spacewalkingninja/img2text-clip: {
         win: {
             project_dir: Desota\Desota_Models\controlnet,
-            desota_runner: img2text-clip.py,
+            desota_runner: img2txt-clip.py,
             python_path: Desota\Desota_Models\automatic\env\python.exe,
             
-            runner: Desota\Desota_Models\controlnet\img2text-clip.py,
+            runner: Desota\Desota_Models\controlnet\img2txt-clip.py,
             runner_py: Desota\Desota_Models\automatic\env\python.exe,
             test_args: {
                 query: Beautiful shrek in the night,
@@ -1476,6 +1476,83 @@ services_params: {
         timeout: 1240,
         submodel: true,
         parent_model: spacewalkingninja/Shap-E
+    },
+    spacewalkingninja/wcppw: {
+        win: {
+            version: 0.0.0,
+            commit: fa01946fbdd951e49fa57ff8b21eee00ca767dc9,
+            project_dir: Desota\Desota_Models\wcppw,
+            execs_path: executables\Windows,
+            setup: wcppw.setup.bat,
+            setup_args: [/manualstart, /debug],
+            uninstaller: wcppw.uninstall.bat,
+            uninstaller_args: [/Q],
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: audio-2-text.py,
+            python_path: Desota\Portables\Transformers\env\python.exe,
+            cli_cmd: [
+                Desota\Portables\Transformers\env\python.exe,
+                Desota\Desota_Models\wcppw\main.py
+            ],
+            test_args: {
+                query: Transcribe,
+                type: audio,
+                file: sample.flac,
+                raw_dict: null,
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Portables\Transformers\requirements.txt
+        },
+        lin: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/wcppw,
+            execs_path: executables/Linux,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        mac: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/wcppw,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        service_type: tool,
+        timeout: 1240,
+        required: false,
+        source_code: https://github.com/spacewalkingninja/wcppw,
+        report_issue: https://github.com/spacewalkingninja/wcppw/issues,
+        description: https://github.com/spacewalkingninja/wcppw/tree/main#readme,
+        short_description: Transcribe audio with whisper on widonws,
+        model_cli: cli_cmd,
+        run_constantly: false,
+        submodel: false,
+        dependencies: [
+            spacewalkingninja/transformers
+        ],
     },
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
