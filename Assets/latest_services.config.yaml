@@ -1480,7 +1480,7 @@ services_params: {
     spacewalkingninja/wcppw: {
         win: {
             version: 0.0.0,
-            commit: fa01946fbdd951e49fa57ff8b21eee00ca767dc9,
+            commit: cebfec33f688f3c0a2dee82a8bd5a88955fbfa39,
             project_dir: Desota\Desota_Models\wcppw,
             execs_path: executables\Windows,
             setup: wcppw.setup.bat,
