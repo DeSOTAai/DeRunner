@@ -319,9 +319,9 @@ def call_model(model_req, result_file):
     # API Response URLs
     _model_res_url = result_file
     
-    # Pip Install Requirements ~ NSSM BUGFIX
-    if USER_SYS == "win" and _model_isTool:
-        _model_requirements = os.path.join(USER_PATH, _model_runner_param["nssm_requirements"], )
+    ## Pip Install Requirements ~ NSSM BUGFIX
+    if USER_SYS == "win" and _model_isTool and 1 == 2:
+        _model_requirements = os.path.join(USER_PATH, _model_runner_param["install_requirements"], )
         delogger(f"[ DEBUG ] -> Install Model Requirements...")
         _install_cmd = [ _model_requirements ]
         _sproc = Popen( 

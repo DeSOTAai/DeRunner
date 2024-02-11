@@ -487,7 +487,7 @@ class Derunner():
                 "model":model
             }
             
-            task = simple_post(API_URL, data=data, timeout=30)
+            task = simple_post(API_URL, data=data, timeout=15)
 
             cprint(f"\nSignal DeSOTA that Model is wake up:\n{json.dumps(data, indent=2)}", debug)
             cprint(f"Response Status = {task.status_code}", debug)
@@ -500,29 +500,34 @@ class Derunner():
             ''' 
             data = {
                 "api_key":self.user_api_key,
-                "model":model,
+                "model":user_models,
                 "select_task":I
             }
             
-            select_task = simple_post(API_URL, data=data, timeout=30)
+            select_task = simple_post(API_URL, data=data, timeout=15)
 
             cprint(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}", debug)
             cprint(f"Response Status = {task.status_code}", debug)
-            cprint(f"\n\n\n[ DEBUG ] -> MODEL REQ. Response Body: {task.text}\n\n\n", debug)
+            cprint(f"\n\n\n[ DEBUG ] -> MODEL REQ. Response Body: {select_task.text}\n\n\n", debug)
             if select_task.status_code != 200:
                 continue
+            I=I+1
             
-            cprint(f"MODEL: {model}", debug)     
+            
             
             cont = str(select_task.content.decode('UTF-8'))
             # print(cont)
             try:
                 # print(selected_task)
                 selected_task = json.loads(cont)
+                cprint(f"MODEL: {select_task['model']}", debug)
+                selected_model = select_task['model']
                 # print(json.dumps(selected_task, indent=2))
             except:
-                cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   
                 cont = cont.replace("FIXME!!!", "")
+                #cont = cont.replace('\\', '')
+                cont = cont.replace('\\\\', '')
+                cprint(f"[ INFO ] -> API MODEL REQUEST FORMAT NOT JSON!\nResponse: {cont}", debug)   
                 ''' 
                 cont = cont.replace("\n", "")
                 #cont = cont.replace(r'\\\\', "")
@@ -535,12 +540,16 @@ class Derunner():
                 try:
                     selected_task = json.loads(cont)
                 except:
-                    selected_task = "error"
+                    cont = cont.replace('\\', '')
+                    try:
+                        selected_task = json.loads(cont)
+                    except:
+                        selected_task = "error"
                     # print(selected_task)
 
             if "error" in selected_task:
                 #error = selected_task['error']
-                cprint(f"[ WARNING ] -> API Model Request fail for model `{model}`", debug)
+                cprint(f"[ WARNING ] -> API Model Request fail", debug)
                 selected_task = False
                 continue
             
@@ -612,6 +621,7 @@ class Derunner():
                 cprint(f"Request INPUT Files: {json.dumps(model_request_dict['input_args'], indent=2)}", debug)
                     
                 model_request_dict["task_type"] = selected_task['type']
+                model_request_dict["task_model"] = selected_task['model']
                 task_dep = str(selected_task['dep']).replace("\\\\n", "").replace("\\", "")
                 task_dep = ast.literal_eval(task_dep)
                 model_request_dict["task_dep"] = task_dep
@@ -702,11 +712,11 @@ class Derunner():
                 cprint("No Dependencies!", debug)    
                 #exit()
 
-            cprint(f"No task for {model}!", debug)   
+            cprint(f"No task, wait..!", debug)   
             #exit()
 
 
-            model_request_dict["task_model"] = model    # Return Model to work on
+            #model_request_dict["task_model"] = selected_model    # Return Model to work on
 
             if selected_task and "error" not in selected_task:
                 break
@@ -2035,7 +2045,7 @@ class Derunner():
                 #     _reinstall_model = DERRUNER_ID
                 pass
 
-            if error_level:
+            if error_level and not DEBUG:
                 _handled_error = True
                 try: # If error_level without some payload parameter 
                     error_payload = {
