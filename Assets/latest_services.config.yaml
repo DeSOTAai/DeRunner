@@ -1369,6 +1369,80 @@ services_params: {
         submodel: true,
         parent_model: spacewalkingninja/controlnet
     },
+    spacewalkingninja/AskAnyK: {
+        win: {
+            version: 0.0.0,
+            commit: 0c71e1f51d5cdfe06f2eb6028e4ccc1fb634fb51,
+            project_dir: Desota\Desota_Models\AskAnyK,
+            execs_path: executables\Windows,
+            setup: askanyk.setup.bat,
+            setup_args: [/manualstart, /debug],
+            uninstaller: askanyk.uninstall.bat,
+            uninstaller_args: [/Q],
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: app_ke_runner.py,
+            python_path: Desota\Desota_Models\AskAnyK\env\python.exe,
+            cli_cmd: [
+                Desota\Desota_Models\AskAnyK\env\python.exe,
+                Desota\Desota_Models\AskAnyK\app_ke_runner.py
+            ],
+            test_args: {
+                query: Transcribe,
+                type: video,
+                file: sample.mp4,
+                raw_dict: null
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            pyrequirements: Desota\Desota_Models\AskAnyK\requirements.txt
+        },
+        lin: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/AskAnyK,
+            execs_path: executables/Linux,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        mac: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Desota_Models/AskAnyK,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+
+            desota_runner: ,
+            python_path: ,
+            cli_cmd: 
+        },
+        service_type: tool,
+        timeout: 9000,
+        required: false,
+        source_code: https://github.com/spacewalkingninja/AskAnyK,
+        report_issue: https://github.com/spacewalkingninja/AskAnyK/issues,
+        description: https://github.com/spacewalkingninja/AskAnyK/tree/main#readme,
+        short_description: Let AI Watch video with Ask Anything Kristian Edit,
+        model_cli: cli_cmd,
+        run_constantly: false,
+        submodel: false,
+    },
     spacewalkingninja/Shap-E: {
         win: {
             version: 0.0.0,
