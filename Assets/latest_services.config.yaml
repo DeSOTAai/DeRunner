@@ -1390,9 +1390,8 @@ services_params: {
                 Desota\Desota_Models\FreeInit\runner.py
             ],
             test_args: {
-                query: Transcribe,
-                type: video,
-                file: sample.mp4,
+                query: Shrek dancing on the beach,
+                type: text,
                 raw_dict: null
                 # test_timout = OPTIONAL (default = timeout)
             },
@@ -1442,7 +1441,6 @@ services_params: {
         model_cli: cli_cmd,
         run_constantly: false,
         submodel: false,
-    },
     },
     spacewalkingninja/AskAnyK: {
         win: {
