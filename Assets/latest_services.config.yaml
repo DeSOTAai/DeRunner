@@ -182,7 +182,7 @@ services_params: {
                 file: null,
                 raw_dict: {
                     context: "The main characters of The Simpsons are: Homer, Marge, Bart, Lisa, Maggie and Santas Little Helper",
-                    question: What characters are in The Simpsons?
+                    question: "What characters are in The Simpsons?"
                 }
                 # test_timout = OPTIONAL (default = timeout)
             },
@@ -208,8 +208,8 @@ services_params: {
                 type: null,
                 file: null,
                 raw_dict: {
-                    context: The main characters of The Simpsons are: Homer, Marge, Bart, Lisa, Maggie and Santas Little Helper,
-                    question: What characters are in The Simpsons?
+                    context: "The main characters of The Simpsons are: Homer, Marge, Bart, Lisa, Maggie and Santas Little Helper",
+                    question: "What characters are in The Simpsons?"
                 }
                 # test_timout = OPTIONAL (default = timeout)
             },
