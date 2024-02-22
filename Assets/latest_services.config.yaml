@@ -164,8 +164,8 @@ services_params: {
     # Models
     franciscomvargas/neuralqa/qa: {
         win: {
-            version: 0.0.0,
-            commit: a40bfe1e4a4b4c834bae9c9663a89659b80316a8,
+            version: 0.0.1,
+            commit: fe4643a499ce48ba2a7626d6e211aac4178698a2,
             install_dir: Desota\Desota_Models\NeuralQA, # OPTIONAL - `project_dir`as default 
             project_dir: Desota\Desota_Models\NeuralQA\neuralqa,
             execs_path: executables\Windows,
