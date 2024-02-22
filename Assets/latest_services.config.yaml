@@ -1745,7 +1745,7 @@ services_params: {
                 Desota\Desota_Models\cutting\main.py
             ],
             test_args: {
-                query: start-cut-video@00:00:10;end-cut-video@ 1 minute 25 Seconds,
+                query: start-cut-video@00:00:10;end-cut-video@ 18 Seconds,
                 type: video,
                 file: sample.mp4,
                 raw_dict: null
