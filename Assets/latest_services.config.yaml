@@ -50,61 +50,6 @@ services_params: {
         run_constantly: true,
         submodel: false
     },
-    desotaai/tinypython: {
-        win: {
-            version: 0.0.0,
-            commit: 53fab0787dba6c329c2e57996cb8755992146fa6,
-            project_dir: Desota\Portables\TinyPython,
-            execs_path: executables\Windows,
-            setup: tinypython.setup.bat,
-            setup_args: null,
-            uninstaller: tinypython.uninstall.bat,
-            uninstaller_args: [/Q],
-            starter: ,
-            stoper: ,
-            status: ,
-            python_path: Desota\Portables\TinyPython\env\python.exe,
-            pyrequirements: Desota\Portables\TinyPython\requirements.txt
-        },
-        lin: {
-            version: 0.0.0,
-            commit: 53fab0787dba6c329c2e57996cb8755992146fa6,
-            project_dir: Desota/Portables/TinyPython,
-            execs_path: executables/Linux,
-            setup: tinypython.setup.bash,
-            setup_args: null,
-            uninstaller: tinypython.uninstall.bash,
-            uninstaller_args: [-q],
-            starter: ,
-            stoper: ,
-            status: ,
-            python_path: Desota/Portables/TinyPython/env/bin/python3,
-            pyrequirements: Desota/Portables/TinyPython/requirements.txt
-        },
-        mac: {
-            version: ,
-            commit: ,
-            project_dir: Desota/Portables/TinyPython,
-            execs_path: executables/MacOS,
-            setup: ,
-            setup_args: ,
-            uninstaller: ,
-            uninstaller_args: ,
-            starter: ,
-            stoper: ,
-            status: ,
-            python_path:
-        },
-        service_type: asset,
-        required: false,
-        source_code: https://github.com/DeSOTAai/TinyPython,
-        report_issue: https://github.com/DeSOTAai/TinyPython/issues,
-        description: https://github.com/DeSOTAai/TinyPython/tree/main#readme,
-        short_description: Portable Python as tool for Dedicated Model Runners,
-        run_constantly: false,
-        submodel: false,
-        child_models: 
-    },
     #NOT REQUIRED ASSETS
     spacewalkingninja/transformers: {
             win: {
@@ -161,7 +106,104 @@ services_params: {
             submodel: false,
             child_models: 
         },
+    desotaai/tinypython: {
+        win: {
+            version: 0.0.0,
+            commit: 53fab0787dba6c329c2e57996cb8755992146fa6,
+            project_dir: Desota\Portables\TinyPython,
+            execs_path: executables\Windows,
+            setup: tinypython.setup.bat,
+            setup_args: null,
+            uninstaller: tinypython.uninstall.bat,
+            uninstaller_args: [/Q],
+            starter: ,
+            stoper: ,
+            status: ,
+            python_path: Desota\Portables\TinyPython\env\python.exe,
+            pyrequirements: Desota\Portables\TinyPython\requirements.txt
+        },
+        lin: {
+            version: 0.0.0,
+            commit: 53fab0787dba6c329c2e57996cb8755992146fa6,
+            project_dir: Desota/Portables/TinyPython,
+            execs_path: executables/Linux,
+            setup: tinypython.setup.bash,
+            setup_args: null,
+            uninstaller: tinypython.uninstall.bash,
+            uninstaller_args: [-q],
+            starter: ,
+            stoper: ,
+            status: ,
+            python_path: Desota/Portables/TinyPython/env/bin/python3,
+            pyrequirements: Desota/Portables/TinyPython/requirements.txt
+        },
+        mac: {
+            version: ,
+            commit: ,
+            project_dir: Desota/Portables/TinyPython,
+            execs_path: executables/MacOS,
+            setup: ,
+            setup_args: ,
+            uninstaller: ,
+            uninstaller_args: ,
+            starter: ,
+            stoper: ,
+            status: ,
+            python_path:
+        },
+        service_type: asset,
+        required: false,
+        source_code: https://github.com/DeSOTAai/TinyPython,
+        report_issue: https://github.com/DeSOTAai/TinyPython/issues,
+        description: https://github.com/DeSOTAai/TinyPython/tree/main#readme,
+        short_description: Portable Python as tool for Dedicated Model Runners,
+        run_constantly: false,
+        submodel: false,
+        child_models: 
+    },
     # Models
+    franciscomvargas/tts/en-man: {
+        win: {}, # TODO
+        lin: {
+            version: 0.16.6,
+            commit: 54661230ca865fb922a45c99f92dc4bfc708f846,
+            project_dir: Desota/Desota_Models/tts,
+            execs_path: executables/Linux,
+            setup: tts.setup.bash,
+            setup_args: [-m],
+            uninstaller: tts.uninstall.bash,
+            uninstaller_args: [-q],
+            starter: null,
+            stoper: null,
+            status: null,
+            test_args: {
+                query: null,
+                type: text,
+                file: The state of the art will revolutionize the world,
+                raw_dict: null,
+                # test_timout = OPTIONAL (default = timeout)
+            },
+            desota_runner: male_en.runner.py,
+            python_path: Desota/Desota_Models/tts/env/bin/python3,
+            pyrequirements: Desota/Desota_Models/tts/requirements.txt,
+            cli_cmd: {
+                Desota/Desota_Models/tts/env/bin/python3,
+                Desota/Desota_Models/tts/main.py
+            }
+        },
+        mac: {}, # TODO
+        service_type: tool,
+        timeout: 600,
+        required: false,
+        source_code: https://github.com/franciscomvargas/tts,
+        report_issue: https://github.com/franciscomvargas/tts/issues,
+        description: https://github.com/franciscomvargas/tts/tree/master#readme,
+        short_description: Deep learning toolkit for Text-to-Speech,
+        model_cli: cli_cmd,
+        run_constantly: false,
+        submodel: false,
+        child_models: null
+    },
     franciscomvargas/neuralqa/qa: {
         win: {
             version: 0.0.1,
