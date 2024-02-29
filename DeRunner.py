@@ -24,6 +24,8 @@ if len(sys.argv)>1:
         DEVELOPMENT = True
     if "-deb" in sys.argv:
         DEBUG = True
+    if "-cli" in sys.argv:
+        CLI_MODE = True
         
 USER_SYS = detools.get_platform()
     
@@ -74,6 +76,61 @@ DEFAULT_MODEL_TIMEOUT = 3600
 
 
 # Utils Funcs
+def remove_single_quotes(text):
+    pattern = r"\['(.*?)'\]"
+    matches = re.findall(pattern, text)
+    for match in matches:
+        replaced_match = match.replace("'", "")
+        text = text.replace(f"['{match}']", f"['{replaced_match}']")
+    return text
+def json_comquotes(raw_json, lone_char_searches=2, debug=False):
+    try:
+        out_json = json.loads(raw_json)
+        return out_json
+    except:
+        try:
+            out_json = ast.literal_eval(raw_json)
+            return out_json
+        except:
+            # prepare raw json from some unwanted scenarios 
+            raw_json = raw_json.replace(": '", ":'").replace(", '", ",'").replace("{ '", "{'").replace("[ '", "['").replace("' }", "'}").replace("' }", "'}").replace("''", "' '")
+            raw_json = raw_json.replace(': "', ':"').replace(', "', ',"').replace('{ "', '{"').replace('[ "', '["').replace('" }', '"}').replace('" }', '"}').replace('""', '" "')
+
+            # Regex patterns : dq|sq stands for double|single quote(s)
+            _re_dq_pattern = r'([\s\w])"([\s\w])'
+            _re_dq_sub = r"\1\"\2"
+            _re_sq_pattern = r"([\s\w])'([\s\w])"
+            _re_sq_sub = r'\1\'\2'
+            
+            for _lone_char in range(lone_char_searches):
+                # Substitute Double Quotes
+                if _lone_char == 0:
+                    _re_find = re.sub(_re_dq_pattern, _re_dq_sub, raw_json)
+                #   > Solve schenarios like ""a"a"a"a"a" since 1st return "a\"a"a\"a"a", second time return a\"a\"a\"a\"a" (Other egs. ["Anything"a"Anything else", "Anything"a"Anythin"g" else"])
+                else:
+                    _re_find = re.sub(_re_dq_pattern, _re_dq_sub, _re_find)
+
+                # Substitute Single Quote   > Solve schenarios like 'a'a'a' since 1st return 'a\'a'a', secund time return 'a\'a\'\a' ...
+                _re_find = re.sub(_re_sq_pattern, _re_sq_sub, _re_find)
+
+                if debug:
+                    print(f"Iteration #{_lone_char+1}:", _re_find)
+
+                try:
+                    out_json = json.loads(_re_find)
+                    # Rem space from raw_json.replace("''", "' '").replace('""', '" "')
+                    _re_find= _re_find.replace('\\" "', '\\""').replace('\\" \\"', '\\"\\"').replace("\\' '", "\\''").replace("\\' \\'", "\\'\\'")
+                    return json.loads(_re_find)
+                except Exception as ej:
+                    try:
+                        out_json = ast.literal_eval(_re_find)
+                        # Rem space from raw_json.replace("''", "' '").replace('""', '" "')
+                        _re_find= _re_find.replace('\\" "', '\\""').replace("\\' '", "\\''")
+                        return ast.literal_eval(_re_find)
+                    except Exception as ea:
+                        if _lone_char != lone_char_searches-1:
+                            continue
+                        raise ValueError(f"Json Parse exception: {ej}\nAst Parse exception : {ea}\nProcessed Json      : {_re_find}")
 #   > Find JSON OBJ in STR
 def find_json(s):
     s = s.replace("\'", "\"")
@@ -487,7 +544,7 @@ class Derunner():
                 "model":model
             }
             
-            task = simple_post(API_URL, data=data, timeout=15)
+            task = simple_post(API_URL, data=data, timeout=5)
 
             cprint(f"\nSignal DeSOTA that Model is wake up:\n{json.dumps(data, indent=2)}", debug)
             cprint(f"Response Status = {task.status_code}", debug)
@@ -504,7 +561,7 @@ class Derunner():
                 "select_task":I
             }
             
-            select_task = simple_post(API_URL, data=data, timeout=15)
+            select_task = simple_post(API_URL, data=data, timeout=5)
 
             cprint(f"Task Selection Request Payload:\n{json.dumps(data, indent=2)}", debug)
             cprint(f"Response Status = {task.status_code}", debug)
@@ -516,10 +573,11 @@ class Derunner():
             
             
             cont = str(select_task.content.decode('UTF-8'))
-            # print(cont)
+            print(cont)
             try:
                 # print(selected_task)
-                selected_task = json.loads(cont)
+                selected_task = json.loads(str(cont.decode('UTF-8')))
+                cont=remove_single_quotes(cont)
                 cprint(f"MODEL: {select_task['model']}", debug)
                 selected_model = select_task['model']
                 # print(json.dumps(selected_task, indent=2))
@@ -538,11 +596,11 @@ class Derunner():
                 '''
                 
                 try:
-                    selected_task = json.loads(cont)
+                    selected_task = json_comquotes(cont, debug=True)
                 except:
                     cont = cont.replace('\\', '')
                     try:
-                        selected_task = json.loads(cont)
+                        selected_task = json_comquotes(cont)
                     except:
                         selected_task = "error"
                     # print(selected_task)
@@ -748,6 +806,17 @@ class Derunner():
     #   > Start Service
     def start_model_serv(self, model_id) -> None:
         _model_params = self.serv_conf["services_params"][model_id]
+        
+        #This code will make derunner NOT try to load a service if it is set to run constantly
+        #because by default run constant model services will start with windows/linux os boot
+        if not _model_params["submodel"] and CLI_MODE:
+            if _model_params["run_constantly"]:
+                return
+        # MAYBE TODO:: Is to: make check service status, so 
+            #if model service already running? 
+        #        return
+            #else:
+            #| logic below will turn on service
 
         if not _model_params["submodel"]:
             _model_serv = self.serv_conf["services_params"][model_id][USER_SYS]
@@ -1397,16 +1466,14 @@ class Derunner():
     def quiet_subprocess(self, cmd_list, timeout=None):
         start_time = time.time()
         # retrieved from https://stackoverflow.com/a/62226026
-        if DEBUG or USER_SYS == "lin":
+        if USER_SYS == "lin":
             cprint(f'Quiet Subprocess Requested:\n\t{" ".join(cmd_list)}', DEBUG)
             _sproc = Popen(
                 cmd_list
             )
-        elif USER_SYS == "win":
+        elif USER_SYS == "win":                
             _sproc = Popen(
                 cmd_list,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.STDOUT,
                 creationflags=subprocess.CREATE_NO_WINDOW
             )
         else:
@@ -1419,243 +1486,6 @@ class Derunner():
                 break
             continue
         return ret_code
-    
-    def grab_model_info(self, model, version):
-        '''
-        DEPRECATED !!
-         This Funk will be removed after future releases:
-         - this info is now gathered from [latest_services.config.yaml](https://github.com/DeSOTAai/DeRunner/blob/main/Assets/latest_services.config.yaml)
-        '''
-        return {}
-        match model:
-            case "franciscomvargas/deurlcruncher":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', 'Search',        # Can go to service_config
-                        '--input-type', 'text',             # Can go to service_config
-                        '--input-file', '"Search Engine"',  # Can go to service_config
-                        # report-file > URL OF DESOTA IN THE FUTURE
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "duc_report.json")
-                    ],
-                    "timeout": 180  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "franciscomvargas/whisper.cpp":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', 'Transcribe',  # Can go to service_config
-                        '--input-type', 'audio',        # Can go to service_config
-                        '--input-file', 'Desota/Desota_Models/WhisperCpp/samples/jfk.wav',  # Can go to service_config
-                        # report-file > URL OF DESOTA IN THE FUTURE
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "whisper_report.json")
-                    ],
-                    "timeout": 240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "franciscomvargas/descraper/url":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Search"',        # Can go to service_config
-                        '--input-dict', '{"url":["https://pt.wikipedia.org/wiki/Os_Simpsons"]}',   # Can go to service_config
-                        # report-file > URL OF DESOTA IN THE FUTURE
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "descraper_url_report.json")
-                    ],
-                    "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "franciscomvargas/descraper/html":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Search"',        # Can go to service_config
-                        '--input-dict', '{"url":["https://pt.wikipedia.org/wiki/Os_Simpsons"]}',   # Can go to service_config
-                        # report-file > URL OF DESOTA IN THE FUTURE
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "descraper_html_report.json")
-                    ],
-                    "timeout": 60   # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/text-and-pose":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/text-and-softedge":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Beautiful Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/text-and-canny":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Hulk walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/text-and-depth":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Robot walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/text-and-shuffle":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"HAPPY Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/text-and-lineart":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Cartoon Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/text-to-anime-style":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Anime Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/extract-canny":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/extract-pose":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/extract-scribble":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/extract-softedge":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/extract-depth":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/extract-face-geometry":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/extract-normals":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/extract-lineart":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-            case "spacewalkingninja/DesotaControlVideo/extract-anime":
-                return {
-                    "cmd": [
-                        '--model', model,
-                        '--input-query', '"Shrek walking in the forest"',  # Can go to service_config
-                        '--input-type', 'video',        # Can go to service_config
-                        '--input-file', os.path.join(DESOTA_ROOT_PATH, 'Desota_Models', 'DesotaControlVideo', 'data', 'moonwalk.mp4'),  # Can go to service_config
-                        '--report-file', os.path.join(DESOTA_ROOT_PATH, "spacewalking_report.json")
-                    ],
-                    "timeout": 1240  # Can go to service_config ( NOT EDITABLE AFTER)
-                }
-                
-
-            case _:
-                print(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
-                delogger(f"[ RUNNER TESTER ] -> Error: Model [{model}] info not found. Derunner>get_model_info()")
-                return None
         
     def grab_models2test(self):
         # Grab Function required Configs
@@ -1750,17 +1580,6 @@ class Derunner():
             # INFO
             print(f"[ INFO ] -> Model Tester start:\n  Model ID: {model}")
             delogger(f"[ INFO ] -> Model Tester start:\n  Model ID: {model}")
-            
-            ''' grab_model_info is DEPRECATED !! This Funk will be removed after future releases '''
-            # model_test_info = self.grab_model_info(model, version)
-            # # Confirm Info
-            # if not model_test_info:
-            #     continue
-            # else:
-            #     for key in ["cmd", "timeout"]:
-            #         if key not in model_test_info or not model_test_info[key]:
-            #             continue
-            
 
             # Get Model Test TimeOut
             try: # from service ~ test_timeout
@@ -1878,76 +1697,94 @@ class Derunner():
         _model_id = model_req['task_model']                                             # Model Name
         _model_runner_param = self.serv_conf["services_params"][_model_id]  # Model params from services.config.yaml
         _model_runner_sys_param = _model_runner_param[USER_SYS] 
-        _model_runner = os.path.join(USER_PATH, _model_runner_sys_param["project_dir"], _model_runner_sys_param["desota_runner"])          # Model runner path
-        _model_runner_py = os.path.join(USER_PATH, _model_runner_sys_param["python_path"])    # Python with model runner packages
+        _model_runner_py = None
         _model_isTool = (_model_runner_param["service_type"] == "tool")
+        if str(_model_runner_sys_param["desota_runner"]).endswith(".py"):
+            _model_runner = os.path.join(USER_PATH, _model_runner_sys_param["project_dir"], _model_runner_sys_param["desota_runner"])          # Model runner path
+            _model_runner_py = os.path.join(USER_PATH, _model_runner_sys_param["python_path"])    # Python with model runner packages
+        if str(_model_runner_sys_param["desota_runner"]).endswith(".bat"):
+            _model_runner = os.path.join(USER_PATH, _model_runner_sys_param["desota_runner"])          # Model runner path
+            
         # API Response URL
         _model_res_url = f"{API_URL}?api_key={self.user_api_key}&model={model_req['task_model']}&send_task=" + model_req['task_id']
-        
-        # Start / Wait Model
+        # Begin and Wait Model
         # retrieved from https://stackoverflow.com/a/62226026
-        _modelCall_cmd = [
-            _model_runner_py, _model_runner, 
-            "--model_req", _tmp_req_path, 
-            "--model_res_url", _model_res_url
-        ]
-        cprint(f'[ INFO ] Model runner cmd:\n\t{" ".join([_model_runner_py, _model_runner, "--model_req", _tmp_req_path, "--model_res_url", _model_res_url])}', DEBUG)
-        if _model_isTool:
-            _sproc = Popen(
-                _modelCall_cmd,
-                stdin=subprocess.PIPE, 
-                stdout=subprocess.PIPE, 
-                stderr=subprocess.STDOUT, 
-                encoding='utf-8',
-            )
+        if not _model_runner_py:
+            _modelCall_cmd = [
+                _model_runner, 
+                "--model_req", _tmp_req_path, 
+                f'--model_res_url="{_model_res_url}"'
+            ]
+            print(" [ DEBUG ] -> GOing to run:", " ".join(_modelCall_cmd))
+            model_running_payload = {
+                        "api_key": self.user_api_key,
+                        "models_list": _model_id,
+                        "handshake":"1"
+                    }
+            model_running_res = simple_post(url=API_URL, data=model_running_payload)
+            try:
+                _sproc = check_call(
+                    _modelCall_cmd
+                )
+                _ret_code = 0
+            except CalledProcessError as e:
+                _ret_code = e
         else:
-            _sproc = Popen(
-                _modelCall_cmd
-            )
-            
-        # Model timeout
-        try:
-            _model_runner_timeout = _model_runner_param["timeout"]
-        except:
-            _model_runner_timeout = DEFAULT_MODEL_TIMEOUT
-        print(" [ INFO ] -> Model Timeout:", _model_runner_timeout)
+            _modelCall_cmd = [
+                _model_runner_py, _model_runner, 
+                "--model_req", _tmp_req_path, 
+                "--model_res_url", _model_res_url
+            ]
         
-        # Signal User Configs
-        edit_user_conf = self.get_user_config()
-        try:
-            edit_user_conf["running"][self.user_api_key] = _model_id
-        except:
-            edit_user_conf.update({"running":{self.user_api_key:_model_id}})
-        self.set_user_config(edit_user_conf)
-        
-        # Lets GO!
-        while True:
-            _ret_code = _sproc.poll()
-            if _ret_code != None:
-                if _model_isTool:
-                    try:
-                        _total_stdout = _sproc.stdout.readlines()
-                    except Exception as e:
-                        _total_stdout = []
-                    if _model_isTool:
-                        delogger(f"[ INFO ] -> Model main stdout: {json.dumps(_total_stdout, indent=2)}")
-                break
-            # Check Timeout
-            if time.time() - start_time > _model_runner_timeout:
-                _ret_code = 2
-                break
-        
-            # Signal DeSOTA API
-            if time.time() - last_signal_time > signal_api_freq:
-                last_signal_time = time.time()
-                model_running_payload = {
-                    "api_key": self.user_api_key,
-                    "models_list": _model_id,
-                    "handshake":"1"
-                }
-                model_running_res = simple_post(url=API_URL, data=model_running_payload)
-                cprint(f"[ INFO ] -> Signal Desota about Server Alive: {json.dumps(model_running_res.json(), indent=2)}", DEBUG)
-            continue
+            # Start / Wait Model
+            # retrieved from https://stackoverflow.com/a/62226026
+            cprint(f'[ INFO ] Model runner cmd:\n\t{" ".join([_model_runner_py, _model_runner, "--model_req", _tmp_req_path, "--model_res_url", _model_res_url])}', DEBUG)
+            if _model_isTool:
+                _sproc = Popen(
+                    _modelCall_cmd,
+                    #stdin=subprocess.PIPE, 
+                    stdout=subprocess.PIPE, 
+                    stderr=None if CLI_MODE else subprocess.PIPE, 
+                    encoding='utf-8',
+                )
+            else:
+                _sproc = Popen(
+                    _modelCall_cmd
+                )
+            # Model timeout
+            try:
+                _model_runner_timeout = _model_runner_param["timeout"]
+            except:
+                _model_runner_timeout = DEFAULT_MODEL_TIMEOUT
+            print(" [ DEBUG ] -> Model Timeout:", _model_runner_timeout)
+            # Signal User Configs
+            edit_user_conf = self.get_user_config()
+            try:
+                edit_user_conf["running"][self.user_api_key] = _model_id
+            except:
+                edit_user_conf.update({"running":{self.user_api_key:_model_id}})
+            self.set_user_config(edit_user_conf)
+
+            # Lets GO!
+            while True:
+                # Check Timeout
+                if time.time() - start_time > _model_runner_timeout:
+                    _ret_code = 2
+                    break
+                _ret_code = _sproc.poll()
+                if _ret_code != None:
+                    break
+                # Signal DeSOTA API
+                if time.time() - last_signal_time > signal_api_freq:
+                    last_signal_time = time.time()
+                    model_running_payload = {
+                        "api_key": self.user_api_key,
+                        "models_list": _model_id,
+                        "handshake":"1"
+                    }
+                    model_running_res = simple_post(url=API_URL, data=model_running_payload)
+                    cprint(f"[ INFO ] -> Signal Desota about Server Alive: {json.dumps(model_running_res.json(), indent=2)}", DEBUG)
+                continue
 
         # Remove Signal from User Configs
         edit_user_conf["running"][self.user_api_key] = None
