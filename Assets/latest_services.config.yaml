@@ -1447,8 +1447,8 @@ services_params: {
             stoper: ,
             status: ,
 
-            desota_runner: runner.py,
-            python_path: Desota\Desota_Models\FreeInit\env\python.exe,
+            desota_runner: Desota\Desota_Models\FreeInit\runner.bat,
+            python_path: null,
             cli_cmd: [
                 Desota\Desota_Models\FreeInit\env\python.exe,
                 Desota\Desota_Models\FreeInit\runner.py
@@ -1520,8 +1520,8 @@ services_params: {
             stoper: ,
             status: ,
 
-            desota_runner: app_ke_runner.py,
-            python_path: Desota\Desota_Models\AskAnyK\env\python.exe,
+            desota_runner: Desota\Desota_Models\AskAnyK\runner.bat,
+            python_path: null,
             cli_cmd: [
                 Desota\Desota_Models\AskAnyK\env\python.exe,
                 Desota\Desota_Models\AskAnyK\app_ke_runner.py
