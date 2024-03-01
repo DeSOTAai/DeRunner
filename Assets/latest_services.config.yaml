@@ -163,7 +163,7 @@ services_params: {
     },
     # Models
     franciscomvargas/tts/en-man: {
-        win: {}, # TODO
+        win: {version: null}, # TODO
         lin: {
             version: 0.16.6,
             commit: 54661230ca865fb922a45c99f92dc4bfc708f846,
@@ -191,7 +191,7 @@ services_params: {
                 Desota/Desota_Models/tts/main.py
             }
         },
-        mac: {}, # TODO
+        mac: {version: null}, # TODO
         service_type: tool,
         timeout: 600,
         required: false,
