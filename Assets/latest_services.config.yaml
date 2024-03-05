@@ -325,7 +325,7 @@ services_params: {
     spacewalkingninja/automatic/text-to-image: {
         win: {
             version: 0.0.0,
-            commit: 27d9865e36f0c8b36200842386ddef87ae859ccf,
+            commit: de34221d41339a9aa5658da0982874b6add449bb,
             project_dir: Desota\Desota_Models\automatic,
             execs_path: executables\Windows,
             setup: automatic.setup.bat,
@@ -435,7 +435,7 @@ services_params: {
     spacewalkingninja/controlnet: {
         win: {
             version: 0.0.0,
-            commit: 638c22d7cd92ba029027ed20ea904194f151b03a,
+            commit: 23099fa60a1763961805056c0189ae08de3e3b64,
             project_dir: Desota\Desota_Models\controlnet,
             execs_path: executables\Windows,
             setup: control.setup.bat,
@@ -1436,7 +1436,7 @@ services_params: {
     spacewalkingninja/FreeInit: {
         win: {
             version: 0.0.0,
-            commit: e7f3d4fe9767bb924b7f20cba43731ea948ebfb8,
+            commit: 6bd4f2d184c52756e5f72ecbf504c7910e427e4f,
             project_dir: Desota\Desota_Models\FreeInit,
             execs_path: executables\Windows,
             setup: fi.setup.bat,
@@ -1509,7 +1509,7 @@ services_params: {
     spacewalkingninja/AskAnyK: {
         win: {
             version: 0.0.0,
-            commit: 0c71e1f51d5cdfe06f2eb6028e4ccc1fb634fb51,
+            commit: 3c50f8f1b9de0dfefbc0b7f4867f233deb2e8568,
             project_dir: Desota\Desota_Models\AskAnyK,
             execs_path: executables\Windows,
             setup: askanyk.setup.bat,
@@ -1583,7 +1583,7 @@ services_params: {
     spacewalkingninja/Shap-E: {
         win: {
             version: 0.0.0,
-            commit: 438f287476571ffb97093b0f80fc04a625b72d2c,
+            commit: 521725215e8ba09fef02abc06d41413d6df98eb5,
             project_dir: Desota\Desota_Models\Shap-E,
             execs_path: executables\Windows,
             setup: shape.setup.bat,
@@ -1768,7 +1768,7 @@ services_params: {
     spacewalkingninja/ffbox: {
         win: {
             version: 0.0.0,
-            commit: 22a001e6697b8ebc7c94beb9592ee75f53c8123f,
+            commit: 93e56fd20d0aadef4af3213196405cfde376c461,
             project_dir: Desota\Desota_Models\ffbox,
             execs_path: executables\Windows,
             setup: ffbox.setup.bat,
@@ -1879,7 +1879,7 @@ services_params: {
     spacewalkingninja/audiocraft/text-to-music: {
         win: {
             version: 0.0.0,
-            commit: 28ead8d4f71447405bcad29de6a6a5edd6f2e022,
+            commit: 3d7ccbe96ba18fac995652e1bc429b89aa5be761,
             project_dir: Desota\Desota_Models\audiocraft,
             execs_path: executables\Windows,
             setup: audiocraft.setup.bat,
