@@ -791,13 +791,6 @@ class Derunner():
         #    "model":model
         # }
         # sendTask = simple_post(API_URL, data=send_task_data)
-
-        # TODO: Sorry Kris :')
-        # if model_request_dict["task_type"] in ["image-to-image", "seg-image-to-image", "canny-image-to-image", "softedge-image-to-image", "lines-image-to-image", "normals-image-to-image", "pose-image-to-image"]:
-        #     for file_type, file_value in model_request_dict['input_args']:
-        #         if (not model_request_dict['files'].endswith('.jpg')) and (not model_request_dict['files'].endswith('.png')) and (not model_request_dict['files'].endswith('.png')) and (not model_request_dict['files'].endswith('.gif')) and (not model_request_dict['files'].endswith('.bmp')):
-        #             model_request_dict['text_prompt'] = model_request_dict['files']
-        #             model_request_dict["task_type"] = model_request_dict["task_type"].replace("image-to-", "text-to-")
         
         return model_request_dict
 
