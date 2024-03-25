@@ -11,9 +11,11 @@ services_params: {
             setup_args: [/manualstart],
             uninstaller: derunner.uninstall.bat,
             uninstaller_args: [/Q],
-            starter: derunner.start.bat,
-            stoper: derunner.stop.bat,
-            status: derunner.status.bat
+            subprocess_exec: Desota\DeRunner\env\python,
+            subprocess_target: Desota\DeRunner\DeRunner.py,
+            starter: null,
+            stoper: null,
+            status: null,
         },
         lin: {
             version: 0.1.1,
